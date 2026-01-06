@@ -72,7 +72,7 @@ void DrawMenu(SDL_Renderer *renderer, TTF_Font *fontTitre, TTF_Font *fontOptions
     SDL_RenderClear(renderer);
 
     // 2. Titre
-    dessinerTexteMenu(renderer, fontTitre, "LE JEU DU CHATEAU", 30, 0);
+    dessinerTexteMenu(renderer, fontTitre, "nom du jeu", 30, 0);
 
     // 3. Options
     int startY = 100;

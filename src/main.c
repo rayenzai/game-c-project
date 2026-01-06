@@ -3,11 +3,13 @@
 #include <stdio.h>
 #include "intro.h"
 #include "menu.h"
+#include "game.h"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 #define LOGICAL_WIDTH 320
 #define LOGICAL_HEIGHT 240
+#define FPS 60
 
 typedef enum {
     ETAT_MENU,
@@ -22,10 +24,10 @@ int main(int argc, char* argv[]) {
     if (TTF_Init() < 0) return 1;
 
     SDL_Window *window = SDL_CreateWindow("nom du jeu", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
 
     SDL_RenderSetLogicalSize(renderer, LOGICAL_WIDTH, LOGICAL_HEIGHT);
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest"); //nearest pour une sorte de Vsync 
 
     TTF_Font *fontGrand = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 20);
     TTF_Font *fontPetit = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 12);
@@ -39,9 +41,13 @@ int main(int argc, char* argv[]) {
     int running = 1;
     SDL_Event event;
 
+    Uint32 frameStart;
+    int frameTime;
+    const int frameDelay = 1000 / FPS;
+
     // --- BOUCLE PRINCIPALE ---
     while (running) {
-        
+        frameStart = SDL_GetTicks();
         // A. GESTION DES EVENEMENTS (Clavier / Souris)
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) running = 0;
@@ -57,9 +63,11 @@ int main(int argc, char* argv[]) {
             else if (etat == ETAT_INTRO) {
                 if (HandleIntroInput(&event) == 1) {
                     etat = ETAT_JEU;
+                    InitGame();
                 }
             }
             else if (etat == ETAT_JEU) {
+                
                 if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                     etat = ETAT_MENU;
                 }
@@ -70,6 +78,12 @@ int main(int argc, char* argv[]) {
             UpdateIntroTimer();
         }
 
+        else if (etat == ETAT_JEU)
+        {
+            UpdateGame();
+        }
+        
+
         // C. DESSIN
         if (etat == ETAT_MENU) {
             DrawMenu(renderer, fontGrand, fontPetit);
@@ -78,8 +92,7 @@ int main(int argc, char* argv[]) {
             DrawIntro(renderer, fontPetit);
         }
         else if (etat == ETAT_JEU) {
-            SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
-            SDL_RenderClear(renderer);
+            DrawGame(renderer);
         }
 
         
@@ -88,7 +101,11 @@ int main(int argc, char* argv[]) {
     SDL_Rect bordure = {2, 2, LOGICAL_WIDTH - 4, LOGICAL_HEIGHT - 4};
     SDL_RenderDrawRect(renderer, &bordure);
 
-        SDL_RenderPresent(renderer);
+    SDL_RenderPresent(renderer);
+    frameTime = SDL_GetTicks() - frameStart;
+        if (frameDelay > frameTime) {
+            SDL_Delay(frameDelay - frameTime);
+        }
     }
 
     // Nettoyage...
