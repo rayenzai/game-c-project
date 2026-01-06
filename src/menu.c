@@ -85,8 +85,4 @@ void DrawMenu(SDL_Renderer *renderer, TTF_Font *fontTitre, TTF_Font *fontOptions
         }
     }
 
-    // 4. Bordure
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_Rect bordure = {2, 2, LOGICAL_WIDTH - 4, LOGICAL_HEIGHT - 4};
-    SDL_RenderDrawRect(renderer, &bordure);
 }

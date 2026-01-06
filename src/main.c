@@ -82,6 +82,12 @@ int main(int argc, char* argv[]) {
             SDL_RenderClear(renderer);
         }
 
+        
+    // 4. Bordure
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_Rect bordure = {2, 2, LOGICAL_WIDTH - 4, LOGICAL_HEIGHT - 4};
+    SDL_RenderDrawRect(renderer, &bordure);
+
         SDL_RenderPresent(renderer);
     }
 
