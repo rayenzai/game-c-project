@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
     if (TTF_Init() < 0) return 1;
 
     SDL_Window *window = SDL_CreateWindow("nom du jeu", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE); //acceleration materiel : SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
 
     SDL_RenderSetLogicalSize(renderer, LOGICAL_WIDTH, LOGICAL_HEIGHT);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest"); //nearest pour une sorte de Vsync 
@@ -50,7 +50,22 @@ int main(int argc, char* argv[]) {
         frameStart = SDL_GetTicks();
         // A. GESTION DES EVENEMENTS (Clavier / Souris)
         while (SDL_PollEvent(&event)) {
+
             if (event.type == SDL_QUIT) running = 0;
+
+            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_F11) {
+                // On récupère l'état actuel
+                Uint32 flags = SDL_GetWindowFlags(window);
+                
+                // Si on est déjà en plein écran, on repasse en fenêtré (0)
+                if (flags & SDL_WINDOW_FULLSCREEN_DESKTOP) {
+                    SDL_SetWindowFullscreen(window, 0);
+                } else {
+                    // Sinon, on passe en plein écran "Bureau" (Borderless)
+                    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                }
+            }
+            // -----------------------------------------
 
             if (etat == ETAT_MENU) {
                 int action = UpdateMenu(&event);
@@ -70,6 +85,7 @@ int main(int argc, char* argv[]) {
                 
                 if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                     etat = ETAT_MENU;
+                    
                 }
             }
         }
