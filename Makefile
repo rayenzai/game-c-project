@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -Iinclude $(shell sdl2-config --cflags)
-LDFLAGS = $(shell sdl2-config --libs) -lSDL2_ttf
+LDFLAGS = $(shell sdl2-config --libs) -lSDL2_ttf -lm
 
 SRC_DIR = src
 OBJ_DIR = obj

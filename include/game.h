@@ -3,7 +3,8 @@
 
 #include <SDL2/SDL.h>
 
-void InitGame(void);
+
+void InitGame(SDL_Renderer *renderer);
 void UpdateGame(void);
 void DrawGame(SDL_Renderer *renderer);
 

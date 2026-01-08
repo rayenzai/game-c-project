@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
             else if (etat == ETAT_INTRO) {
                 if (HandleIntroInput(&event) == 1) {
                     etat = ETAT_JEU;
-                    InitGame();
+                    InitGame(renderer);
                 }
             }
             else if (etat == ETAT_JEU) {
