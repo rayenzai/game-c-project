@@ -55,8 +55,8 @@ int main(int argc, char* argv[]) {
             if (etat == ETAT_MENU) {
                 int action = UpdateMenu(&event);
                 if (action == 1) { 
-                    etat = ETAT_INTRO; 
-                    InitIntro();
+                    etat = ETAT_JEU; 
+                    InitGame(renderer);
                 }
                 if (action == 2) running = 0;
             }
@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
             DrawIntro(renderer, fontPetit);
         }
         else if (etat == ETAT_JEU) {
-            DrawGame(renderer);
+            DrawGame(renderer,fontPetit);
         }
 
         
