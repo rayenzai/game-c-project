@@ -28,7 +28,7 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
  {      //carte 1 (chambre)
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
-        {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 8, 1, 1},
         {1, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
         {1, 1, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
         {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
@@ -191,7 +191,7 @@ void UpdateGame(void) {
     }
     }
     // 2. Quitter le COULOIR (Niveau 1) par le BAS
-    // On vérifie si on est au niveau 1 ET si on dépasse le bas de l'écran
+    // On vérifie si on est au niveau 1 ET si on dépasse le haut de l'écran
     else if (currentLevel == 1 && player.y > (MAP_HEIGHT * TILE_SIZE) - 20) {
         currentLevel = 0;  // On retourne à la CHAMBRE
         player.y = 10;     // On apparaît tout en HAUT de la chambre
