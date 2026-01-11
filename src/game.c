@@ -180,7 +180,6 @@ void UpdateGame(void) {
         if (hasDoudou == 1) {
             currentLevel = 1; 
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
-            player.x = 160;
             currentLevel = 1;  
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
     }
@@ -220,7 +219,7 @@ int estEclaire(int gridX, int gridY, int rayon) {
     double distance = sqrt(dx*dx + dy*dy);
 
     if (distance <= rayon) {
-        return 1; // C'est allumé !
+        return 1; 
     }
     return 0; // C'est éteint
 }
