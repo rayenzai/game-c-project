@@ -1,11 +1,12 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "game.h"
 #include <stdio.h>
 #include <math.h>
 
 // --- CONSTANTES ---
 #define TILE_SIZE 16        
-#define PLAYER_SPEED 0.5f   
+#define PLAYER_SPEED 2.0f   
 #define LOGICAL_WIDTH 320
 #define LOGICAL_HEIGHT 240
 #define MAP_WIDTH 20        
@@ -65,6 +66,7 @@ static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
 
 int dialogueStep = 0;
 int dialogueStep_sortie1 = 0;
+int dialogue_hasDoudou = 0;
 int toucheRelache = 0;
 int hasDoudou = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
@@ -129,6 +131,22 @@ void UpdateGame(void) {
         }
         return;
     }
+    if (dialogue_hasDoudou > 0) {
+        if (state[SDL_SCANCODE_RETURN]) {
+            if (toucheRelache) {
+                dialogue_hasDoudou ++;
+                if (dialogue_hasDoudou > 3)
+                {
+                    dialogue_hasDoudou = 0;
+                }
+                
+                toucheRelache = 0;
+            }
+        } else {
+            toucheRelache = 1;
+        }
+        return;
+    }
 
     float nextX = player.x;
     float nextY = player.y;
@@ -159,20 +177,18 @@ void UpdateGame(void) {
     // --- GESTION DU DOUDOU ---
     if (currentLevel == 0 && hasDoudou == 0) {
         // Vérifier si le joueur touche le doudou
-        // Simple collision de rectangles
+        // collision de rectangles
         if (player.x < doudouRect.x + doudouRect.w &&
             player.x + player.w > doudouRect.x &&
             player.y < doudouRect.y + doudouRect.h &&
             player.y + player.h > doudouRect.y) {
             
-            hasDoudou = 1; // On l'a ramassé !
+            hasDoudou = 1; 
+            dialogue_hasDoudou = 1;
             
-            // TODO : dialogue quand on a le doudou
-            // "ah je te tiens" ou un truc du genre
         }
     }
-
-    // --- GESTION DES PASSAGES ENTRE NIVEAUX ---
+    
 
     // 1. Quitter la CHAMBRE (Niveau 0) par le HAUT
     // On vérifie si on est au niveau 0 ET si on dépasse le haut de l'écran (y < 5)
@@ -186,7 +202,6 @@ void UpdateGame(void) {
     else{
         player.y = 10;
         dialogueStep_sortie1 = 1;
-        //TODO : texte "je ne peut pas partir sans mon doudou il fait sombre la bas..."
     }
     }
     // 2. Quitter le COULOIR (Niveau 1) par le BAS
@@ -295,7 +310,6 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
             
             SDL_Rect srcDoudou = { doudouTileIndex * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
             
-            // Petit ajustement pour centrer (ton -2)
             SDL_Rect destDoudou = { doudouRect.x - 2, doudouRect.y - 2, 16, 16 };
             
             SDL_RenderCopy(renderer, tilesetTexture, &srcDoudou, &destDoudou);
@@ -337,6 +351,40 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
     if (dialogueStep_sortie1 > 0) {
         char *texteAffiche = "";
         if (dialogueStep_sortie1 == 1) texteAffiche = "je peux pas sortir sans mon doudou...";
+
+        SDL_Rect rectBulle = { 20, 180, 280, 50 };
+        
+        // Fond blanc
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderFillRect(renderer, &rectBulle);
+        
+        // Bordure noire
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderDrawRect(renderer, &rectBulle);
+
+        // 3. Dessiner le Texte
+        SDL_Color couleurNoire = {0, 0, 0, 255};
+        SDL_Surface *surfaceTexte = TTF_RenderText_Solid(font, texteAffiche, couleurNoire);
+        if (surfaceTexte) {
+            SDL_Texture *textureTexte = SDL_CreateTextureFromSurface(renderer, surfaceTexte);
+            SDL_Rect rectTexte = { 
+                rectBulle.x + 10, 
+                rectBulle.y + 15, 
+                surfaceTexte->w, 
+                surfaceTexte->h 
+            };
+            SDL_RenderCopy(renderer, textureTexte, NULL, &rectTexte);
+            
+            SDL_FreeSurface(surfaceTexte);
+            SDL_DestroyTexture(textureTexte);
+        }
+    }
+    if (dialogue_hasDoudou > 0) {
+        char *texteAffiche = "";
+        printf("%d", dialogue_hasDoudou);
+        if (dialogue_hasDoudou == 1) texteAffiche = "je te tiens";
+        if (dialogue_hasDoudou == 2) texteAffiche = "OH...";
+        if (dialogue_hasDoudou == 3) texteAffiche = "De la lumiere !";
 
         SDL_Rect rectBulle = { 20, 180, 280, 50 };
         

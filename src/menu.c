@@ -6,7 +6,6 @@
 #define LOGICAL_WIDTH 320
 #define LOGICAL_HEIGHT 240
 
-// Couleurs inversées (Style Minit)
 static SDL_Color NOIR = {255, 255, 255, 255}; // Visuellement Blanc (Fond)
 static SDL_Color BLANC = {0, 0, 0, 255};      // Visuellement Noir (Encre)
 
@@ -33,13 +32,13 @@ static void dessinerTexteMenu(SDL_Renderer *renderer, TTF_Font *font, const char
     SDL_DestroyTexture(texture);
 }
 
-// Fonction pour l'épée
-static void dessinerEpee(SDL_Renderer *renderer, int y) {
+// Fonction pour la croix de selection
+static void dessinerCroix(SDL_Renderer *renderer, int y) {
     SDL_SetRenderDrawColor(renderer, NOIR.r, NOIR.g, NOIR.b, 255);
-    int x = (LOGICAL_WIDTH / 2) - 60;
+    int x = (LOGICAL_WIDTH / 2) - 45;
     SDL_Rect p1 = {x+2, y, 2, 6};   SDL_RenderFillRect(renderer, &p1);
-    SDL_Rect p2 = {x, y+4, 6, 2};   SDL_RenderFillRect(renderer, &p2);
-    SDL_Rect p3 = {x+2, y+6, 2, 3}; SDL_RenderFillRect(renderer, &p3);
+    SDL_Rect p2 = {x, y+2, 2, 2};   SDL_RenderFillRect(renderer, &p2);
+    SDL_Rect p3 = {x+4, y+2, 2, 2}; SDL_RenderFillRect(renderer, &p3);
 }
 
 void InitMenu(void) {
@@ -81,7 +80,7 @@ void DrawMenu(SDL_Renderer *renderer, TTF_Font *fontTitre, TTF_Font *fontOptions
         dessinerTexteMenu(renderer, fontOptions, options[i], itemY, (i == selection));
         
         if (i == selection) {
-            dessinerEpee(renderer, itemY + 2);
+            dessinerCroix(renderer, itemY + 2);
         }
     }
 
