@@ -381,7 +381,6 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
     }
     if (dialogue_hasDoudou > 0) {
         char *texteAffiche = "";
-        printf("%d", dialogue_hasDoudou);
         if (dialogue_hasDoudou == 1) texteAffiche = "je te tiens";
         if (dialogue_hasDoudou == 2) texteAffiche = "OH...";
         if (dialogue_hasDoudou == 3) texteAffiche = "De la lumiere !";
