@@ -85,6 +85,7 @@ int main(int argc, char* argv[]) {
                 
                 if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                     etat = ETAT_MENU;
+                    currentLevel = 0;
                     
                 }
             }

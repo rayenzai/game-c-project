@@ -23,7 +23,7 @@ static SDL_Texture *tilesetTexture = NULL;
 static SDL_Texture *playerTexture = NULL; 
 
 #define NB_LEVELS 2      
-int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
+currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 
 // --- LA CARTE DU NIVEAU ---
 static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
@@ -70,6 +70,7 @@ int dialogue_hasDoudou = 0;
 int toucheRelache = 0;
 int hasDoudou = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
+
 
 // --- INITIALISATION ---
 void InitGame(SDL_Renderer *renderer) {
@@ -165,6 +166,7 @@ void UpdateGame(void) {
 
     if (!touchWallX) player.x = nextX;
 
+    
     // Collision Y
     int touchWallY = 0;
     if (isWall(player.x, nextY)) touchWallY = 1;
