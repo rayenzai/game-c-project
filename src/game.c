@@ -148,8 +148,38 @@ int isWall(float x, float y) {
     int caseY = y / TILE_SIZE;
     if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
     int type = maps[currentLevel][caseY][caseX];
-    if (type == 1 || type == 2 || type == 3 || type == 4) return 1;
-    return 0;
+    // --- TYPE 1 : MURS CLASSIQUES (Tout le bloc est solide) ---
+    // Les murs, les bords, le vide...
+    if (type >= 1 && type <= 4) return 1;
+    if (type == 10) return 1; // Placard vide (complètement bloquant ?)
+
+    // --- TYPE 2 : MEUBLES AVEC PROFONDEUR (Placard 8 et 9) ---
+    // On veut que le haut du meuble soit traversable (effet de perspective)
+    // et que seul le bas bloque les pieds du joueur.
+    if (type == 8 || type == 9) {
+        int localY = (int)y % TILE_SIZE; // Position de 0 à 15 dans la case
+
+        // Hitbox : Seulement les 8 pixels du bas sont solides
+        if (localY < 7) {
+            return 1; // Collision !
+        } else {
+            return 0; // Le haut est traversable (on passe "derrière")
+        }
+    }
+
+    // --- TYPE 3 : PETITS OBJETS (Exemple : Un vase au milieu) ---
+    /*
+    if (type == 15) { // Imaginons que 15 est un vase
+        int localX = (int)x % TILE_SIZE;
+        int localY = (int)y % TILE_SIZE;
+        
+        // On définit un petit carré de 8x8 au centre
+        if (localX > 4 && localX < 12 && localY > 4 && localY < 12) return 1;
+        return 0;
+    }
+    */
+
+    return 0; // Par défaut, c'est vide
 }
 
 // --- UPDATE ---
