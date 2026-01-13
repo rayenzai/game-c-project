@@ -162,6 +162,7 @@ void InitGame(SDL_Renderer *renderer) {
     // Chargement du Tileset
     SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");
     if (surface) {
+        SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));
         tilesetTexture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
     } else {
@@ -183,16 +184,37 @@ int isWall(float x, float y) {
     // --- TYPE 2 : MEUBLES AVEC PROFONDEUR (Placard 8 et 9) ---
     // On veut que le haut du meuble soit traversable (effet de perspective)
     // et que seul le bas bloque les pieds du joueur.
-    if (type == 8 || type == 9) {
+    if (type == 10 || type == 11 || type == 14 || type == 15 || type == 18 || type == 19) {
         int localY = (int)y % TILE_SIZE; // Position de 0 à 15 dans la case
 
         // Hitbox : Seulement les 8 pixels du bas sont solides
-        if (localY < 7) {
-            return 1; // Collision !
+        if (localY < 5) {
+            return 1;
         } else {
             return 0; // Le haut est traversable (on passe "derrière")
         }
     }
+
+    if (type == 22 || type == 23)
+    {
+         int localY = (int)y % TILE_SIZE; // Position de 0 à 15 dans la case
+
+        // Hitbox : Seulement les 8 pixels du bas sont solides
+        if (localY > 2) {
+            return 1;
+        } else {
+            return 0; // Le haut est traversable (on passe "derrière")
+        }
+    }
+    if (type == 20)
+    {
+        return 1;
+        
+    }
+    if (type == 21){
+        return 1;
+    }
+    
 
     // --- TYPE 3 : PETITS OBJETS (Exemple : Un vase au milieu) ---
     /*
