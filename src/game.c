@@ -25,15 +25,42 @@ static SDL_Texture *playerTexture = NULL;
 #define NB_LEVELS 2      
 currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 
+/* 
+0 = sol
+1 = mur en brique 
+2 = toit
+3 = haut du lit
+4 = bas du lit
+5 = ancien perso
+6 = doudou
+7 = perso actuel
+8 = haut gauche armoire fermée 
+9 = haut droit armoire fermée
+10 = bas gauche armoire fermée
+11 = bas droit armoire fermée
+12 = haut gauche armoire ouverte 
+13 = haut droit armoire ouverte
+14 = bas gauche armoire ouverte
+15 = bas droit armoire ouverte
+16 = haut gauche armoire ouverte doudou
+17 = haut droit armoire ouverte doudou
+18 = bas gauche armoire ouverte doudou
+19 = bas droit armoire ouverte doudou
+20 = livre 
+21 = lampe 
+22 = armoire vu de haut partie gauche
+23 = armoire vu de haut partie droite
+*/
+
 // --- LA CARTE DU NIVEAU ---
 static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
  {      //carte 1 (chambre)
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
-        {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 8, 1, 1},
-        {1, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 16, 17, 1, 1}, 
+        {1, 1, 0, 3, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 19, 1, 1},
         {1, 1, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
         {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
         {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
         {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
         {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
@@ -41,7 +68,7 @@ static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
         {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
         {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1}, // Bas fermé
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 23, 0, 0, 0, 1, 1},
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
     },
     //couloir niveau 1
