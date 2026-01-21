@@ -101,6 +101,8 @@ int toucheRelache = 0;
 int hasDoudou = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
 
+int collision[] = {1, 2, 3, 4, 18, 19}; // Rajouter dans ce tableau les int des collisions
+int taille_collision = (int) (sizeof(collision) / sizeof(collision[0]));
 
 // --- INITIALISATION ---
 void InitGame(SDL_Renderer *renderer) {
@@ -121,13 +123,21 @@ void InitGame(SDL_Renderer *renderer) {
     }
 }
 
+int IsCollision(int type){
+    for (int i = 0; i < taille_collision; ++i)
+    {
+        if(collision[i] == type) return 1;
+    }
+    return 0;
+}
+
 // Fonction utilitaire collision
 int isWall(float x, float y) {
     int caseX = x / TILE_SIZE;
     int caseY = y / TILE_SIZE;
     if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
     int type = maps[currentLevel][caseY][caseX];
-    if (type == 1 || type == 2 || type == 3 || type == 4) return 1;
+    if (IsCollision(type)) return 1;
     return 0;
 }
 
