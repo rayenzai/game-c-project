@@ -166,7 +166,6 @@ int isWall(float x, float y) {
 // --- UPDATE ---
 void UpdateGame(void) {
     const Uint8 *state = SDL_GetKeyboardState(NULL);
-
     // --- MODE DIALOGUE (Joueur Bloqué) ---
     if (dialogueStep > 0) {
 
