@@ -15,7 +15,7 @@
 #define MAP_HEIGHT 15       
 
 // Pour les sons
-static Mix_Chunk *sonTransition = NULL;
+// static Mix_Chunk *sonTransition = NULL;
 static Mix_Chunk *sonPickUp = NULL;
 static Mix_Chunk *sonOpenDoor = NULL;
 static Mix_Chunk *sonCloseDoor = NULL;
@@ -36,7 +36,7 @@ static SDL_Texture *tilesetTexture = NULL;
 
 
 #define NB_LEVELS 5      
-currentLevel = 0;   // 0 = Chambre, 1 = Couloir
+int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 
 
 /* 
@@ -177,7 +177,7 @@ void InitGame(SDL_Renderer *renderer) {
     hasDoudou = 0;
 
     // Chargement des sons
-    sonTransition = chargement_son_transition();
+    // sonTransition = chargement_son_transition();
     sonPickUp = chargement_son_item_pick_up();
     sonOpenDoor = chargement_son_door_open();
     sonCloseDoor = chargement_son_door_close();
@@ -391,11 +391,6 @@ void UpdateGame(void) {
     // On vérifie si on est au niveau 0 ET si on dépasse le haut de l'écran (y < 5)
     if (currentLevel == 0 && player.y < 5) {
         if (hasDoudou == 1) {
-            
-            if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
-            SDL_Delay(300);
-
-
             currentLevel = 1; 
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
             
@@ -409,8 +404,6 @@ void UpdateGame(void) {
     // 2. Quitter le COULOIR (Niveau 1) par le BAS
     // On vérifie si on est au niveau 1 ET si on dépasse le haut de l'écran
     else if (currentLevel == 1 && player.y > (MAP_HEIGHT * TILE_SIZE) - 20) {
-        if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
-        SDL_Delay(300);
         currentLevel = 0;  // On retourne à la CHAMBRE
         player.y = 10;     // On apparaît tout en HAUT de la chambre
         
@@ -418,8 +411,6 @@ void UpdateGame(void) {
     
 if (currentLevel == 1 && player.y < 5) {
         if (hasDoudou == 1) {
-            if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
-            SDL_Delay(300);
             currentLevel = 2; 
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
     }
@@ -428,8 +419,6 @@ if (currentLevel == 1 && player.y < 5) {
     }
     }
     else if (currentLevel == 2 && player.y > (MAP_HEIGHT * TILE_SIZE) - 20) {
-        if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
-        SDL_Delay(300);
         currentLevel = 1;  // On retourne à la CHAMBRE
         player.y = 10;     // On apparaît tout en HAUT de la chambre
         
@@ -437,8 +426,6 @@ if (currentLevel == 1 && player.y < 5) {
     
     if (currentLevel == 2 && player.x < 5) {
         if (hasDoudou == 1) {
-            if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
-            SDL_Delay(300);
             currentLevel = 3; 
             player.x = (MAP_WIDTH * TILE_SIZE) - 20;
     }
@@ -447,8 +434,6 @@ if (currentLevel == 1 && player.y < 5) {
     }
     }
     else if (currentLevel == 3 && player.x > (MAP_WIDTH * TILE_SIZE) - 20) {
-        if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
-        SDL_Delay(300);
         currentLevel = 2;  // On retourne à la CHAMBRE
         player.x = 3;     // On apparaît tout en HAUT de la chambre
         
@@ -456,8 +441,6 @@ if (currentLevel == 1 && player.y < 5) {
         
 if (currentLevel == 3 && player.y < 5) {
         if (hasDoudou == 1) {
-            if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
-            SDL_Delay(300);
             currentLevel = 4; 
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
     }
@@ -466,8 +449,6 @@ if (currentLevel == 3 && player.y < 5) {
     }
     }
     else if (currentLevel == 4 && player.y > (MAP_HEIGHT * TILE_SIZE) - 20) {
-        if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
-        SDL_Delay(300);
         currentLevel = 3;  // On retourne à la CHAMBRE
         player.y = 10;     // On apparaît tout en HAUT de la chambre
         
