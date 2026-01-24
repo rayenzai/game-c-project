@@ -1,6 +1,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include "game.h"
+#include "sons.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -12,6 +14,16 @@
 #define MAP_WIDTH 20        
 #define MAP_HEIGHT 15       
 
+// Pour les sons
+static Mix_Chunk *sonTransition = NULL;
+static Mix_Chunk *sonPickUp = NULL;
+static Mix_Chunk *sonOpenDoor = NULL;
+static Mix_Chunk *sonCloseDoor = NULL;
+  
+// Pour les touches
+static int toucheE_Relache = 1;
+static int toucheEnter_Relache = 1;
+
 // --- VARIABLES GLOBALES ---
 typedef struct {
     float x, y;     
@@ -20,10 +32,10 @@ typedef struct {
 
 static Joueur player;
 static SDL_Texture *tilesetTexture = NULL; 
-static SDL_Texture *playerTexture = NULL; 
+// static SDL_Texture *playerTexture = NULL; 
 
 #define NB_LEVELS 2      
-currentLevel = 0;   // 0 = Chambre, 1 = Couloir
+int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 
 /* 
 0 = sol
@@ -59,8 +71,8 @@ currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
  {      //carte 1 (chambre)
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
-        {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 16, 17, 1, 1}, 
-        {1, 1, 0, 3, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 19, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 8, 9, 1, 1}, 
+        {1, 1, 0, 3, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 11, 1, 1},
         {1, 1, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
         {1, 1, 30, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
         {1, 1, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
@@ -101,7 +113,7 @@ int toucheRelache = 0;
 int hasDoudou = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
 
-int collision[] = {1, 2, 3, 4, 18, 19}; // Rajouter dans ce tableau les int des collisions
+int collision[] = {1, 2, 3, 4, 8, 9, 10, 11, 12, 13, 14, 15, 18, 19, 21, 22, 23}; // Rajouter dans ce tableau les int des collisions
 int taille_collision = (int) (sizeof(collision) / sizeof(collision[0]));
 
 // --- INITIALISATION ---
@@ -113,6 +125,14 @@ void InitGame(SDL_Renderer *renderer) {
     dialogueStep = 1;
     toucheRelache = 0;
     hasDoudou = 0;
+
+    // Chargement des sons
+    sonTransition = chargement_son_transition();
+    sonPickUp = chargement_son_item_pick_up();
+    sonOpenDoor = chargement_son_door_open();
+    sonCloseDoor = chargement_son_door_close();
+    
+
     // Chargement du Tileset
     SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");
     if (surface) {
@@ -121,6 +141,8 @@ void InitGame(SDL_Renderer *renderer) {
     } else {
         printf("ERREUR: Impossible de charger assets/tileset.bmp ! %s\n", SDL_GetError());
     }
+
+
 }
 
 int IsCollision(int type){
@@ -216,19 +238,75 @@ void UpdateGame(void) {
 
     if (!touchWallY) player.y = nextY;
 
-    // --- GESTION DU DOUDOU ---
-    if (currentLevel == 0 && hasDoudou == 0) {
-        // Vérifier si le joueur touche le doudou
-        // collision de rectangles
-        if (player.x < doudouRect.x + doudouRect.w &&
-            player.x + player.w > doudouRect.x &&
-            player.y < doudouRect.y + doudouRect.h &&
-            player.y + player.h > doudouRect.y) {
-            
-            hasDoudou = 1; 
-            dialogue_hasDoudou = 1;
-            
+    float armoireX = 256 + 16; 
+    float armoireY = 32 + 16; 
+
+    // Calcul de la distance entre le joueur et l'armoire
+    float dx = (player.x + player.w / 2) - armoireX;
+    float dy = (player.y + player.h / 2) - armoireY;
+    float distance = sqrt(dx*dx + dy*dy);
+
+    if (state[SDL_SCANCODE_E]) {
+        if (toucheE_Relache) {
+            // Si le joueur est à moins de 16 pixel (une tuile)
+            if (distance < 16 && currentLevel == 0) {
+                
+                // On vérifie si l'armoire est FERMÉE (8) (tuile en haut à gauche de l'armoire)
+                // On l'ouvre avec le doudou dedans
+                if (maps[0][1][16] == 8 && hasDoudou == 0) {
+                    if (sonOpenDoor) Mix_PlayChannel(-1, sonOpenDoor, 0);
+                    SDL_Delay(250);
+                    maps[0][1][16] = 16; 
+                    maps[0][1][17] = 17; 
+                    maps[0][2][16] = 18; 
+                    maps[0][2][17] = 19; 
+                }
+                // Si elle est OUVERTE (16 = avec le doudou dedans), on peut la refermer
+                else if (maps[0][1][16] == 16 || maps[0][1][16] == 12) {
+                    if (sonCloseDoor) Mix_PlayChannel(-1, sonCloseDoor, 0);
+                    SDL_Delay(250);
+                    maps[0][1][16] = 8;
+                    maps[0][1][17] = 9;
+                    maps[0][2][16] = 10;
+                    maps[0][2][17] = 11;
+                }
+                else{
+                    if (sonOpenDoor) Mix_PlayChannel(-1, sonOpenDoor, 0);
+                    SDL_Delay(250);
+                    maps[0][1][16] = 12; 
+                    maps[0][1][17] = 13; 
+                    maps[0][2][16] = 14; 
+                    maps[0][2][17] = 15; 
+                }
+            }
+            toucheE_Relache = 0; // On verrouille tant qu'on n'a pas lâché E
         }
+    } else {
+        toucheE_Relache = 1; // On a lâché la touche E on peut re appuyer
+    }
+
+    if (state[SDL_SCANCODE_RETURN] || state[SDL_SCANCODE_KP_ENTER])
+    {
+        if(toucheEnter_Relache){
+            if(distance < 16 && currentLevel==0){
+                if (maps[0][1][16] == 16)
+                {
+                    if (sonPickUp) Mix_PlayChannel(-1, sonPickUp, 0);
+                    SDL_Delay(250);
+                    maps[0][1][16] = 12; 
+                    maps[0][1][17] = 13; 
+                    maps[0][2][16] = 14; 
+                    maps[0][2][17] = 15; 
+                    hasDoudou = 1; 
+                    dialogue_hasDoudou = 1;
+                }
+
+            }
+        }
+        toucheEnter_Relache = 0;
+    }
+    else{
+            toucheEnter_Relache = 1;
     }
     
 
@@ -236,10 +314,15 @@ void UpdateGame(void) {
     // On vérifie si on est au niveau 0 ET si on dépasse le haut de l'écran (y < 5)
     if (currentLevel == 0 && player.y < 5) {
         if (hasDoudou == 1) {
+            
+            if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
+            SDL_Delay(300);
+
+
             currentLevel = 1; 
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
-            currentLevel = 1;  
-            player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
+            
+
     }
     else{
         player.y = 10;
@@ -249,6 +332,8 @@ void UpdateGame(void) {
     // 2. Quitter le COULOIR (Niveau 1) par le BAS
     // On vérifie si on est au niveau 1 ET si on dépasse le haut de l'écran
     else if (currentLevel == 1 && player.y > (MAP_HEIGHT * TILE_SIZE) - 20) {
+        if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
+        SDL_Delay(300);
         currentLevel = 0;  // On retourne à la CHAMBRE
         player.y = 10;     // On apparaît tout en HAUT de la chambre
         
@@ -289,13 +374,13 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
 
     // 2. Dessiner la CARTE avec le tileset
     if (tilesetTexture) {
-        int rayonLumiere = 0;
+        // int rayonLumiere = 0;
         int rayon = 0; 
         if (hasDoudou == 1) {
-            rayonLumiere = 60; 
+            // rayonLumiere = 60; 
             rayon = 60;
         } else {
-            rayonLumiere = 30;
+            // rayonLumiere = 30;
             rayon = 30;
         }
         
@@ -340,21 +425,6 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
                     SDL_RenderDrawLine(renderer, px + ts, py, px + ts, py + ts);
                 }
             }
-        }
-    }
-    //doudou
-    if (currentLevel == 0 && hasDoudou == 0) {
-        int gridX = doudouRect.x / TILE_SIZE;
-        int gridY = doudouRect.y / TILE_SIZE;
-        if (estEclaire(gridX, gridY, 30)) {
-            
-            int doudouTileIndex = 6; // L'index de ton ourson
-            
-            SDL_Rect srcDoudou = { doudouTileIndex * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
-            
-            SDL_Rect destDoudou = { doudouRect.x - 2, doudouRect.y - 2, 16, 16 };
-            
-            SDL_RenderCopy(renderer, tilesetTexture, &srcDoudou, &destDoudou);
         }
     }
     //dialogues

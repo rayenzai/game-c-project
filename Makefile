@@ -1,16 +1,15 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -Iinclude $(shell sdl2-config --cflags)
-LDFLAGS = $(shell sdl2-config --libs) -lSDL2_ttf -lm
+# J'ai ajouté -lSDL2_mixer ci-dessous
+LDFLAGS = $(shell sdl2-config --libs) -lSDL2_ttf -lSDL2_mixer -lm
 
 SRC_DIR = src
 OBJ_DIR = obj
 BIN_DIR = bin
 
-# Find all source files
+# Le reste du fichier ne change pas...
 SRCS = $(wildcard $(SRC_DIR)/*.c)
-# Generate object filenames
 OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
-# Output executable name
 TARGET = $(BIN_DIR)/game
 
 .PHONY: all clean run directories

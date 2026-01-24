@@ -4,6 +4,7 @@
 #include "intro.h"
 #include "menu.h"
 #include "game.h"
+#include "sons.h"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -20,6 +21,15 @@ typedef enum {
 int main(int argc, char* argv[]) {
     (void)argc; (void)argv;
 
+    // -- INIT SONS --
+    SDL_SetHint(SDL_HINT_AUDIO_RESAMPLING_MODE, "3"); 
+    
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+
+    if (Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 3072) < 0) {
+        printf("Erreur SDL_mixer : %s\n", Mix_GetError());
+    }
+
     if (SDL_Init(SDL_INIT_VIDEO) < 0) return 1;
     if (TTF_Init() < 0) return 1;
 
@@ -33,6 +43,8 @@ int main(int argc, char* argv[]) {
     TTF_Font *fontPetit = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 12);
 
     if (!fontGrand || !fontPetit) { printf("Erreur Font\n"); return 1; }
+
+    Mix_Music *bgm = chargement_son_ambiance();
 
     GameState etat = ETAT_MENU;
     InitIntro();
@@ -124,6 +136,10 @@ int main(int argc, char* argv[]) {
             SDL_Delay(frameDelay - frameTime);
         }
     }
+
+    // Nettoyage sons
+    Mix_FreeMusic(bgm);
+    Mix_CloseAudio();
 
     // Nettoyage...
     TTF_CloseFont(fontGrand);
