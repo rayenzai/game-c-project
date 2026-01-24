@@ -34,8 +34,10 @@ static Joueur player;
 static SDL_Texture *tilesetTexture = NULL; 
 // static SDL_Texture *playerTexture = NULL; 
 
-#define NB_LEVELS 2      
-int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
+
+#define NB_LEVELS 5      
+currentLevel = 0;   // 0 = Chambre, 1 = Couloir
+
 
 /* 
 0 = sol
@@ -86,7 +88,7 @@ static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 23, 0, 0, 0, 1, 1},
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
     },
-    //couloir niveau 1
+    //carte 2 (couloir)
     {
         {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1}, // Haut (Suite)
         {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -102,6 +104,57 @@ static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1},
         {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1}, // Bas (Entrée)
         {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1}
+    }, 
+    {      //carte 3 (hall)
+        {2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
+        {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 8, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1}, // Bas fermé
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1}
+    },
+         {      //carte 4 
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
+        {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 8, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1}, // Bas fermé
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+    },
+    {   // carte
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
+        {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 8, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1}, // Bas fermé
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
         {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1}
     }
 };
@@ -136,6 +189,7 @@ void InitGame(SDL_Renderer *renderer) {
     // Chargement du Tileset
     SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");
     if (surface) {
+        SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));
         tilesetTexture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
     } else {
@@ -159,6 +213,7 @@ int isWall(float x, float y) {
     int caseY = y / TILE_SIZE;
     if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
     int type = maps[currentLevel][caseY][caseX];
+
     if (IsCollision(type)) return 1;
     return 0;
 }
@@ -337,6 +392,64 @@ void UpdateGame(void) {
         player.y = 10;     // On apparaît tout en HAUT de la chambre
         
     }
+    
+if (currentLevel == 1 && player.y < 5) {
+        if (hasDoudou == 1) {
+            if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
+            SDL_Delay(300);
+            currentLevel = 2; 
+            player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
+    }
+    else{
+        player.y = 10;
+    }
+    }
+    else if (currentLevel == 2 && player.y > (MAP_HEIGHT * TILE_SIZE) - 20) {
+        if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
+        SDL_Delay(300);
+        currentLevel = 1;  // On retourne à la CHAMBRE
+        player.y = 10;     // On apparaît tout en HAUT de la chambre
+        
+    }
+    
+    if (currentLevel == 2 && player.x < 5) {
+        if (hasDoudou == 1) {
+            if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
+            SDL_Delay(300);
+            currentLevel = 3; 
+            player.x = (MAP_WIDTH * TILE_SIZE) - 20;
+    }
+    else{
+        player.x = 3;
+    }
+    }
+    else if (currentLevel == 3 && player.x > (MAP_WIDTH * TILE_SIZE) - 20) {
+        if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
+        SDL_Delay(300);
+        currentLevel = 2;  // On retourne à la CHAMBRE
+        player.x = 3;     // On apparaît tout en HAUT de la chambre
+        
+    }
+        
+if (currentLevel == 3 && player.y < 5) {
+        if (hasDoudou == 1) {
+            if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
+            SDL_Delay(300);
+            currentLevel = 4; 
+            player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
+    }
+    else{
+        player.y = 10;
+    }
+    }
+    else if (currentLevel == 4 && player.y > (MAP_HEIGHT * TILE_SIZE) - 20) {
+        if (sonTransition) Mix_PlayChannel(-1, sonTransition, 0);
+        SDL_Delay(300);
+        currentLevel = 3;  // On retourne à la CHAMBRE
+        player.y = 10;     // On apparaît tout en HAUT de la chambre
+        
+    }
+
 
 
 
