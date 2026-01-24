@@ -209,7 +209,7 @@ int isWall(float x, float y) {
     int type = maps[currentLevel][caseY][caseX];
     // --- TYPE 1 : MURS CLASSIQUES (Tout le bloc est solide) ---
     // Les murs, les bords, le vide...
-    if (type >= 2 && type <= 4) return 1;
+    if (type >= 2 && type <= 5) return 1;
 
     // --- TYPE 2 : MEUBLES AVEC PROFONDEUR (Placard 8 et 9) ---
     // On veut que le haut du meuble soit traversable (effet de perspective)
@@ -321,7 +321,7 @@ void UpdateGame(void) {
     if (!touchWallY) player.y = nextY;
 
     float armoireX = 256 + 16; 
-    float armoireY = 32 + 16; 
+    float armoireY = 16 + 16; 
 
     // Calcul de la distance entre le joueur et l'armoire
     float dx = (player.x + player.w / 2) - armoireX;
@@ -335,30 +335,30 @@ void UpdateGame(void) {
                 
                 // On vérifie si l'armoire est FERMÉE (8) (tuile en haut à gauche de l'armoire)
                 // On l'ouvre avec le doudou dedans
-                if (maps[0][1][16] == 8 && hasDoudou == 0) {
+                if (maps[0][0][16] == 8 && hasDoudou == 0) {
                     if (sonOpenDoor) Mix_PlayChannel(-1, sonOpenDoor, 0);
                     SDL_Delay(250);
-                    maps[0][1][16] = 16; 
-                    maps[0][1][17] = 17; 
-                    maps[0][2][16] = 18; 
-                    maps[0][2][17] = 19; 
+                    maps[0][0][16] = 16; 
+                    maps[0][0][17] = 17; 
+                    maps[0][1][16] = 18; 
+                    maps[0][1][17] = 19; 
                 }
                 // Si elle est OUVERTE (16 = avec le doudou dedans), on peut la refermer
-                else if (maps[0][1][16] == 16 || maps[0][1][16] == 12) {
+                else if (maps[0][0][16] == 16 || maps[0][0][16] == 12) {
                     if (sonCloseDoor) Mix_PlayChannel(-1, sonCloseDoor, 0);
                     SDL_Delay(250);
-                    maps[0][1][16] = 8;
-                    maps[0][1][17] = 9;
-                    maps[0][2][16] = 10;
-                    maps[0][2][17] = 11;
+                    maps[0][0][16] = 8;
+                    maps[0][0][17] = 9;
+                    maps[0][1][16] = 10;
+                    maps[0][1][17] = 11;
                 }
                 else{
                     if (sonOpenDoor) Mix_PlayChannel(-1, sonOpenDoor, 0);
                     SDL_Delay(250);
-                    maps[0][1][16] = 12; 
-                    maps[0][1][17] = 13; 
-                    maps[0][2][16] = 14; 
-                    maps[0][2][17] = 15; 
+                    maps[0][0][16] = 12; 
+                    maps[0][0][17] = 13; 
+                    maps[0][1][16] = 14; 
+                    maps[0][1][17] = 15; 
                 }
             }
             toucheE_Relache = 0; // On verrouille tant qu'on n'a pas lâché E
@@ -371,14 +371,14 @@ void UpdateGame(void) {
     {
         if(toucheEnter_Relache){
             if(distance < 16 && currentLevel==0){
-                if (maps[0][1][16] == 16)
+                if (maps[0][0][16] == 16)
                 {
                     if (sonPickUp) Mix_PlayChannel(-1, sonPickUp, 0);
                     SDL_Delay(250);
-                    maps[0][1][16] = 12; 
-                    maps[0][1][17] = 13; 
-                    maps[0][2][16] = 14; 
-                    maps[0][2][17] = 15; 
+                    maps[0][0][16] = 12; 
+                    maps[0][0][17] = 13; 
+                    maps[0][1][16] = 14; 
+                    maps[0][1][17] = 15; 
                     hasDoudou = 1; 
                     dialogue_hasDoudou = 1;
                 }
