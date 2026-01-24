@@ -166,9 +166,6 @@ int toucheRelache = 0;
 int hasDoudou = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
 
-int collision[] = {1, 2, 3, 4, 8, 9, 10, 11, 12, 13, 14, 15, 18, 19, 21, 22, 23}; // Rajouter dans ce tableau les int des collisions
-int taille_collision = (int) (sizeof(collision) / sizeof(collision[0]));
-
 // --- INITIALISATION ---
 void InitGame(SDL_Renderer *renderer) {
     player.x = 100; 
@@ -199,22 +196,48 @@ void InitGame(SDL_Renderer *renderer) {
 
 }
 
-int IsCollision(int type){
-    for (int i = 0; i < taille_collision; ++i)
-    {
-        if(collision[i] == type) return 1;
-    }
-    return 0;
-}
-
 // Fonction utilitaire collision
 int isWall(float x, float y) {
     int caseX = x / TILE_SIZE;
     int caseY = y / TILE_SIZE;
     if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
     int type = maps[currentLevel][caseY][caseX];
+    // --- TYPE 1 : MURS CLASSIQUES (Tout le bloc est solide) ---
+    // Les murs, les bords, le vide...
+    if (type >= 1 && type <= 4) return 1;
 
-    if (IsCollision(type)) return 1;
+    // --- TYPE 2 : MEUBLES AVEC PROFONDEUR (Placard 8 et 9) ---
+    // On veut que le haut du meuble soit traversable (effet de perspective)
+    // et que seul le bas bloque les pieds du joueur.
+    if (type == 10 || type == 11 || type == 14 || type == 15 || type == 18 || type == 19) {
+        int localY = (int)y % TILE_SIZE; // Position de 0 à 15 dans la case
+
+        // Hitbox : Seulement les 8 pixels du bas sont solides
+        if (localY < 5) {
+            return 1;
+        } else {
+            return 0; // Le haut est traversable (on passe "derrière")
+        }
+    }
+
+    if (type == 22 || type == 23)
+    {
+         int localY = (int)y % TILE_SIZE; // Position de 0 à 15 dans la case
+
+        // Hitbox : Seulement les 8 pixels du bas sont solides
+        if (localY > 2) {
+            return 1;
+        } else {
+            return 0; // Le haut est traversable (on passe "derrière")
+        }
+    }
+    if (type == 20)
+    {
+        return 1;
+    }
+    if (type == 21){
+        return 1;
+    }
     return 0;
 }
 
