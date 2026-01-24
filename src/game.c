@@ -14,24 +14,26 @@
 
 // --- VARIABLES GLOBALES ---
 typedef struct {
-    float x, y;     
-    int w, h;       
+    float x, y;  //centre 
+    int w, h;   
+    float vx, vy;
+    int onGround; 
 } Joueur;
 
 static Joueur player;
 static SDL_Texture *tilesetTexture = NULL; 
 static SDL_Texture *playerTexture = NULL; 
+static SDL_Texture *doudouTexture = NULL;
 
 #define NB_LEVELS 2      
-currentLevel = 0;   // 0 = Chambre, 1 = Couloir
+int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 
 /* 
-0 = sol
-1 = mur en brique 
-2 = toit
-3 = haut du lit
-4 = bas du lit
-5 = ancien perso
+0,1 = sol en bois 
+2 = mur en brique
+3 = cube 1
+4 = cube 2
+5 = affiche perso
 6 = doudou
 7 = perso actuel
 8 = haut gauche armoire fermée 
@@ -53,26 +55,29 @@ currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 24,25,26 = bas tapis
 27,28,29 = haut tapis
 30,31 = tapis rond
+32,33 = haut grand lit bb 
+34,35 = bas grand lit bb
+36,37 = déco haut du lit
 */
 
 // --- LA CARTE DU NIVEAU ---
 static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
  {      //carte 1 (chambre)
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
-        {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 16, 17, 1, 1}, 
-        {1, 1, 0, 3, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 19, 1, 1},
-        {1, 1, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-        {1, 1, 30, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-        {1, 1, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 28, 29, 0, 0, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 25, 26, 0, 0, 1, 1}, // Bas fermé
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 23, 0, 0, 0, 1, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+        {2, 2,  2,  2,  2,  2, 2, 2, 0, 0, 0, 0, 2,  2,  2,  2,  2,  2, 2, 2}, // Trou en haut   
+        {2, 2,  2, 36, 37,  2, 2, 2, 0, 0, 0, 0, 2,  2,  5,  2,  8,  9, 2, 2}, 
+        {2, 1,  0, 32, 33, 21, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1, 10, 11, 0, 2},
+        {2, 1,  0, 34, 35,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
+        {2, 1, 30, 31,  0,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
+        {2, 1,  0, 20,  0,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
+        {2, 1,  0,  1,  0,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
+        {2, 1,  0,  1,  0,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
+        {2, 1,  0,  1,  0,  3, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
+        {2, 1,  0,  1,  0,  1, 4, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
+        {2, 1,  0,  1,  0,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
+        {2, 1,  0,  1,  0,  1, 0, 1, 0, 1, 0, 1, 0, 27, 28, 29,  0,  1, 0, 2},
+        {2, 1,  0,  1,  0,  1, 0, 1, 0, 1, 0, 1, 0, 24, 25, 26,  0,  1, 0, 2}, // Bas fermé
+        {2, 1,  0,  1,  0,  1, 0, 1, 0, 1, 0, 1, 0, 22, 23,  0,  0,  1, 0, 2},
+        {2, 2,  2,  2,  2,  2, 2, 2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2, 2, 2}
     },
     //couloir niveau 1
     {
@@ -101,19 +106,50 @@ int toucheRelache = 0;
 int hasDoudou = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
 
+/// tous les fonds transparents si magenta
+
+static SDL_Texture* LoadTextureWithMagentaKey(SDL_Renderer *renderer, const char *path)
+{
+    SDL_Surface *surface = SDL_LoadBMP(path);
+    if (!surface) {
+        printf("ERREUR: SDL_LoadBMP(%s) : %s\n", path, SDL_GetError());
+        return NULL;
+    }
+
+    // Magenta pur #FF00FF => transparent
+    Uint32 key = SDL_MapRGB(surface->format, 255, 0, 255);
+    SDL_SetColorKey(surface, SDL_TRUE, key);
+
+    SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+
+    if (!tex) {
+        printf("ERREUR: SDL_CreateTextureFromSurface(%s) : %s\n", path, SDL_GetError());
+        return NULL;
+    }
+
+    SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
+    return tex;
+}
 
 // --- INITIALISATION ---
-void InitGame(SDL_Renderer *renderer) {
-    player.x = 100; 
-    player.y = 100; 
-    player.w = 12; 
-    player.h = 12;
+void InitGame(SDL_Renderer *renderer)
+{
+    // --- Init joueur ---
+    player.x = 100;
+    player.y = 50;
+    player.w = 12;
+    player.h = 14;
+    player.vx = 0;
+    player.vy = 0;
+
     dialogueStep = 1;
     toucheRelache = 0;
     hasDoudou = 0;
-    // Chargement du Tileset
+
     SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");
     if (surface) {
+        SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 255, 0, 255));
         tilesetTexture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
     } else {
@@ -127,7 +163,7 @@ int isWall(float x, float y) {
     int caseY = y / TILE_SIZE;
     if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
     int type = maps[currentLevel][caseY][caseX];
-    if (type == 1 || type == 2 || type == 3 || type == 4) return 1;
+    if (type == 2 || type == 3 || type == 4) return 1;
     return 0;
 }
 
@@ -220,8 +256,6 @@ void UpdateGame(void) {
             
         }
     }
-    
-
     // 1. Quitter la CHAMBRE (Niveau 0) par le HAUT
     // On vérifie si on est au niveau 0 ET si on dépasse le haut de l'écran (y < 5)
     if (currentLevel == 0 && player.y < 5) {
@@ -243,8 +277,6 @@ void UpdateGame(void) {
         player.y = 10;     // On apparaît tout en HAUT de la chambre
         
     }
-
-
 
 }
 
@@ -269,6 +301,17 @@ int estEclaire(int gridX, int gridY, int rayon) {
         return 1; 
     }
     return 0; // C'est éteint
+}
+
+static void DrawTile(SDL_Renderer *renderer,
+                     SDL_Texture *tileset,
+                     int tileIndex,
+                     int x,
+                     int y)
+{
+    SDL_Rect src = { tileIndex * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
+    SDL_Rect dst = { x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE };
+    SDL_RenderCopy(renderer, tileset, &src, &dst);
 }
 
 // --- DESSIN ---
@@ -298,9 +341,7 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
 
                 // --- A. DESSINER LA TUILE ---
                 int type = maps[currentLevel][y][x]; 
-                SDL_Rect srcRect = { type * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
-                SDL_Rect destRect = { x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE };
-                SDL_RenderCopy(renderer, tilesetTexture, &srcRect, &destRect);
+                DrawTile(renderer, tilesetTexture, type, x, y);
 
                 // --- B. DESSINER LE CONTOUR (Bords pixelisés) ---
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // Blanc
@@ -342,7 +383,7 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
             
             SDL_Rect srcDoudou = { doudouTileIndex * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
             
-            SDL_Rect destDoudou = { doudouRect.x - 2, doudouRect.y - 2, 16, 16 };
+            SDL_Rect destDoudou = { doudouRect.x, doudouRect.y, 16, 16 };
             
             SDL_RenderCopy(renderer, tilesetTexture, &srcDoudou, &destDoudou);
         }
@@ -444,9 +485,7 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
             SDL_DestroyTexture(textureTexte);
         }
     }
-
-
-    SDL_Rect srcPlayer = { 112, 0, 16, 16 };
-    SDL_Rect destPlayer = { (int)player.x - 2, (int)player.y - 2, 16, 16 };
-    SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
+SDL_Rect srcPlayer = { 112, 0, 16, 16 };
+SDL_Rect destPlayer = { (int)player.x - 2, (int)player.y - 2, 16, 16 };
+SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
 }
