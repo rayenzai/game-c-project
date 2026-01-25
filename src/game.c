@@ -75,7 +75,7 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
  {      //carte 1 (chambre)
         {2, 2,  2,  2,  2,  2, 2, 2, 0, 0, 0, 0, 2,  2,  2,  2,  8,  9, 2, 2}, // Trou en haut   
-        {2, 2,  2, 36, 37,  2, 2, 2, 0, 0, 0, 0, 2,  2,  5,  2,  10,  11, 2, 2}, 
+        {2, 2,  2, 36, 1,  2, 2, 2, 0, 0, 0, 0, 2,  2,  5,  2,  10,  11, 2, 2}, 
         {2, 1,  0, 32, 33, 21, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1, 0, 1, 0, 2},
         {2, 1,  0, 34, 35,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
         {2, 1, 30, 31,  0,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
@@ -464,6 +464,8 @@ if (currentLevel == 3 && player.y < 5) {
 
 }
 
+
+
 // Retourne 1 si la case est dans la lumière sinon 0.
 int estEclaire(int gridX, int gridY, int rayon) {
     
@@ -485,6 +487,12 @@ int estEclaire(int gridX, int gridY, int rayon) {
         return 1; 
     }
     return 0; // C'est éteint
+}
+
+void DrawTuiles(float x, float y, int indexTuile, SDL_Renderer *renderer){
+    SDL_Rect srcTuile = { TILE_SIZE * indexTuile, 0, TILE_SIZE, TILE_SIZE };
+    SDL_Rect destTuile = { x * TILE_SIZE, y * TILE_SIZE , TILE_SIZE, TILE_SIZE };
+    SDL_RenderCopy(renderer, tilesetTexture, &srcTuile, &destTuile);
 }
 
 // --- DESSIN ---
@@ -512,11 +520,14 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
                     continue; 
                 }
 
-                // --- A. DESSINER LA TUILE ---
+                // --- A. DESSINER LA TUILE --- (avec le tableau)
                 int type = maps[currentLevel][y][x]; 
                 SDL_Rect srcRect = { type * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
                 SDL_Rect destRect = { x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE };
                 SDL_RenderCopy(renderer, tilesetTexture, &srcRect, &destRect);
+
+                // Dessin des tuiles
+                DrawTuiles(4, 1, 37, renderer);
 
                 // --- B. DESSINER LE CONTOUR (Bords pixelisés) ---
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // Blanc
