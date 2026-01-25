@@ -171,6 +171,8 @@ int dialogue_hasDoudou = 0;
 int toucheRelache = 0;
 int hasDoudou = 0;
 int showInteractPrompt = 0;
+int showInteractPrompt2 = 0;
+int showInteractPrompt3 = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
 
 int TuilesNotSpecial[] = {0, 1, 2};
@@ -355,12 +357,26 @@ void UpdateGame(void) {
     float dy = (player.y + player.h / 2) - armoireY;
     float distance = sqrt(dx*dx + dy*dy);
 
-    if (distance < 16 && currentLevel == 0) {
+    if (distance < 16 && currentLevel == 0 && maps[0][0][16] == 8) {
         showInteractPrompt = 1;
     }
     else{
         showInteractPrompt = 0;
     }
+
+    if (distance < 16 && currentLevel == 0 && maps[0][0][16] == 16) {
+        showInteractPrompt2 = 1;
+    }
+    else{
+        showInteractPrompt2 = 0;
+    }
+    if (distance < 16 && currentLevel == 0 && maps[0][0][16] == 12) {
+        showInteractPrompt3 = 1;
+    }
+    else{
+        showInteractPrompt3 = 0;
+    }
+
 
     if (state[SDL_SCANCODE_E]) {
         if (toucheE_Relache) {
@@ -539,7 +555,7 @@ int IsTuileSpecial(int index){
 }
 
 // --- DESSIN ---
-void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
+void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     // 1. Fond Noir
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
@@ -708,32 +724,96 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
     SDL_Rect destPlayer = { (int)player.x - 2, (int)player.y - 2, 16, 16 };
     SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
 
-    if (showInteractPrompt == 1) {
+   if (showInteractPrompt == 1) {
         SDL_Color cBlanc = {255, 255, 255, 255};
-        // On crée le texte
-        SDL_Surface *sText = TTF_RenderText_Solid(font, "[E] Interagir", cBlanc);
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Ouvrir", cBlanc);
         
         if (sText) {
             SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
             
-            // On le place au-dessus du joueur
-            SDL_Rect rText = { 
-                (int)player.x - (sText->w / 2) + 8, // Centré horizontalement
-                (int)player.y + 25,                 // 25 pixels au-dessus
-                sText->w, 
-                sText->h 
-            };
+            // 1. Calcul de la position théorique
+            int posX = (int)player.x - (sText->w / 2) + 8;
+            int posY = (int)player.y + 20;
+
+            // 2. CORRECTION (Clamping) pour ne pas sortir de l'écran
+            if (posX < 2) { 
+                posX = 2; // Bloque à gauche
+            } 
+            else if (posX + sText->w > LOGICAL_WIDTH - 2) {
+                posX = LOGICAL_WIDTH - sText->w - 2; // Bloque à droite
+            }
+
+            // 3. On applique la position corrigée
+            SDL_Rect rText = { posX, posY, sText->w, sText->h };
 
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150); 
             SDL_Rect rFond = { rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2 };
             SDL_RenderFillRect(renderer, &rFond);
 
-            // On dessine le texte
             SDL_RenderCopy(renderer, tText, NULL, &rText);
             
-            // Nettoyage mémoire (TRES IMPORTANT sinon le jeu va lagger)
             SDL_FreeSurface(sText);
             SDL_DestroyTexture(tText);
         }
     }
+
+     if (showInteractPrompt2 == 1) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[ENTER] Interagir", cBlanc);
+        
+        if (sText) {
+            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+            
+            // 1. Calcul position
+            int posX = (int)player.x - (sText->w / 2) + 8;
+            int posY = (int)player.y + 20;
+
+            // 2. Correction (Clamping)
+            if (posX < 2) posX = 2;
+            else if (posX + sText->w > LOGICAL_WIDTH - 2) posX = LOGICAL_WIDTH - sText->w - 2;
+            
+            // 3. Application
+            SDL_Rect rText = { posX, posY, sText->w, sText->h };
+            
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150); 
+            SDL_Rect rFond = { rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2 };
+            SDL_RenderFillRect(renderer, &rFond);
+
+            SDL_RenderCopy(renderer, tText, NULL, &rText);
+            
+            SDL_FreeSurface(sText);
+            SDL_DestroyTexture(tText);
+        }
+    }
+    if (showInteractPrompt3 == 1) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Fermer", cBlanc);
+        
+        if (sText) {
+            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+            
+            // 1. Calcul position
+            int posX = (int)player.x - (sText->w / 2) + 8;
+            int posY = (int)player.y + 20;
+
+            // 2. Correction (Clamping)
+            if (posX < 2) posX = 2;
+            else if (posX + sText->w > LOGICAL_WIDTH - 2) posX = LOGICAL_WIDTH - sText->w - 2;
+            
+            // 3. Application
+            SDL_Rect rText = { posX, posY, sText->w, sText->h };
+            
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150); 
+            SDL_Rect rFond = { rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2 };
+            SDL_RenderFillRect(renderer, &rFond);
+
+            SDL_RenderCopy(renderer, tText, NULL, &rText);
+            
+            SDL_FreeSurface(sText);
+            SDL_DestroyTexture(tText);
+        }
+    }
+
 }

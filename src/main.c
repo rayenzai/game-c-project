@@ -41,8 +41,9 @@ int main(int argc, char* argv[]) {
 
     TTF_Font *fontGrand = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 20);
     TTF_Font *fontPetit = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 12);
+    TTF_Font *fontMini = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 11);
 
-    if (!fontGrand || !fontPetit) { printf("Erreur Font\n"); return 1; }
+    if (!fontGrand || !fontPetit || !fontMini) { printf("Erreur Font\n"); return 1; }
 
     Mix_Music *bgm = chargement_son_ambiance();
 
@@ -121,7 +122,7 @@ int main(int argc, char* argv[]) {
             DrawIntro(renderer, fontPetit);
         }
         else if (etat == ETAT_JEU) {
-            DrawGame(renderer,fontPetit);
+            DrawGame(renderer,fontPetit, fontMini);
         }
 
         
@@ -144,6 +145,7 @@ int main(int argc, char* argv[]) {
     // Nettoyage...
     TTF_CloseFont(fontGrand);
     TTF_CloseFont(fontPetit);
+    TTF_CloseFont(fontMini);
     TTF_Quit();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
