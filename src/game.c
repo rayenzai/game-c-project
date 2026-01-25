@@ -1011,7 +1011,7 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
     int caseY = (int)(fantome.y / TILE_SIZE);
 
     if (estEclaire(caseX, caseY, rayon) && currentLevel == 5) {
-        SDL_Rect src = { 6 * TILE_SIZE, 0, 16, 16 }; // Image index 6
+        SDL_Rect src = { 63 * TILE_SIZE, 0, 16, 16 }; // Image index 6
         SDL_Rect dest = { (int)fantome.x, (int)fantome.y, 16, 16 }; 
         SDL_RenderCopy(renderer, tilesetTexture, &src, &dest);
     }  
