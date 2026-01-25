@@ -42,6 +42,8 @@ typedef struct {
 typedef struct{
     float x, y;
     int w, h;
+    int direction; // 0: Haut, 1: Bas, 2: Gauche, 3: Droite
+    int timer;     // Nombre de frames restantes avant de changer de direction
 } Fantome;
 
 static Joueur player;
@@ -278,8 +280,8 @@ int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesN
 
 // --- INITIALISATION ---
 void InitGame(SDL_Renderer *renderer) {
-    player.x = 100; 
-    player.y = 100; 
+    // player.x = 100; 
+    // player.y = 100; 
     player.w = 12; 
     player.h = 12;
     dialogueStep = 1;
@@ -287,10 +289,12 @@ void InitGame(SDL_Renderer *renderer) {
     hasDoudou = 0;
 
     // Test pour le fantome
-    fantome.x = 100;
-    fantome.y = 100;
-    fantome.w = 12;
-    fantome.h = 12;
+    fantome.x = 8 * TILE_SIZE; 
+    fantome.y = 11 * TILE_SIZE;
+    fantome.w = 15;
+    fantome.h = 15;
+    fantome.direction = 0; 
+    fantome.timer = 0;     
 
     // Chargement des sons
     // sonTransition = chargement_son_transition();
@@ -300,6 +304,10 @@ void InitGame(SDL_Renderer *renderer) {
     MusicInterior = chargement_son_ambiance();
     MusicExterior = chargement_son_exterieur();
     
+    currentLevel = 5;
+    player.x = 20; 
+    player.y = 12*TILE_SIZE ;
+    hasDoudou = 1;
 
     // Chargement du Tileset
     SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");
@@ -383,16 +391,6 @@ int isWall(float x, float y) {
     if (type == 21){
         return 1;
     }
-    return 0;
-}
-
-int IsWallFantome(float x, float y){
-    int caseX = x / TILE_SIZE;
-    int caseY = y / TILE_SIZE;
-    if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
-    int type_pattern = maps_patern[currentLevel][caseY][caseX];
-
-    if(type_pattern == 2) return 1;
     return 0;
 }
 
@@ -696,9 +694,103 @@ void UpdateGame(void) {
     // Changement de son d'ambiance
     ManageMusic();
 
+    ActionFantome();
+
 
     // printf("lvl: %d \n", currentLevel);
 }
+
+// Fonction utilitaire collision (avec marge de sécurité +1 pixel)
+int CheckCollisionFantome(float x, float y) {
+    if (isWall(x + 1, y + 1)) return 0;
+    if (isWall(x + fantome.w - 1, y + 1)) return 0;
+    if (isWall(x + 1, y + fantome.h - 1)) return 0;
+    if (isWall(x + fantome.w - 1, y + fantome.h - 1)) return 0;
+    return 1;
+}
+
+void ActionFantome() {
+    float nextX = fantome.x;
+    float nextY = fantome.y;
+
+    // 1. Calcul position théorique
+    if (fantome.direction == 0) nextY -= FANTOME_SPEED; // Haut
+    if (fantome.direction == 1) nextY += FANTOME_SPEED; // Bas
+    if (fantome.direction == 2) nextX -= FANTOME_SPEED; // Gauche
+    if (fantome.direction == 3) nextX += FANTOME_SPEED; // Droite
+
+    // 2. Est-ce qu'on cogne un mur ?
+    int hitWall = !CheckCollisionFantome(nextX, nextY);
+
+    fantome.timer--;
+
+    // 3. LOGIQUE DE DECISION
+    // Si on tape un mur OU si le timer est fini
+    if (hitWall || fantome.timer <= 0) {
+        
+        int directionOpposee = -1;
+        if (fantome.direction == 0) directionOpposee = 1;
+        else if (fantome.direction == 1) directionOpposee = 0;
+        else if (fantome.direction == 2) directionOpposee = 3;
+        else if (fantome.direction == 3) directionOpposee = 2;
+
+        // Lister les chemins possibles autour du fantôme
+        int cheminsLibres[4]; 
+        int nbChemins = 0;
+
+        // On regarde un peu plus loin (SPEED * 2) pour anticiper
+        if (CheckCollisionFantome(fantome.x, fantome.y - FANTOME_SPEED*2)) cheminsLibres[nbChemins++] = 0;
+        if (CheckCollisionFantome(fantome.x, fantome.y + FANTOME_SPEED*2)) cheminsLibres[nbChemins++] = 1;
+        if (CheckCollisionFantome(fantome.x - FANTOME_SPEED*2, fantome.y)) cheminsLibres[nbChemins++] = 2;
+        if (CheckCollisionFantome(fantome.x + FANTOME_SPEED*2, fantome.y)) cheminsLibres[nbChemins++] = 3;
+
+        // Filtrer le demi-tour (sauf si cul-de-sac)
+        int choixPossibles[4];
+        int nbChoix = 0;
+
+        if (nbChemins > 0) {
+            for (int i = 0; i < nbChemins; i++) {
+                if (cheminsLibres[i] != directionOpposee) {
+                    choixPossibles[nbChoix++] = cheminsLibres[i];
+                }
+            }
+
+            // Choix final
+            if (nbChoix > 0) {
+                fantome.direction = choixPossibles[rand() % nbChoix];
+            } else {
+                fantome.direction = directionOpposee; // Cul-de-sac obligé
+            }
+            
+            // On lui donne du temps pour parcourir le couloir
+            fantome.timer = 30 + (rand() % 60);
+
+            // --- LE RECALAGE (SNAP TO GRID) ---
+            // C'est ICI la correction magique.
+            // Si le fantôme décide d'aller en Haut/Bas, on aligne son X parfaitement.
+            // Si le fantôme décide d'aller à Gauche/Droite, on aligne son Y parfaitement.
+            
+            if (fantome.direction == 0 || fantome.direction == 1) { // Vertical
+                int col = (int)((fantome.x + fantome.w/2) / TILE_SIZE); // Colonne actuelle
+                fantome.x = (float)(col * TILE_SIZE + (TILE_SIZE - fantome.w)/2); // Centrage parfait
+            } 
+            else { // Horizontal
+                int lig = (int)((fantome.y + fantome.h/2) / TILE_SIZE); // Ligne actuelle
+                fantome.y = (float)(lig * TILE_SIZE + (TILE_SIZE - fantome.h)/2); // Centrage parfait
+            }
+
+        } else {
+            // Bloqué (bug collision), on attend un peu
+            fantome.timer = 10;
+        }
+
+    } else {
+        // Pas de mur, on avance fluide
+        fantome.x = nextX;
+        fantome.y = nextY;
+    }
+}
+
 
 // Retourne 1 si la case est dans la lumière sinon 0.
 int estEclaire(int gridX, int gridY, int rayon) {
@@ -908,5 +1000,15 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
     SDL_Rect srcPlayer = { 112, 0, 16, 16 };
     SDL_Rect destPlayer = { (int)player.x - 2, (int)player.y - 2, 16, 16 };
     SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);  
+
+
+    int caseX = (int)(fantome.x / TILE_SIZE);
+    int caseY = (int)(fantome.y / TILE_SIZE);
+
+    if (estEclaire(caseX, caseY, rayon) && currentLevel == 5) {
+        SDL_Rect src = { 6 * TILE_SIZE, 0, 16, 16 }; // Image index 6
+        SDL_Rect dest = { (int)fantome.x, (int)fantome.y, 16, 16 }; 
+        SDL_RenderCopy(renderer, tilesetTexture, &src, &dest);
+    }  
 }
 
