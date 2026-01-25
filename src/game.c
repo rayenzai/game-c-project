@@ -35,6 +35,7 @@ static Joueur player;
 static SDL_Texture *tilesetTexture = NULL; 
 // static SDL_Texture *playerTexture = NULL; 
 
+int rayon = 0;
 
 #define NB_LEVELS 5      
 int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
@@ -517,7 +518,6 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
     // 2. Dessiner la CARTE avec le tileset
     if (tilesetTexture) {
         // int rayonLumiere = 0;
-        int rayon = 0; 
         if (hasDoudou == 1) {
             // rayonLumiere = 60; 
             rayon = 60;
@@ -535,10 +535,7 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
 
                 // --- A. DESSINER LA TUILE --- (avec le tableau)
                 int type = maps_patern[currentLevel][y][x]; 
-                SDL_Rect srcRect = { type * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
-                SDL_Rect destRect = { x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE };
-                SDL_RenderCopy(renderer, tilesetTexture, &srcRect, &destRect);
-
+                DrawTuiles(x, y, type, renderer, rayon);
 
                 int type_maps = maps[currentLevel][y][x];
                 if(IsTuileSpecial(type_maps)){
