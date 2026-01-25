@@ -13,9 +13,7 @@
 #define LOGICAL_WIDTH 320
 #define LOGICAL_HEIGHT 240
 #define MAP_WIDTH 20        
-#define MAP_HEIGHT 15   
-
-#define FANTOME_SPEED 1.0f    
+#define MAP_HEIGHT 15     
 
 // -- Pour les sons -- 
 
@@ -39,13 +37,7 @@ typedef struct {
     int w, h;       
 } Joueur;
 
-typedef struct{
-    float x, y;
-    int w, h;
-} Fantome;
-
 static Joueur player;
-static Fantome fantome;
 static SDL_Texture *tilesetTexture = NULL; 
 // static SDL_Texture *playerTexture = NULL; 
 

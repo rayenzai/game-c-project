@@ -8,7 +8,6 @@
 void InitGame(SDL_Renderer *renderer);
 void UpdateGame(void);
 void DrawGame(SDL_Renderer *renderer, TTF_Font *font);
-void ActionFantome();
 
 extern int currentLevel; 
 
