@@ -15,7 +15,7 @@
 #define MAP_WIDTH 20        
 #define MAP_HEIGHT 15   
 
-#define FANTOME_SPEED 0.75f  
+#define FANTOME_SPEED 1.0f  
 
 // -- Pour les sons -- 
 
