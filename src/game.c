@@ -15,7 +15,7 @@
 #define MAP_WIDTH 20        
 #define MAP_HEIGHT 15   
 
-#define FANTOME_SPEED 1.0f    
+#define FANTOME_SPEED 0.75f  
 
 // -- Pour les sons -- 
 
@@ -39,12 +39,14 @@ typedef struct {
     int w, h;       
 } Joueur;
 
+
 typedef struct{
     float x, y;
     int w, h;
     int direction; // 0: Haut, 1: Bas, 2: Gauche, 3: Droite
     int timer;     // Nombre de frames restantes avant de changer de direction
 } Fantome;
+
 
 static Joueur player;
 static Fantome fantome;
@@ -278,6 +280,9 @@ int dialogueStep_sortie1 = 0;
 int dialogue_hasDoudou = 0;
 int toucheRelache = 0;
 int hasDoudou = 0;
+int showInteractPrompt = 0;
+int showInteractPrompt2 = 0;
+int showInteractPrompt3 = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
 
 int TuilesNotSpecial[] = {0, 1, 2};
@@ -292,6 +297,7 @@ void InitGame(SDL_Renderer *renderer) {
     dialogueStep = 1;
     toucheRelache = 0;
     hasDoudou = 0;
+
 
     // Test pour le fantome
     fantome.x = 8 * TILE_SIZE; 
@@ -333,12 +339,10 @@ int isWall(float x, float y) {
     int caseY = y / TILE_SIZE;
     if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
     int type = maps[currentLevel][caseY][caseX];
-    int type_pattern = maps_patern[currentLevel][caseY][caseX];
+    // int type_pattern = maps_patern[currentLevel][caseY][caseX];
 
     // --- TYPE 1 : MURS CLASSIQUES (Tout le bloc est solide) ---
     // Les murs, les bords, le vide...
-
-    if ( (type >= 2 && type <= 5) || (type_pattern >= 2 && type_pattern <= 5) ) return 1;
 
     if (type == 2 || type == 5){
         // VERIFICATION DU MUR "DU DESSOUS"
@@ -528,11 +532,31 @@ void UpdateGame(void) {
     float dy = (player.y + player.h / 2) - armoireY;
     float distance = sqrt(dx*dx + dy*dy);
 
+    if (distance < 16 && currentLevel == 0 && maps[0][0][16] == 8) {
+        showInteractPrompt = 1;
+    }
+    else{
+        showInteractPrompt = 0;
+    }
+
+    if (distance < 16 && currentLevel == 0 && maps[0][0][16] == 16) {
+        showInteractPrompt2 = 1;
+    }
+    else{
+        showInteractPrompt2 = 0;
+    }
+    if (distance < 16 && currentLevel == 0 && maps[0][0][16] == 12) {
+        showInteractPrompt3 = 1;
+    }
+    else{
+        showInteractPrompt3 = 0;
+    }
+
+
     if (state[SDL_SCANCODE_E]) {
         if (toucheE_Relache) {
             // Si le joueur est à moins de 16 pixel (une tuile)
             if (distance < 16 && currentLevel == 0) {
-                
                 // On vérifie si l'armoire est FERMÉE (8) (tuile en haut à gauche de l'armoire)
                 // On l'ouvre avec le doudou dedans
                 if (maps[0][0][16] == 8 && hasDoudou == 0) {
@@ -565,6 +589,7 @@ void UpdateGame(void) {
         }
     } else {
         toucheE_Relache = 1; // On a lâché la touche E on peut re appuyer
+        
     }
 
     if (state[SDL_SCANCODE_RETURN] || state[SDL_SCANCODE_KP_ENTER])
@@ -705,13 +730,40 @@ void UpdateGame(void) {
     // printf("lvl: %d \n", currentLevel);
 }
 
+int isWallSimple(float x, float y) {
+    int caseX = (int)(x / TILE_SIZE);
+    int caseY = (int)(y / TILE_SIZE);
+
+    // 1. Sécurité : Si hors de la carte, c'est un mur
+    if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) {
+        return 1;
+    }
+
+    // 2. Lecture de la tuile
+    int type = maps[currentLevel][caseY][caseX];
+
+    // 3. Logique binaire pour le labyrinthe :
+    // Les sols sont 0 et 1. Tout le reste (2, meubles, etc.) bloque le fantôme.
+    if (type == 0 || type == 1) {
+        return 0; // C'est libre
+    }
+    
+    // Si tu as des passages secrets ou portes ouvertes (12, 13..), ajoute-les ici :
+    // if (type >= 12 && type <= 19) return 0; 
+
+    return 1; // C'est un mur
+}
+
 // Fonction utilitaire collision (avec marge de sécurité +1 pixel)
 int CheckCollisionFantome(float x, float y) {
-    if (isWall(x + 1, y + 1)) return 0;
-    if (isWall(x + fantome.w - 1, y + 1)) return 0;
-    if (isWall(x + 1, y + fantome.h - 1)) return 0;
-    if (isWall(x + fantome.w - 1, y + fantome.h - 1)) return 0;
-    return 1;
+    // On utilise isWallSimple au lieu de isWall
+    // On vérifie les 4 coins du fantôme
+    if (isWallSimple(x + 1, y + 1)) return 0;
+    if (isWallSimple(x + fantome.w - 1, y + 1)) return 0;
+    if (isWallSimple(x + 1, y + fantome.h - 1)) return 0;
+    if (isWallSimple(x + fantome.w - 1, y + fantome.h - 1)) return 0;
+    
+    return 1; // 1 = La voie est libre (c'est inversé dans ta logique actuelle)
 }
 
 void ActionFantome() {
@@ -840,7 +892,7 @@ int IsTuileSpecial(int index){
 }
 
 // --- DESSIN ---
-void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
+void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     // 1. Fond Noir
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
@@ -1015,5 +1067,97 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
         SDL_Rect dest = { (int)fantome.x, (int)fantome.y, 16, 16 }; 
         SDL_RenderCopy(renderer, tilesetTexture, &src, &dest);
     }  
+
+   if (showInteractPrompt == 1) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Ouvrir", cBlanc);
+        
+        if (sText) {
+            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+            
+            // 1. Calcul de la position théorique
+            int posX = (int)player.x - (sText->w / 2) + 8;
+            int posY = (int)player.y + 20;
+
+            // 2. CORRECTION (Clamping) pour ne pas sortir de l'écran
+            if (posX < 2) { 
+                posX = 2; // Bloque à gauche
+            } 
+            else if (posX + sText->w > LOGICAL_WIDTH - 2) {
+                posX = LOGICAL_WIDTH - sText->w - 2; // Bloque à droite
+            }
+
+            // 3. On applique la position corrigée
+            SDL_Rect rText = { posX, posY, sText->w, sText->h };
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150); 
+            SDL_Rect rFond = { rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2 };
+            SDL_RenderFillRect(renderer, &rFond);
+
+            SDL_RenderCopy(renderer, tText, NULL, &rText);
+            
+            SDL_FreeSurface(sText);
+            SDL_DestroyTexture(tText);
+        }
+    }
+
+     if (showInteractPrompt2 == 1) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[ENTER] Interagir", cBlanc);
+        
+        if (sText) {
+            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+            
+            // 1. Calcul position
+            int posX = (int)player.x - (sText->w / 2) + 8;
+            int posY = (int)player.y + 20;
+
+            // 2. Correction (Clamping)
+            if (posX < 2) posX = 2;
+            else if (posX + sText->w > LOGICAL_WIDTH - 2) posX = LOGICAL_WIDTH - sText->w - 2;
+            
+            // 3. Application
+            SDL_Rect rText = { posX, posY, sText->w, sText->h };
+            
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150); 
+            SDL_Rect rFond = { rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2 };
+            SDL_RenderFillRect(renderer, &rFond);
+
+            SDL_RenderCopy(renderer, tText, NULL, &rText);
+            
+            SDL_FreeSurface(sText);
+            SDL_DestroyTexture(tText);
+        }
+    }
+    if (showInteractPrompt3 == 1) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Fermer", cBlanc);
+        
+        if (sText) {
+            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+            
+            // 1. Calcul position
+            int posX = (int)player.x - (sText->w / 2) + 8;
+            int posY = (int)player.y + 20;
+
+            // 2. Correction (Clamping)
+            if (posX < 2) posX = 2;
+            else if (posX + sText->w > LOGICAL_WIDTH - 2) posX = LOGICAL_WIDTH - sText->w - 2;
+            
+            // 3. Application
+            SDL_Rect rText = { posX, posY, sText->w, sText->h };
+            
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150); 
+            SDL_Rect rFond = { rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2 };
+            SDL_RenderFillRect(renderer, &rFond);
+
+            SDL_RenderCopy(renderer, tText, NULL, &rText);
+            
+            SDL_FreeSurface(sText);
+            SDL_DestroyTexture(tText);
+        }
+    }
 }
 
