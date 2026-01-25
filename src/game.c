@@ -278,11 +278,6 @@ void InitGame(SDL_Renderer *renderer) {
     toucheRelache = 0;
     hasDoudou = 0;
 
-    // Test pour le fantome
-    fantome.x = 100;
-    fantome.y = 100;
-    fantome.w = 12;
-    fantome.h = 12;
 
     // Chargement des sons
     // sonTransition = chargement_son_transition();
@@ -378,15 +373,6 @@ int isWall(float x, float y) {
     return 0;
 }
 
-int IsWallFantome(float x, float y){
-    int caseX = x / TILE_SIZE;
-    int caseY = y / TILE_SIZE;
-    if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
-    int type_pattern = maps_patern[currentLevel][caseY][caseX];
-
-    if(type_pattern == 2) return 1;
-    return 0;
-}
 
 // -- Fonctions pour vérification de directions et d'emplacements
 
