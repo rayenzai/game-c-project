@@ -3,6 +3,7 @@
 #include <SDL2/SDL_mixer.h>
 #include "game.h"
 #include "sons.h"
+#include "map.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -75,7 +76,7 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
  {      //carte 1 (chambre)
         {2, 2,  2,  2,  2,  2, 2, 2, 0, 0, 0, 0, 2,  2,  2,  2,  8,  9, 2, 2}, // Trou en haut   
-        {2, 2,  2, 36, 1,  2, 2, 2, 0, 0, 0, 0, 2,  2,  5,  2,  10,  11, 2, 2}, 
+        {2, 2,  2, 36, 37,  2, 2, 2, 0, 0, 0, 0, 2,  2,  5,  2,  10,  11, 2, 2}, 
         {2, 1,  0, 32, 33, 21, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1, 0, 1, 0, 2},
         {2, 1,  0, 34, 35,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
         {2, 1, 30, 31,  0,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
@@ -88,7 +89,7 @@ static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 1,  0,  1,  0,  1, 0, 1, 0, 1, 0, 1, 0, 27, 28, 29,  0,  1, 0, 2},
         {2, 1,  0,  1,  0,  1, 0, 1, 0, 1, 0, 1, 0, 24, 25, 26,  0,  1, 0, 2}, // Bas fermé
         {2, 1,  0,  1,  0,  1, 0, 1, 0, 1, 0, 1, 0, 22, 23,  0,  0,  1, 0, 2},
-        {2, 2,  2,  2,  2,  2, 2, 2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2, 2, 2}
+        {2, 2,  2,  2,  2,  2, 2, 2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2, 2, 2}  // Bas fermé
     },
     // CARTE 2 : COULOIR (Niveau 1)
     {
@@ -170,6 +171,9 @@ int dialogue_hasDoudou = 0;
 int toucheRelache = 0;
 int hasDoudou = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
+
+int TuilesNotSpecial[] = {0, 1, 2};
+int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
 
 // --- INITIALISATION ---
 void InitGame(SDL_Renderer *renderer) {
@@ -414,7 +418,7 @@ void UpdateGame(void) {
         
     }
     
-if (currentLevel == 1 && player.y < 5) {
+    if (currentLevel == 1 && player.y < 5) {
         if (hasDoudou == 1) {
             currentLevel = 2; 
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
@@ -444,7 +448,7 @@ if (currentLevel == 1 && player.y < 5) {
         
     }
         
-if (currentLevel == 3 && player.y < 5) {
+    if (currentLevel == 3 && player.y < 5) {
         if (hasDoudou == 1) {
             currentLevel = 4; 
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
@@ -458,10 +462,6 @@ if (currentLevel == 3 && player.y < 5) {
         player.y = 10;     // On apparaît tout en HAUT de la chambre
         
     }
-
-
-
-
 }
 
 
@@ -489,10 +489,23 @@ int estEclaire(int gridX, int gridY, int rayon) {
     return 0; // C'est éteint
 }
 
-void DrawTuiles(float x, float y, int indexTuile, SDL_Renderer *renderer){
-    SDL_Rect srcTuile = { TILE_SIZE * indexTuile, 0, TILE_SIZE, TILE_SIZE };
-    SDL_Rect destTuile = { x * TILE_SIZE, y * TILE_SIZE , TILE_SIZE, TILE_SIZE };
-    SDL_RenderCopy(renderer, tilesetTexture, &srcTuile, &destTuile);
+void DrawTuiles(float x, float y, int indexTuile, SDL_Renderer *renderer, int rayon){
+    if(estEclaire(x, y, rayon))
+    {   
+        SDL_Rect srcTuile = { TILE_SIZE * indexTuile, 0, TILE_SIZE, TILE_SIZE };
+        SDL_Rect destTuile = { x * TILE_SIZE, y * TILE_SIZE , TILE_SIZE, TILE_SIZE };
+        SDL_RenderCopy(renderer, tilesetTexture, &srcTuile, &destTuile);
+    }
+}
+
+int IsTuileSpecial(int index){
+    for (int i = 0; i < tailleTuilesNotSpecial; ++i)
+    {
+        if(TuilesNotSpecial[i] == index){
+            return 0;
+        }
+    }
+    return 1;
 }
 
 // --- DESSIN ---
@@ -521,13 +534,16 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
                 }
 
                 // --- A. DESSINER LA TUILE --- (avec le tableau)
-                int type = maps[currentLevel][y][x]; 
+                int type = maps_patern[currentLevel][y][x]; 
                 SDL_Rect srcRect = { type * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
                 SDL_Rect destRect = { x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE };
                 SDL_RenderCopy(renderer, tilesetTexture, &srcRect, &destRect);
 
-                // Dessin des tuiles
-                DrawTuiles(4, 1, 37, renderer);
+
+                int type_maps = maps[currentLevel][y][x];
+                if(IsTuileSpecial(type_maps)){
+                    DrawTuiles(x, y, type_maps, renderer, rayon);
+                }
 
                 // --- B. DESSINER LE CONTOUR (Bords pixelisés) ---
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // Blanc
