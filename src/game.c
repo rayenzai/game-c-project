@@ -223,9 +223,11 @@ int isWall(float x, float y) {
     int caseY = y / TILE_SIZE;
     if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
     int type = maps[currentLevel][caseY][caseX];
+    int type_pattern = maps_patern[currentLevel][caseY][caseX];
+
     // --- TYPE 1 : MURS CLASSIQUES (Tout le bloc est solide) ---
     // Les murs, les bords, le vide...
-    if (type >= 2 && type <= 5) return 1;
+    if ( (type >= 2 && type <= 5) || (type_pattern >= 2 && type_pattern <= 5) ) return 1;
 
     // --- TYPE 2 : MEUBLES AVEC PROFONDEUR (Placard 8 et 9) ---
     // On veut que le haut du meuble soit traversable (effet de perspective)
