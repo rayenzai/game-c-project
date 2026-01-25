@@ -232,8 +232,6 @@ int isWall(float x, float y) {
     // --- TYPE 1 : MURS CLASSIQUES (Tout le bloc est solide) ---
     // Les murs, les bords, le vide...
 
-    if ( (type >= 2 && type <= 5) || (type_pattern >= 2 && type_pattern <= 5) ) return 1;
-
     if (type == 2 || type == 5){
         // VERIFICATION DU MUR "DU DESSOUS"
         // Si la case en dessous est un autre mur (type 2), alors c'est un "mur de coté" ou un "mur plein".
