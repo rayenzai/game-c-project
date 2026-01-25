@@ -21,6 +21,8 @@ typedef enum {
 int main(int argc, char* argv[]) {
     (void)argc; (void)argv;
 
+    srand(time(NULL));
+
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
     // --- AJOUT IMPORTANT ---

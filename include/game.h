@@ -3,9 +3,13 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <time.h>
 
 void InitGame(SDL_Renderer *renderer);
 void UpdateGame(void);
 void DrawGame(SDL_Renderer *renderer, TTF_Font *font);
+void ActionFantome();
+
 extern int currentLevel; 
+
 #endif

@@ -13,14 +13,22 @@
 #define LOGICAL_WIDTH 320
 #define LOGICAL_HEIGHT 240
 #define MAP_WIDTH 20        
-#define MAP_HEIGHT 15       
+#define MAP_HEIGHT 15   
 
-// Pour les sons
+#define FANTOME_SPEED 1.0f    
+
+// -- Pour les sons -- 
+
+// Sound Effects
 // static Mix_Chunk *sonTransition = NULL;
 static Mix_Chunk *sonPickUp = NULL;
 static Mix_Chunk *sonOpenDoor = NULL;
 static Mix_Chunk *sonCloseDoor = NULL;
-  
+
+// Musiques D'ambiance
+static Mix_Music *MusicInterior = NULL;
+static Mix_Music *MusicExterior = NULL;
+
 // Pour les touches
 static int toucheE_Relache = 1;
 static int toucheEnter_Relache = 1;
@@ -31,13 +39,19 @@ typedef struct {
     int w, h;       
 } Joueur;
 
+typedef struct{
+    float x, y;
+    int w, h;
+} Fantome;
+
 static Joueur player;
+static Fantome fantome;
 static SDL_Texture *tilesetTexture = NULL; 
 // static SDL_Texture *playerTexture = NULL; 
 
 int rayon = 0;
 
-#define NB_LEVELS 5      
+#define NB_LEVELS 9   
 int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 
 
@@ -134,8 +148,8 @@ static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2}, // Bas fermé
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Bas fermé
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}
     },
@@ -164,17 +178,92 @@ static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2}, // Bas fermé
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}
-    }
+    },
+    // --- LABYRINTHE 1 (Index 4) ---
+    {
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, 
+        {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 2}, 
+        {2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2},
+        {2, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 2},
+        {2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 2}, 
+        {2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 2},
+        {2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1, 2}, 
+        {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2}, 
+        {2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2}, 
+        {2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2},
+        {2, 1, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2}, 
+        {1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 2},
+        {1, 1, 2, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 1, 1}, // SORTIE DROITE (Ligne 12)
+        {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2}, 
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}  
+    },
+
+    // --- LABYRINTHE 2 (Index 5) ---
+    {
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Mur Haut
+        {2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2},
+        {2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2},
+        {2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 2},
+        {2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 2, 2, 1, 2}, // Gros bloc central
+        {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2},
+        {2, 2, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2},
+        {2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2},
+        {2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 2},
+        {2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 2},
+        {2, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 2, 2, 1, 2, 1, 2},
+        {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 2},
+        {1, 1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2}, // ENTRÉE GAUCHE (Ligne 12, connectée à l'autre)
+        {2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2}  // SORTIE BAS (Ligne 14, Colonnes 10-11)
+    },
+
+    // --- LABYRINTHE 3 (Index 6) ---
+    {
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2}, // ENTRÉE HAUT (Alignée avec sortie précédente)
+        {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2}, // Zone ouverte pour tromper
+        {2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2},
+        {2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 2}, // Début des fausses pistes
+        {2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 1, 2},
+        {2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 2},
+        {2, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2},
+        {2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2}, // Grand couloir transversal
+        {2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Cul de sac massif à droite
+        {2, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2},
+        {2, 2, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2},
+        {2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2},
+        {1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2}, // SORTIE GAUCHE (Ligne 12)
+        {2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}  // Mur Bas fermé
+    },
+
+    // --- LABYRINTHE 4 (Index 7) ---
+    {
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Mur Haut
+        {2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2}, // Chemin du haut
+        {2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2},
+        {2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2},
+        {2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 2},
+        {2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 2},
+        {2, 1, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 2, 1, 2},
+        {2, 1, 2, 1, 2, 1, 2, 1, 1, 6, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2}, // <--- LE DOUDOU (6) EST ICI
+        {2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2},
+        {2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 2, 1, 1, 1, 2},
+        {2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2},
+        {2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1}, // ENTRÉE DROITE (Ligne 12)
+        {2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2}, // Fausse piste en bas
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+    },
 };
 
 int dialogueStep = 0;
@@ -197,11 +286,19 @@ void InitGame(SDL_Renderer *renderer) {
     toucheRelache = 0;
     hasDoudou = 0;
 
+    // Test pour le fantome
+    fantome.x = 100;
+    fantome.y = 100;
+    fantome.w = 12;
+    fantome.h = 12;
+
     // Chargement des sons
     // sonTransition = chargement_son_transition();
     sonPickUp = chargement_son_item_pick_up();
     sonOpenDoor = chargement_son_door_open();
     sonCloseDoor = chargement_son_door_close();
+    MusicInterior = chargement_son_ambiance();
+    MusicExterior = chargement_son_exterieur();
     
 
     // Chargement du Tileset
@@ -287,6 +384,63 @@ int isWall(float x, float y) {
         return 1;
     }
     return 0;
+}
+
+int IsWallFantome(float x, float y){
+    int caseX = x / TILE_SIZE;
+    int caseY = y / TILE_SIZE;
+    if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
+    int type_pattern = maps_patern[currentLevel][caseY][caseX];
+
+    if(type_pattern == 2) return 1;
+    return 0;
+}
+
+// -- Fonctions pour vérification de directions et d'emplacements
+
+// Entrer le xDébut et xFin du trou, CurrLvl correspond au lvl courant (<==> currentLevel),
+// yDiff correpond à la marge de détection que vous accordez au joueur pour passer à l'autre salle 
+// à combien de blocks de la porte vous accordez le joueur pour pouvoir passer d'une salle à l'autre
+
+int IsLocationUp(int xDebut, int xFin, int CurrLvl, int yDiff){
+    return (currentLevel == CurrLvl && player.y < yDiff && player.x >= (xDebut * TILE_SIZE) && player.x <= (xFin * TILE_SIZE) );
+}
+
+int IsLocationDown(int xDebut, int xFin, int CurrLvl, int yDiff){
+    return (currentLevel == CurrLvl && player.y > (MAP_HEIGHT * TILE_SIZE) - yDiff && player.x >= (xDebut * TILE_SIZE) && player.x <= (xFin * TILE_SIZE) );
+}
+
+int IsLocationRight(int yDebut, int yFin, int CurrLvl, int xDiff){
+    return (currentLevel == CurrLvl && player.x > (MAP_WIDTH * TILE_SIZE) - xDiff && player.y >= (yDebut * TILE_SIZE) && player.y <= (yFin * TILE_SIZE) );
+}
+
+int IsLocationLeft(int yDebut, int yFin, int CurrLvl, int xDiff){
+    return (currentLevel == CurrLvl && player.x < xDiff && player.y >= (yDebut * TILE_SIZE) && player.y <= (yFin * TILE_SIZE) );
+}
+        
+void ManageMusic() {
+    static int currentZoneState = -1; 
+    int newZoneState = 0; 
+
+    // Si on est dans les niveaux 5, 6, 7 ou 8, on est à l'EXTERIEUR
+    if (currentLevel >= 5 && currentLevel <= 8) {
+        newZoneState = 1;
+    } else {
+        newZoneState = 0;
+    }
+
+    // Si la zone a changé (ex: on passe de 4 à 5, ou au démarrage du jeu)
+    if (newZoneState != currentZoneState) {
+        Mix_VolumeMusic(32);
+        if (newZoneState == 1) {
+            if (MusicExterior) Mix_FadeInMusic(MusicExterior, -1, 1000); 
+        } 
+        else {
+            if (MusicInterior) Mix_FadeInMusic(MusicInterior, -1, 1000);
+        }
+        currentZoneState = newZoneState;
+    }
+
 }
 
 // --- UPDATE ---
@@ -437,73 +591,114 @@ void UpdateGame(void) {
 
     // 1. Quitter la CHAMBRE (Niveau 0) par le HAUT
     // On vérifie si on est au niveau 0 ET si on dépasse le haut de l'écran (y < 5)
-    if (currentLevel == 0 && player.y < 5) {
+    if (IsLocationUp(8, 13, 0, 5)) {
         if (hasDoudou == 1) {
             currentLevel = 1; 
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
             
 
+        }
+        else{
+            player.y = 10;
+            dialogueStep_sortie1 = 1;
+        }
     }
-    else{
-        player.y = 10;
-        dialogueStep_sortie1 = 1;
-    }
-    }
+
     // 2. Quitter le COULOIR (Niveau 1) par le BAS
     // On vérifie si on est au niveau 1 ET si on dépasse le haut de l'écran
-    else if (currentLevel == 1 && player.y > (MAP_HEIGHT * TILE_SIZE) - 20) {
+    else if (IsLocationDown(8, 13, 1, 20)) {
         currentLevel = 0;  // On retourne à la CHAMBRE
         player.y = 10;     // On apparaît tout en HAUT de la chambre
         
     }
     
-    if (currentLevel == 1 && player.y < 5) {
-        if (hasDoudou == 1) {
+    if (IsLocationUp(8, 13, 1, 5)) {
             currentLevel = 2; 
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
     }
-    else{
-        player.y = 10;
-    }
-    }
-    else if (currentLevel == 2 && player.y > (MAP_HEIGHT * TILE_SIZE) - 20) {
-        currentLevel = 1;  // On retourne à la CHAMBRE
-        player.y = 10;     // On apparaît tout en HAUT de la chambre
+
+    else if (IsLocationDown(8, 13, 2, 20)) {
+        currentLevel = 1;  
+        player.y = 10;     
         
     }
     
-    if (currentLevel == 2 && player.x < 5) {
-        if (hasDoudou == 1) {
+    if (IsLocationLeft(5, 10, 2, 5)) {
             currentLevel = 3; 
             player.x = (MAP_WIDTH * TILE_SIZE) - 20;
     }
-    else{
-        player.x = 3;
-    }
-    }
-    else if (currentLevel == 3 && player.x > (MAP_WIDTH * TILE_SIZE) - 20) {
+
+    else if (IsLocationRight(5, 10, 3, 20)) {
         currentLevel = 2;  // On retourne à la CHAMBRE
         player.x = 3;     // On apparaît tout en HAUT de la chambre
         
     }
         
-    if (currentLevel == 3 && player.y < 5) {
-        if (hasDoudou == 1) {
+    if (IsLocationUp(8, 13, 3, 5)) {
             currentLevel = 4; 
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
     }
-    else{
-        player.y = 10;
-    }
-    }
-    else if (currentLevel == 4 && player.y > (MAP_HEIGHT * TILE_SIZE) - 20) {
+
+    else if (IsLocationDown(8, 13, 4, 20)) {
         currentLevel = 3;  // On retourne à la CHAMBRE
         player.y = 10;     // On apparaît tout en HAUT de la chambre
         
     }
+
+    // --- TRANSITIONS DU LABYRINTHE ---
+
+    // Transition du niveau 2 au premier niveau du labyrinthe (niveau 5)
+    if(IsLocationRight(11, 14, 2, 20)){
+        currentLevel = 5;
+        player.x = 3;
+        // Mix_FreeMusic(bgm);
+    }
+
+    // Transition du premier niveau du labyrinthe (niveau 5) au niveau 2
+    else if (IsLocationLeft(11, 14, 5, 5))
+    {
+        currentLevel = 2;
+        player.x = (MAP_WIDTH * TILE_SIZE) - 20;
+    }
+
+    if(IsLocationRight(12, 14, 5, 20)){
+        currentLevel = 6;
+        player.x = 3;
+    }
+
+    else if (IsLocationLeft(12, 14, 6, 5))
+    {
+        currentLevel = 5;
+        player.x = (MAP_WIDTH * TILE_SIZE) - 20;
+    }
+
+    if(IsLocationDown(10, 13, 6, 20)){
+        currentLevel = 7;
+        player.y = 10;
+    }
+
+    else if(IsLocationUp(10, 13, 7, 5)){
+        currentLevel = 6;
+        player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
+    }
+
+    if(IsLocationLeft(12, 14, 7, 5)){
+        currentLevel = 8;
+        player.x = (MAP_WIDTH * TILE_SIZE) - 20;
+    }
+
+    else if(IsLocationRight(12, 14, 8, 20)){
+        currentLevel = 7;
+        player.x = 3;
+    }
+
+
+    // Changement de son d'ambiance
+    ManageMusic();
+
+
+    // printf("lvl: %d \n", currentLevel);
 }
-
-
 
 // Retourne 1 si la case est dans la lumière sinon 0.
 int estEclaire(int gridX, int gridY, int rayon) {
@@ -708,8 +903,10 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
         }
     }
 
+    
 
     SDL_Rect srcPlayer = { 112, 0, 16, 16 };
     SDL_Rect destPlayer = { (int)player.x - 2, (int)player.y - 2, 16, 16 };
-    SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
+    SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);  
 }
+
