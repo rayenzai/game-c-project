@@ -77,26 +77,37 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 32,33 = haut grand lit bb 
 34,35 = bas grand lit bb
 36,37 = déco haut du lit
+38,39 = petit train
+40 = avion 
+41 = dino
+42,43 = commode mur gauche
+44 = cubes
+45 = cubes 
+46,47,48,49 = bureau enfant
+50 = cube noir
+51 = haut chaise 
+52,53,54 = bas tente
+55,56,57 = haut tente
 */
 
 // --- LA CARTE DU NIVEAU ---
 static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
  {      //carte 1 (chambre)
-        {2, 2,  2,  2,  2,  2, 2, 2, 0, 0, 0, 0, 2,  2,  2,  2,  8,  9, 2, 2}, // Trou en haut   
-        {2, 2,  2, 36, 37,  2, 2, 2, 0, 0, 0, 0, 2,  2,  5,  2,  10,  11, 2, 2}, 
-        {2, 1,  0, 32, 33, 21, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1, 0, 1, 0, 2},
-        {2, 1,  0, 34, 35,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
-        {2, 1, 30, 31,  0,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
-        {2, 1,  0, 20,  0,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
-        {2, 1,  0,  1,  0,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
-        {2, 1,  0,  1,  0,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
-        {2, 1,  0,  1,  0,  3, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
-        {2, 1,  0,  1,  0,  1, 4, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
-        {2, 1,  0,  1,  0,  1, 0, 1, 0, 1, 0, 1, 0,  1,  0,  1,  0,  1, 0, 2},
-        {2, 1,  0,  1,  0,  1, 0, 1, 0, 1, 0, 1, 0, 27, 28, 29,  0,  1, 0, 2},
-        {2, 1,  0,  1,  0,  1, 0, 1, 0, 1, 0, 1, 0, 24, 25, 26,  0,  1, 0, 2}, // Bas fermé
-        {2, 1,  0,  1,  0,  1, 0, 1, 0, 1, 0, 1, 0, 22, 23,  0,  0,  1, 0, 2},
-        {2, 2,  2,  2,  2,  2, 2, 2, 2, 2, 2, 2, 2,  2,  2,  2,  2,  2, 2, 2}  // Bas fermé
+        {2, 2,  2,  2,  2,  2,  2,  2,  0,  0, 0, 0, 2,  2,  5,  2,  8,  9,  2, 2}, // Trou en haut   
+        {2, 2,  2, 36, 37,  2,  2,  2,  0,  1, 0, 0, 2,  2, 41,  2, 10, 11,  2, 2}, 
+        {2, 1,  0, 32, 33, 21,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2, 1,  0, 34, 35,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2, 1, 30, 31,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2, 1,  0, 20,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2, 42, 0,  1,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1, 55, 56, 57, 2},
+        {2, 43, 0,  1,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1, 52, 53, 54, 2},
+        {2, 1,  0,  1,  0,  3, 44,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2, 1,  0, 40,  0,  1,  4,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2, 1,  0,  1, 38, 39,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2, 1,  0,  1,  0,  1,  0,  1,  0,  1, 0, 1, 0, 27, 28, 29,  0,  1,  0, 2},
+        {2, 1,  0,  1,  0,  1, 51,  1,  0,  1, 0, 1, 0, 24, 25, 26,  0,  1,  0, 2}, // Bas fermé
+        {2, 1,  0,  1,  0,  1, 46, 47, 48, 49, 0, 1, 0, 22, 23,  0,  0,  1,  0, 2},
+        {2, 2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2}  // Bas fermé
     },
     // CARTE 2 : COULOIR (Niveau 1)
     {
@@ -295,9 +306,36 @@ int isWall(float x, float y) {
     int caseY = y / TILE_SIZE;
     if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
     int type = maps[currentLevel][caseY][caseX];
+    int type_pattern = maps_patern[currentLevel][caseY][caseX];
+
     // --- TYPE 1 : MURS CLASSIQUES (Tout le bloc est solide) ---
     // Les murs, les bords, le vide...
-    if (type >= 2 && type <= 5) return 1;
+
+    if ( (type >= 2 && type <= 5) || (type_pattern >= 2 && type_pattern <= 5) ) return 1;
+
+    if (type == 2 || type == 5){
+        // VERIFICATION DU MUR "DU DESSOUS"
+        // Si la case en dessous est un autre mur (type 2), alors c'est un "mur de coté" ou un "mur plein".
+        
+        int caseY_Below = caseY + 1;
+        if (caseY_Below < MAP_HEIGHT) {
+            int typeBelow = maps[currentLevel][caseY_Below][caseX];
+            if (typeBelow == 2 || typeBelow == 5) {
+                return 1;
+            }
+        } else {
+             return 1;
+        }
+
+        int localY = (int)y % TILE_SIZE; 
+
+        if (localY < 4) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
 
     // --- TYPE 2 : MEUBLES AVEC PROFONDEUR (Placard 8 et 9) ---
     // On veut que le haut du meuble soit traversable (effet de perspective)
@@ -306,7 +344,7 @@ int isWall(float x, float y) {
         int localY = (int)y % TILE_SIZE; // Position de 0 à 15 dans la case
 
         // Hitbox : Seulement les 8 pixels du bas sont solides
-        if (localY < 5) {
+        if (localY < 4) {
             return 1;
         } else {
             return 0; // Le haut est traversable (on passe "derrière")
