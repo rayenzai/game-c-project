@@ -170,6 +170,7 @@ int dialogueStep_sortie1 = 0;
 int dialogue_hasDoudou = 0;
 int toucheRelache = 0;
 int hasDoudou = 0;
+int showInteractPrompt = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
 
 int TuilesNotSpecial[] = {0, 1, 2};
@@ -184,6 +185,7 @@ void InitGame(SDL_Renderer *renderer) {
     dialogueStep = 1;
     toucheRelache = 0;
     hasDoudou = 0;
+    
 
     // Chargement des sons
     // sonTransition = chargement_son_transition();
@@ -353,11 +355,17 @@ void UpdateGame(void) {
     float dy = (player.y + player.h / 2) - armoireY;
     float distance = sqrt(dx*dx + dy*dy);
 
+    if (distance < 16 && currentLevel == 0) {
+        showInteractPrompt = 1;
+    }
+    else{
+        showInteractPrompt = 0;
+    }
+
     if (state[SDL_SCANCODE_E]) {
         if (toucheE_Relache) {
             // Si le joueur est à moins de 16 pixel (une tuile)
             if (distance < 16 && currentLevel == 0) {
-                
                 // On vérifie si l'armoire est FERMÉE (8) (tuile en haut à gauche de l'armoire)
                 // On l'ouvre avec le doudou dedans
                 if (maps[0][0][16] == 8 && hasDoudou == 0) {
@@ -390,6 +398,7 @@ void UpdateGame(void) {
         }
     } else {
         toucheE_Relache = 1; // On a lâché la touche E on peut re appuyer
+        
     }
 
     if (state[SDL_SCANCODE_RETURN] || state[SDL_SCANCODE_KP_ENTER])
@@ -698,4 +707,33 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font) {
     SDL_Rect srcPlayer = { 112, 0, 16, 16 };
     SDL_Rect destPlayer = { (int)player.x - 2, (int)player.y - 2, 16, 16 };
     SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
+
+    if (showInteractPrompt == 1) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        // On crée le texte
+        SDL_Surface *sText = TTF_RenderText_Solid(font, "[E] Interagir", cBlanc);
+        
+        if (sText) {
+            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+            
+            // On le place au-dessus du joueur
+            SDL_Rect rText = { 
+                (int)player.x - (sText->w / 2) + 8, // Centré horizontalement
+                (int)player.y + 25,                 // 25 pixels au-dessus
+                sText->w, 
+                sText->h 
+            };
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150); 
+            SDL_Rect rFond = { rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2 };
+            SDL_RenderFillRect(renderer, &rFond);
+
+            // On dessine le texte
+            SDL_RenderCopy(renderer, tText, NULL, &rText);
+            
+            // Nettoyage mémoire (TRES IMPORTANT sinon le jeu va lagger)
+            SDL_FreeSurface(sText);
+            SDL_DestroyTexture(tText);
+        }
+    }
 }
