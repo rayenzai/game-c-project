@@ -227,7 +227,32 @@ int isWall(float x, float y) {
 
     // --- TYPE 1 : MURS CLASSIQUES (Tout le bloc est solide) ---
     // Les murs, les bords, le vide...
+
     if ( (type >= 2 && type <= 5) || (type_pattern >= 2 && type_pattern <= 5) ) return 1;
+
+    if (type == 2 || type == 5){
+        // VERIFICATION DU MUR "DU DESSOUS"
+        // Si la case en dessous est un autre mur (type 2), alors c'est un "mur de coté" ou un "mur plein".
+        
+        int caseY_Below = caseY + 1;
+        if (caseY_Below < MAP_HEIGHT) {
+            int typeBelow = maps[currentLevel][caseY_Below][caseX];
+            if (typeBelow == 2 || typeBelow == 5) {
+                return 1;
+            }
+        } else {
+             return 1;
+        }
+
+        int localY = (int)y % TILE_SIZE; 
+
+        if (localY < 4) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
 
     // --- TYPE 2 : MEUBLES AVEC PROFONDEUR (Placard 8 et 9) ---
     // On veut que le haut du meuble soit traversable (effet de perspective)
@@ -236,7 +261,7 @@ int isWall(float x, float y) {
         int localY = (int)y % TILE_SIZE; // Position de 0 à 15 dans la case
 
         // Hitbox : Seulement les 8 pixels du bas sont solides
-        if (localY < 5) {
+        if (localY < 4) {
             return 1;
         } else {
             return 0; // Le haut est traversable (on passe "derrière")
