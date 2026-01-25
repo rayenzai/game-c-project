@@ -1,7 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 
-#define NB_LEVELS 5 
+#define NB_LEVELS 9 
 #define MAP_WIDTH 20        
 #define MAP_HEIGHT 15
 

@@ -5,6 +5,8 @@
 #include <SDL2/SDL_mixer.h>
 
 Mix_Music *chargement_son_ambiance();
+Mix_Music *chargement_son_exterieur();
+
 Mix_Chunk *chargement_son_pas();
 Mix_Chunk *chargement_son_transition();
 Mix_Chunk *chargement_son_item_pick_up();

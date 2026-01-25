@@ -10,15 +10,21 @@ Mix_Music *chargement_son_ambiance(){
 	Mix_Music *bgm = Mix_LoadMUS("assets/sound/scary-ambience.ogg");
 	if (!bgm) printf("Erreur chargement musique : %s\n", Mix_GetError());
 
-	Mix_PlayMusic(bgm, -1); // -1 pour jouer à l'infini
+	// Mettre le volume des bruitages à 50%
+	// Mix_Volume(-1, 64);
+	return bgm;
+}
 
-	// Mettre le volume de la musique à 50% (Max est 128)
-	Mix_VolumeMusic(32);
+Mix_Music *chargement_son_exterieur(){
+	Mix_Music *bgm = Mix_LoadMUS("assets/sound/scary-night-ambience.ogg");
+	if (!bgm) printf("Erreur chargement musique : %s\n", Mix_GetError());
 
 	// Mettre le volume des bruitages à 50%
 	// Mix_Volume(-1, 64);
 	return bgm;
 }
+
+
 
 Mix_Chunk *chargement_son_pas(){
 	Mix_Chunk *sonPas = Mix_LoadWAV("assets/sound/foot-step_.wav");

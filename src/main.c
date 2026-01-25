@@ -21,12 +21,16 @@ typedef enum {
 int main(int argc, char* argv[]) {
     (void)argc; (void)argv;
 
-    // -- INIT SONS --
-    SDL_SetHint(SDL_HINT_AUDIO_RESAMPLING_MODE, "3"); 
-    
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
-    if (Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 3072) < 0) {
+    // --- AJOUT IMPORTANT ---
+    // On prépare SDL_Mixer pour lire du OGG et du MP3 proprement
+    int flags = MIX_INIT_OGG | MIX_INIT_MP3;
+    if ((Mix_Init(flags) & flags) != flags) {
+        printf("Erreur Mix_Init: %s\n", Mix_GetError());
+    }
+
+    if (Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
         printf("Erreur SDL_mixer : %s\n", Mix_GetError());
     }
 
@@ -43,8 +47,6 @@ int main(int argc, char* argv[]) {
     TTF_Font *fontPetit = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 12);
 
     if (!fontGrand || !fontPetit) { printf("Erreur Font\n"); return 1; }
-
-    Mix_Music *bgm = chargement_son_ambiance();
 
     GameState etat = ETAT_MENU;
     InitIntro();
@@ -138,7 +140,6 @@ int main(int argc, char* argv[]) {
     }
 
     // Nettoyage sons
-    Mix_FreeMusic(bgm);
     Mix_CloseAudio();
 
     // Nettoyage...
