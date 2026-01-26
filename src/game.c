@@ -283,8 +283,8 @@ int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesN
 
 // --- INITIALISATION ---
 void InitGame(SDL_Renderer *renderer) {
-    // player.x = 100; 
-    // player.y = 100; 
+    player.x = 80; 
+    player.y = 50; 
     player.w = 12; 
     player.h = 12;
     dialogueStep = 1;
@@ -308,10 +308,10 @@ void InitGame(SDL_Renderer *renderer) {
     MusicInterior = chargement_son_ambiance();
     MusicExterior = chargement_son_exterieur();
     
-    currentLevel = 5;
-    player.x = 20; 
-    player.y = 12*TILE_SIZE ;
-    hasDoudou = 1;
+    // currentLevel = 5;
+    // player.x = 20; 
+    // player.y = 12*TILE_SIZE ;
+    // hasDoudou = 1;
 
     // Chargement du Tileset
     SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");

@@ -117,22 +117,27 @@ int CheckLineOfSight(float x1, float y1, float x2, float y2) {
 void ActionFantome(int rayonDetection) {
     static int isChasing = 0; 
     
-    // --- 1. ANALYSE (CHASSE OU PAS ?) ---
+    // --- 1. ANALYSE ---
     float dx = player.x - fantome.x;
     float dy = player.y - fantome.y;
     double distance = sqrt(dx*dx + dy*dy);
 
+    // SECURITÉ : Si le fantôme est téléporté (changement salle), on reset son cerveau
+    if (distance > 200) { 
+        isChasing = 0;
+        fantome.timer = 0;
+    }
+
     if (isChasing) {
-        FANTOME_SPEED = 0.75;
-        // Arrêt chasse : trop loin ou changement de niveau
+        FANTOME_SPEED = 0.75f; // Il accélère quand il te voit
         if (distance > (5 * TILE_SIZE) || currentLevel < 4) {
             isChasing = 0;
             fantome.timer = 0; 
-            FANTOME_SPEED = 0.5;
+            FANTOME_SPEED = 0.5f;
         }
     } 
     else {
-        // Début chasse
+        FANTOME_SPEED = 0.5f;
         if (distance < rayonDetection && currentLevel >= 4) {
             if (CheckLineOfSight(fantome.x + fantome.w/2, fantome.y + fantome.h/2, 
                                  player.x + player.w/2, player.y + player.h/2)) {
@@ -142,101 +147,112 @@ void ActionFantome(int rayonDetection) {
         }
     }
 
-    // --- 2. PRE-CALCUL COLLISION ACTUELLE ---
+    // --- 2. COLLISIONS & TIMER ---
     float testX = fantome.x;
     float testY = fantome.y;
 
-    if (fantome.direction == 0) { testY -= FANTOME_SPEED; }
-    else if (fantome.direction == 1) { testY += FANTOME_SPEED; }
-    else if (fantome.direction == 2) { testX -= FANTOME_SPEED; }
-    else if (fantome.direction == 3) { testX += FANTOME_SPEED; }
+    if (fantome.direction == 0) testY -= FANTOME_SPEED;
+    else if (fantome.direction == 1) testY += FANTOME_SPEED;
+    else if (fantome.direction == 2) testX -= FANTOME_SPEED;
+    else if (fantome.direction == 3) testX += FANTOME_SPEED;
 
     int hitWall = !CheckCollisionFantome(testX, testY);
     fantome.timer--;
 
+    // Si on est en chasse, on réfléchit très souvent (dès qu'on touche une case ou un mur)
     int onGrid = (((int)fantome.x % TILE_SIZE == (TILE_SIZE - fantome.w)/2) && 
                   ((int)fantome.y % TILE_SIZE == (TILE_SIZE - fantome.h)/2));
     
-    if (isChasing && onGrid) {
+    if (isChasing && (onGrid || hitWall)) {
         fantome.timer = 0;
     }
 
-    // --- 3. CERVEAU (PRISE DE DECISION) ---
+    // --- 3. CERVEAU (NOUVELLE LOGIQUE DE GLISSEMENT) ---
     if (hitWall || fantome.timer <= 0) {
         
-        // Marge pour voir les murs venir (indispensable pour vitesse 0.5)
-        float marge = 4.0f; 
+        int bestDir = -1;
+        float marge = 4.0f; // Marge pour anticiper les murs
 
-        int dirs[4]; int nbDirs = 0;
-        if (CheckCollisionFantome(fantome.x, fantome.y - marge)) { dirs[nbDirs++] = 0; }
-        if (CheckCollisionFantome(fantome.x, fantome.y + marge)) { dirs[nbDirs++] = 1; }
-        if (CheckCollisionFantome(fantome.x - marge, fantome.y)) { dirs[nbDirs++] = 2; }
-        if (CheckCollisionFantome(fantome.x + marge, fantome.y)) { dirs[nbDirs++] = 3; }
+        // >>> MODE CHASSEUR INTELLIGENT (AXIS PRIORITY) <<<
+        if (isChasing) {
+            // 1. Quelles directions mènent vers le joueur ?
+            int dirH = (dx > 0) ? 3 : 2; // 3=Droite, 2=Gauche
+            int dirV = (dy > 0) ? 1 : 0; // 1=Bas, 0=Haut
+            
+            // 2. Vérifions si ces directions sont libres (sans murs)
+            int freeH = 0;
+            // On vérifie si aller horizontalement est possible
+            if (dirH == 2 && CheckCollisionFantome(fantome.x - marge, fantome.y)) freeH = 1;
+            if (dirH == 3 && CheckCollisionFantome(fantome.x + marge, fantome.y)) freeH = 1;
 
-        if (nbDirs > 0) {
-            int bestDir = -1;
+            int freeV = 0;
+            // On vérifie si aller verticalement est possible
+            if (dirV == 0 && CheckCollisionFantome(fantome.x, fantome.y - marge)) freeV = 1;
+            if (dirV == 1 && CheckCollisionFantome(fantome.x, fantome.y + marge)) freeV = 1;
 
-            // >>> MODE CHASSEUR <<<
-            if (isChasing) {
-                double minDst = 999999.0;
-                
-                for (int i = 0; i < nbDirs; i++) {
-                    int d = dirs[i];
-                    
-                    int oppose = -1;
-                    if (fantome.direction == 0) oppose = 1;
-                    else if (fantome.direction == 1) oppose = 0;
-                    else if (fantome.direction == 2) oppose = 3;
-                    else if (fantome.direction == 3) oppose = 2;
-
-                    // Simulation position
-                    float simX = fantome.x; float simY = fantome.y;
-                    if (d == 0) { simY -= TILE_SIZE; }
-                    else if (d == 1) { simY += TILE_SIZE; }
-                    else if (d == 2) { simX -= TILE_SIZE; }
-                    else if (d == 3) { simX += TILE_SIZE; }
-                    
-                    double dSim = sqrt(pow(player.x - simX, 2) + pow(player.y - simY, 2));
-                    
-                    // --- CORRECTION CRUCIALE ICI ---
-                    // On remet la condition "hitWall &&".
-                    // SI on cogne un mur ET que c'est un demi-tour -> Pénalité (Anti-Vibration)
-                    // SINON (couloir libre) -> Pas de pénalité -> Demi-tour autorisé immédiat !
-                    if (hitWall && d == oppose && nbDirs > 1) {
-                        dSim += 32.0; 
-                    }
-
-                    if (dSim < minDst) { 
-                        minDst = dSim; 
-                        bestDir = d; 
-                    }
+            // 3. PRISE DE DÉCISION (GLISSEMENT)
+            // On privilégie l'axe où le joueur est le plus loin (fabs)
+            if (fabs(dx) > fabs(dy)) {
+                // Le joueur est plus loin horizontalement que verticalement
+                if (freeH) {
+                    bestDir = dirH; // On fonce horizontalement
+                } else if (freeV) {
+                    bestDir = dirV; // Bloqué horizontalement ? On glisse verticalement !
+                } else {
+                    // Cul de sac ? On tente l'opposé vertical pour débloquer
+                    int opposeV = (dirV == 0) ? 1 : 0;
+                    if (CheckCollisionFantome(fantome.x, fantome.y + (opposeV==1?marge:-marge))) 
+                        bestDir = opposeV;
                 }
-                // Timer court pour réactivité
-                fantome.timer = (int)(16 / FANTOME_SPEED); 
+            } 
+            else {
+                // Le joueur est plus loin verticalement
+                if (freeV) {
+                    bestDir = dirV; // On fonce verticalement
+                } else if (freeH) {
+                    bestDir = dirH; // Bloqué verticalement ? On glisse horizontalement !
+                } else {
+                    // Cul de sac ? On tente l'opposé horizontal
+                    int opposeH = (dirH == 2) ? 3 : 2;
+                    if (CheckCollisionFantome(fantome.x + (opposeH==3?marge:-marge), fantome.y)) 
+                        bestDir = opposeH;
+                }
             }
             
-            // >>> MODE PATROUILLE <<<
-            if (bestDir == -1) { 
+            // Timer très court pour réagir vite aux changements
+            fantome.timer = (int)(8 / FANTOME_SPEED); 
+        }
+        
+        // >>> MODE PATROUILLE (ALEATOIRE) <<<
+        if (bestDir == -1) { 
+            // On liste les directions possibles
+            int dirs[4]; int nbDirs = 0;
+            if (CheckCollisionFantome(fantome.x, fantome.y - marge)) dirs[nbDirs++] = 0;
+            if (CheckCollisionFantome(fantome.x, fantome.y + marge)) dirs[nbDirs++] = 1;
+            if (CheckCollisionFantome(fantome.x - marge, fantome.y)) dirs[nbDirs++] = 2;
+            if (CheckCollisionFantome(fantome.x + marge, fantome.y)) dirs[nbDirs++] = 3;
+
+            if (nbDirs > 0) {
+                // On évite le demi-tour sauf si cul-de-sac
                 int oppose = -1;
-                if (fantome.direction == 0) oppose = 1;
-                else if (fantome.direction == 1) oppose = 0;
-                else if (fantome.direction == 2) oppose = 3;
-                else if (fantome.direction == 3) oppose = 2;
+                if (fantome.direction == 0) oppose = 1; else if (fantome.direction == 1) oppose = 0;
+                else if (fantome.direction == 2) oppose = 3; else if (fantome.direction == 3) oppose = 2;
 
                 int validDirs[4]; int nbValid = 0;
                 for(int i=0; i<nbDirs; i++) {
-                    if (dirs[i] != oppose) { validDirs[nbValid++] = dirs[i]; }
+                    if (dirs[i] != oppose) validDirs[nbValid++] = dirs[i];
                 }
 
-                if (nbValid > 0) { bestDir = validDirs[rand() % nbValid]; } 
-                else { bestDir = dirs[0]; }
-                
-                fantome.timer = 30 + rand() % 60; 
+                if (nbValid > 0) bestDir = validDirs[rand() % nbValid];
+                else bestDir = dirs[0];
             }
+            fantome.timer = 30 + rand() % 60; 
+        }
 
+        // 4. APPLICATION
+        if (bestDir != -1) {
             fantome.direction = bestDir;
-
-            // Recalage (Snapping) avec float pour supporter les 0.5px
+            // Snapping (Centrage) pour éviter de frotter les murs
             if (fantome.direction <= 1) { // Vertical
                 int col = (int)((fantome.x + fantome.w/2) / TILE_SIZE);
                 fantome.x = (float)(col * TILE_SIZE + (TILE_SIZE - fantome.w)/2.0f);
@@ -244,20 +260,19 @@ void ActionFantome(int rayonDetection) {
                 int lig = (int)((fantome.y + fantome.h/2) / TILE_SIZE);
                 fantome.y = (float)(lig * TILE_SIZE + (TILE_SIZE - fantome.h)/2.0f);
             }
-
         } else {
-            fantome.timer = 10; // Bloqué
+            fantome.timer = 10; // Bloqué totalement
         }
     } 
     
-    // --- 4. MOUVEMENT ---
+    // --- 4. MOUVEMENT FINAL ---
     float moveX = fantome.x;
     float moveY = fantome.y;
 
-    if (fantome.direction == 0) { moveY -= FANTOME_SPEED; }
-    else if (fantome.direction == 1) { moveY += FANTOME_SPEED; }
-    else if (fantome.direction == 2) { moveX -= FANTOME_SPEED; }
-    else if (fantome.direction == 3) { moveX += FANTOME_SPEED; }
+    if (fantome.direction == 0) moveY -= FANTOME_SPEED;
+    else if (fantome.direction == 1) moveY += FANTOME_SPEED;
+    else if (fantome.direction == 2) moveX -= FANTOME_SPEED;
+    else if (fantome.direction == 3) moveX += FANTOME_SPEED;
 
     if (CheckCollisionFantome(moveX, moveY)) {
         fantome.x = moveX;
