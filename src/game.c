@@ -728,56 +728,6 @@ void UpdateGame(void) {
     // printf("lvl: %d \n", currentLevel);
 }
 
-// Retourne 1 si la case est dans la lumière sinon 0.
-int estEclaire(int gridX, int gridY, int rayon) {
-    
-    if (gridX < 0 || gridX >= MAP_WIDTH || gridY < 0 || gridY >= MAP_HEIGHT) {
-        return 0; 
-    }
-
-    // 2. Calcul de distance 
-    int tileCenterX = (gridX * TILE_SIZE) + (TILE_SIZE / 2);
-    int tileCenterY = (gridY * TILE_SIZE) + (TILE_SIZE / 2);
-    int playerCenterX = (int)player.x + (player.w / 2);
-    int playerCenterY = (int)player.y + (player.h / 2);
-
-    int dx = tileCenterX - playerCenterX;
-    int dy = tileCenterY - playerCenterY;
-    double distance = sqrt(dx*dx + dy*dy);
-
-    if (distance <= rayon) {
-        return 1; 
-    }
-    return 0; // C'est éteint
-}
-
-int estEclaireParLampe(int gridX, int gridY, int rayon) {
-    for (int ly = 0; ly < MAP_HEIGHT; ly++) {
-        for (int lx = 0; lx < MAP_WIDTH; lx++) {
-            
-            // Si on trouve une lampe à la case [ly][lx]
-            if (maps[currentLevel][ly][lx] == 21) {
-                
-                // Calcul de la distance entre notre case et la lampe
-                int dx = gridX - lx;
-                int dy = gridY - ly;
-                double distance = sqrt(dx*dx + dy*dy);
-
-                // Si c'est assez proche, c'est allumé !
-                if (distance <= rayon) {
-                    return 1;
-                }
-            }
-        }
-    }
-    return 0; // Aucune lampe à proximité
-}
-
-int estVisible(int x, int y, int rayonJoueur) {
-    if (estEclaire(x, y, rayonJoueur)) return 1;
-    if (estEclaireParLampe(x, y, 2.0)) return 1;
-    return 0;
-}
 
 float getLuminosite(int gridX, int gridY, int rayonPx) {
     float maxIntensite = 0.0f;
@@ -812,7 +762,7 @@ float getLuminosite(int gridX, int gridY, int rayonPx) {
     // --- 2. Lumière des LAMPES (Calcul en cases) ---
     for (int ly = 0; ly < MAP_HEIGHT; ly++) {
         for (int lx = 0; lx < MAP_WIDTH; lx++) {
-             if (maps[currentLevel][ly][lx] == 21) { // Si c'est une lampe
+             if (maps[currentLevel][ly][lx] == 21 || (maps[currentLevel][ly][lx] >= 74 && maps[currentLevel][ly][lx] <= 77)) { // Si c'est une lampe
                  float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
                  float rayonLampe = 2.5f; // Rayon d'une lampe (2.5 cases)
                  
@@ -825,6 +775,38 @@ float getLuminosite(int gridX, int gridY, int rayonPx) {
     }
     
     return maxIntensite; // Retourne la lumière la plus forte trouvée
+}
+
+
+// Retourne 1 si la case est dans la lumière sinon 0.
+int estEclaire(int gridX, int gridY, int rayon) {
+    
+    if (gridX < 0 || gridX >= MAP_WIDTH || gridY < 0 || gridY >= MAP_HEIGHT) {
+        return 0; 
+    }
+
+    // 2. Calcul de distance 
+    int tileCenterX = (gridX * TILE_SIZE) + (TILE_SIZE / 2);
+    int tileCenterY = (gridY * TILE_SIZE) + (TILE_SIZE / 2);
+    int playerCenterX = (int)player.x + (player.w / 2);
+    int playerCenterY = (int)player.y + (player.h / 2);
+
+    int dx = tileCenterX - playerCenterX;
+    int dy = tileCenterY - playerCenterY;
+    double distance = sqrt(dx*dx + dy*dy);
+
+    if (distance <= rayon) {
+        return 1; 
+    }
+    return 0; // C'est éteint
+}
+
+
+int estVisible(int x, int y, int rayonJoueur) {
+    if (getLuminosite(x, y, rayonJoueur) > 0.0f) {
+        return 1;
+    }
+    return 0;
 }
 
 void DrawTuiles(float x, float y, int indexTuile, SDL_Renderer *renderer, int luminosite){
