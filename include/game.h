@@ -5,10 +5,39 @@
 #include <SDL2/SDL_ttf.h>
 #include <time.h>
 
+ 
+// --- DEFINE ---
+#define TILE_SIZE 16        
+#define PLAYER_SPEED 2.0f   
+#define LOGICAL_WIDTH 320
+#define LOGICAL_HEIGHT 240
+#define MAP_WIDTH 20        
+#define MAP_HEIGHT 15  
+#define NB_LEVELS 9  
+#define FANTOME_SPEED 0.5f 
+
+typedef struct {
+    float x, y;     
+    int w, h;       
+} Joueur;
+
+typedef struct{
+    float x, y;
+    int w, h;
+    int direction; // 0: Haut, 1: Bas, 2: Gauche, 3: Droite
+    int timer;     // Nombre de frames restantes avant de changer de direction
+} Fantome;
+
+extern Joueur player;
+extern Fantome fantome;
+
+extern int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH];
+
 void InitGame(SDL_Renderer *renderer);
 void UpdateGame(void);
 void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini);
 void ActionFantome();
+void SpawnFantomeRandom();
 
 extern int currentLevel; 
 

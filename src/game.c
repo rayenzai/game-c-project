@@ -4,18 +4,11 @@
 #include "game.h"
 #include "sons.h"
 #include "map.h"
+#include "ia.h"
 #include <stdio.h>
 #include <math.h>
 
-// --- CONSTANTES ---
-#define TILE_SIZE 16        
-#define PLAYER_SPEED 2.0f   
-#define LOGICAL_WIDTH 320
-#define LOGICAL_HEIGHT 240
-#define MAP_WIDTH 20        
-#define MAP_HEIGHT 15   
-
-#define FANTOME_SPEED 1.0f  
+ 
 
 // -- Pour les sons -- 
 
@@ -34,28 +27,13 @@ static int toucheE_Relache = 1;
 static int toucheEnter_Relache = 1;
 
 // --- VARIABLES GLOBALES ---
-typedef struct {
-    float x, y;     
-    int w, h;       
-} Joueur;
 
-
-typedef struct{
-    float x, y;
-    int w, h;
-    int direction; // 0: Haut, 1: Bas, 2: Gauche, 3: Droite
-    int timer;     // Nombre de frames restantes avant de changer de direction
-} Fantome;
-
-
-static Joueur player;
-static Fantome fantome;
 static SDL_Texture *tilesetTexture = NULL; 
 // static SDL_Texture *playerTexture = NULL; 
 
 int rayon = 0;
 
-#define NB_LEVELS 9   
+ 
 int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 
 
@@ -108,7 +86,7 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 */
 
 // --- LA CARTE DU NIVEAU ---
-static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
+int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
  {      //carte 1 (chambre)
         {2, 2,  2,  2,  2,  2,  2,  2,  0,  0, 0, 0, 2,  2,  5,  2,  8,  9,  2, 2}, // Trou en haut   
         {2, 2,  2, 36, 37,  2,  2,  2,  0,  1, 0, 0, 2,  2, 41,  2, 10, 11,  2, 2}, 
@@ -198,7 +176,7 @@ static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}
     },
-    // --- LABYRINTHE 1 (Index 4) ---
+    // --- LABYRINTHE 1 (Index 5) ---
     {
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, 
         {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 2}, 
@@ -211,13 +189,13 @@ static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2}, 
         {2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2},
         {2, 1, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2}, 
-        {1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 2},
+        {1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 2},
         {1, 1, 2, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 1, 1}, // SORTIE DROITE (Ligne 12)
-        {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2}, 
+        {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2}, 
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}  
     },
 
-    // --- LABYRINTHE 2 (Index 5) ---
+    // --- LABYRINTHE 2 (Index 6) ---
     {
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Mur Haut
         {2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2},
@@ -236,7 +214,7 @@ static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2}  // SORTIE BAS (Ligne 14, Colonnes 10-11)
     },
 
-    // --- LABYRINTHE 3 (Index 6) ---
+    // --- LABYRINTHE 3 (Index 7) ---
     {
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2}, // ENTRÉE HAUT (Alignée avec sortie précédente)
         {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2}, // Zone ouverte pour tromper
@@ -255,7 +233,7 @@ static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}  // Mur Bas fermé
     },
 
-    // --- LABYRINTHE 4 (Index 7) ---
+    // --- LABYRINTHE 4 (Index 8) ---
     {
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Mur Haut
         {2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2}, // Chemin du haut
@@ -675,179 +653,98 @@ void UpdateGame(void) {
 
     // --- TRANSITIONS DU LABYRINTHE ---
 
-    // Transition du niveau 2 au premier niveau du labyrinthe (niveau 5)
+    // 1. Entrée dans le labyrinthe (Niveau 2 -> 5)
     if(IsLocationRight(11, 14, 2, 20)){
         currentLevel = 5;
         player.x = 3;
-        // Mix_FreeMusic(bgm);
+        SpawnFantomeRandom(); // <--- NOUVEAU
     }
 
-    // Transition du premier niveau du labyrinthe (niveau 5) au niveau 2
-    else if (IsLocationLeft(11, 14, 5, 5))
-    {
+    // 2. Retour couloir (5 -> 2)
+    else if (IsLocationLeft(11, 14, 5, 5)) {
         currentLevel = 2;
         player.x = (MAP_WIDTH * TILE_SIZE) - 20;
-        fantome.x = 8 * TILE_SIZE; 
-        fantome.y = 11 * TILE_SIZE;
+        // Pas de fantôme dans le couloir, on le laisse où il est (invisible)
     }
 
+    // 3. Passage 5 -> 6
     if(IsLocationRight(12, 14, 5, 20)){
         currentLevel = 6;
         player.x = 3;
+        SpawnFantomeRandom(); // <--- NOUVEAU
     }
-
-    else if (IsLocationLeft(12, 14, 6, 5))
-    {
+    // Retour 6 -> 5
+    else if (IsLocationLeft(12, 14, 6, 5)) {
         currentLevel = 5;
         player.x = (MAP_WIDTH * TILE_SIZE) - 20;
+        SpawnFantomeRandom(); // <--- NOUVEAU (Le fantôme change de place quand on revient !)
     }
 
+    // 4. Passage 6 -> 7
     if(IsLocationDown(10, 13, 6, 20)){
         currentLevel = 7;
         player.y = 10;
+        SpawnFantomeRandom(); // <--- NOUVEAU
     }
-
+    // Retour 7 -> 6
     else if(IsLocationUp(10, 13, 7, 5)){
         currentLevel = 6;
         player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
+        SpawnFantomeRandom(); // <--- NOUVEAU
     }
 
+    // 5. Passage 7 -> 8 (Dernier niveau)
     if(IsLocationLeft(12, 14, 7, 5)){
         currentLevel = 8;
         player.x = (MAP_WIDTH * TILE_SIZE) - 20;
+        SpawnFantomeRandom(); // <--- NOUVEAU
     }
-
+    // Retour 8 -> 7
     else if(IsLocationRight(12, 14, 8, 20)){
         currentLevel = 7;
         player.x = 3;
+        SpawnFantomeRandom(); // <--- NOUVEAU
     }
 
 
     // Changement de son d'ambiance
     ManageMusic();
 
-    ActionFantome();
+    if (currentLevel >= 5) {
+        ActionFantome(200); 
+    }
+
+    // --- GESTION COLLISION JOUEUR / FANTOME (GAME OVER / RESET) ---
+    if (currentLevel >= 5) {
+        
+        // 1. On définit la hitbox d'attaque du fantôme
+        // On veut qu'il attrape plus haut (pour la perspective) et un peu plus large
+        float killZoneHaut = fantome.y - 12; // Il attrape 12 pixels au-dessus de sa tête !
+        float killZoneBas  = fantome.y + fantome.h; 
+        float killZoneGauche = fantome.x; 
+        float killZoneDroite = fantome.x + fantome.w;
+
+        // 2. On vérifie si le joueur est dans cette zone
+        if (player.x < killZoneDroite &&
+            player.x + player.w > killZoneGauche &&
+            player.y < killZoneBas &&
+            player.y + player.h > killZoneHaut) // C'est cette ligne qui change tout
+        {
+            printf("GAME OVER - ATTRAPE !\n");
+            
+            // RESET
+            currentLevel = 5; 
+            player.x = 20; 
+            player.y = 12 * TILE_SIZE;
+            
+            fantome.x = 8 * TILE_SIZE; 
+            fantome.y = 11 * TILE_SIZE;
+            fantome.timer = 0; 
+        }
+    }
 
 
     // printf("lvl: %d \n", currentLevel);
-}
-
-int isWallSimple(float x, float y) {
-    int caseX = (int)(x / TILE_SIZE);
-    int caseY = (int)(y / TILE_SIZE);
-
-    // 1. Sécurité : Si hors de la carte, c'est un mur
-    if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) {
-        return 1;
-    }
-
-    // 2. Lecture de la tuile
-    int type = maps[currentLevel][caseY][caseX];
-
-    // 3. Logique binaire pour le labyrinthe :
-    // Les sols sont 0 et 1. Tout le reste (2, meubles, etc.) bloque le fantôme.
-    if (type == 0 || type == 1) {
-        return 0; // C'est libre
-    }
-    
-    // Si tu as des passages secrets ou portes ouvertes (12, 13..), ajoute-les ici :
-    // if (type >= 12 && type <= 19) return 0; 
-
-    return 1; // C'est un mur
-}
-
-// Fonction utilitaire collision (avec marge de sécurité +1 pixel)
-int CheckCollisionFantome(float x, float y) {
-    // On utilise isWallSimple au lieu de isWall
-    // On vérifie les 4 coins du fantôme
-    if (isWallSimple(x + 1, y + 1)) return 0;
-    if (isWallSimple(x + fantome.w - 1, y + 1)) return 0;
-    if (isWallSimple(x + 1, y + fantome.h - 1)) return 0;
-    if (isWallSimple(x + fantome.w - 1, y + fantome.h - 1)) return 0;
-    
-    return 1; // 1 = La voie est libre (c'est inversé dans ta logique actuelle)
-}
-
-void ActionFantome() {
-    float nextX = fantome.x;
-    float nextY = fantome.y;
-
-    // 1. Calcul position théorique
-    if (fantome.direction == 0) nextY -= FANTOME_SPEED; // Haut
-    if (fantome.direction == 1) nextY += FANTOME_SPEED; // Bas
-    if (fantome.direction == 2) nextX -= FANTOME_SPEED; // Gauche
-    if (fantome.direction == 3) nextX += FANTOME_SPEED; // Droite
-
-    // 2. Est-ce qu'on cogne un mur ?
-    int hitWall = !CheckCollisionFantome(nextX, nextY);
-
-    fantome.timer--;
-
-    // 3. LOGIQUE DE DECISION
-    // Si on tape un mur OU si le timer est fini
-    if (hitWall || fantome.timer <= 0) {
-        
-        int directionOpposee = -1;
-        if (fantome.direction == 0) directionOpposee = 1;
-        else if (fantome.direction == 1) directionOpposee = 0;
-        else if (fantome.direction == 2) directionOpposee = 3;
-        else if (fantome.direction == 3) directionOpposee = 2;
-
-        // Lister les chemins possibles autour du fantôme
-        int cheminsLibres[4]; 
-        int nbChemins = 0;
-
-        // On regarde un peu plus loin (SPEED * 2) pour anticiper
-        if (CheckCollisionFantome(fantome.x, fantome.y - FANTOME_SPEED*2)) cheminsLibres[nbChemins++] = 0;
-        if (CheckCollisionFantome(fantome.x, fantome.y + FANTOME_SPEED*2)) cheminsLibres[nbChemins++] = 1;
-        if (CheckCollisionFantome(fantome.x - FANTOME_SPEED*2, fantome.y)) cheminsLibres[nbChemins++] = 2;
-        if (CheckCollisionFantome(fantome.x + FANTOME_SPEED*2, fantome.y)) cheminsLibres[nbChemins++] = 3;
-
-        // Filtrer le demi-tour (sauf si cul-de-sac)
-        int choixPossibles[4];
-        int nbChoix = 0;
-
-        if (nbChemins > 0) {
-            for (int i = 0; i < nbChemins; i++) {
-                if (cheminsLibres[i] != directionOpposee) {
-                    choixPossibles[nbChoix++] = cheminsLibres[i];
-                }
-            }
-
-            // Choix final
-            if (nbChoix > 0) {
-                fantome.direction = choixPossibles[rand() % nbChoix];
-            } else {
-                fantome.direction = directionOpposee; // Cul-de-sac obligé
-            }
-            
-            // On lui donne du temps pour parcourir le couloir
-            fantome.timer = 30 + (rand() % 60);
-
-            // --- LE RECALAGE (SNAP TO GRID) ---
-            // C'est ICI la correction magique.
-            // Si le fantôme décide d'aller en Haut/Bas, on aligne son X parfaitement.
-            // Si le fantôme décide d'aller à Gauche/Droite, on aligne son Y parfaitement.
-            
-            if (fantome.direction == 0 || fantome.direction == 1) { // Vertical
-                int col = (int)((fantome.x + fantome.w/2) / TILE_SIZE); // Colonne actuelle
-                fantome.x = (float)(col * TILE_SIZE + (TILE_SIZE - fantome.w)/2); // Centrage parfait
-            } 
-            else { // Horizontal
-                int lig = (int)((fantome.y + fantome.h/2) / TILE_SIZE); // Ligne actuelle
-                fantome.y = (float)(lig * TILE_SIZE + (TILE_SIZE - fantome.h)/2); // Centrage parfait
-            }
-
-        } else {
-            // Bloqué (bug collision), on attend un peu
-            fantome.timer = 10;
-        }
-
-    } else {
-        // Pas de mur, on avance fluide
-        fantome.x = nextX;
-        fantome.y = nextY;
-    }
 }
 
 
@@ -1064,11 +961,12 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     int caseX = (int)(fantome.x / TILE_SIZE);
     int caseY = (int)(fantome.y / TILE_SIZE);
 
-    if (estEclaire(caseX, caseY, rayon) && currentLevel == 5) {
-        SDL_Rect src = { 63 * TILE_SIZE, 0, 16, 16 }; // Image index 6
+    // On l'affiche s'il est éclairé ET qu'on est dans un niveau de labyrinthe
+    if (estEclaire(caseX, caseY, rayon) && currentLevel >= 5) {
+        SDL_Rect src = { 63 * TILE_SIZE, 0, 16, 16 }; 
         SDL_Rect dest = { (int)fantome.x, (int)fantome.y, 16, 16 }; 
         SDL_RenderCopy(renderer, tilesetTexture, &src, &dest);
-    }  
+    }
 
    if (showInteractPrompt == 1) {
         SDL_Color cBlanc = {255, 255, 255, 255};
