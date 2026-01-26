@@ -6,6 +6,8 @@
 Joueur player;
 Fantome fantome;
 
+float FANTOME_SPEED;
+
 void SpawnFantomeRandom() {
     int validPosition = 0;
     int maxEssais = 100; // Sécurité pour ne pas boucler à l'infini
@@ -121,10 +123,12 @@ void ActionFantome(int rayonDetection) {
     double distance = sqrt(dx*dx + dy*dy);
 
     if (isChasing) {
+        FANTOME_SPEED = 0.75;
         // Arrêt chasse : trop loin ou changement de niveau
         if (distance > (5 * TILE_SIZE) || currentLevel < 4) {
             isChasing = 0;
             fantome.timer = 0; 
+            FANTOME_SPEED = 0.5;
         }
     } 
     else {
@@ -194,13 +198,11 @@ void ActionFantome(int rayonDetection) {
                     
                     double dSim = sqrt(pow(player.x - simX, 2) + pow(player.y - simY, 2));
                     
-                    // --- CORRECTION FINALE ANTI-VIBRATION ---
-                    // On applique la pénalité TOUT LE TEMPS si on a le choix (nbDirs > 1).
-                    // On a retiré "hitWall &&".
-                    // On met 32px (2 cases) : C'est assez pour dire "Va de l'avant !",
-                    // mais si le joueur est vraiment derrière, la distance sera si courte
-                    // qu'il se retournera quand même.
-                    if (d == oppose && nbDirs > 1) {
+                    // --- CORRECTION CRUCIALE ICI ---
+                    // On remet la condition "hitWall &&".
+                    // SI on cogne un mur ET que c'est un demi-tour -> Pénalité (Anti-Vibration)
+                    // SINON (couloir libre) -> Pas de pénalité -> Demi-tour autorisé immédiat !
+                    if (hitWall && d == oppose && nbDirs > 1) {
                         dSim += 32.0; 
                     }
 
@@ -209,7 +211,7 @@ void ActionFantome(int rayonDetection) {
                         bestDir = d; 
                     }
                 }
-                // Timer adapté à la vitesse 0.5 (32 frames par case)
+                // Timer court pour réactivité
                 fantome.timer = (int)(16 / FANTOME_SPEED); 
             }
             

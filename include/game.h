@@ -7,14 +7,18 @@
 
  
 // --- DEFINE ---
-#define TILE_SIZE 16        
-#define PLAYER_SPEED 2.0f   
+#define TILE_SIZE 16          
 #define LOGICAL_WIDTH 320
 #define LOGICAL_HEIGHT 240
 #define MAP_WIDTH 20        
 #define MAP_HEIGHT 15  
-#define NB_LEVELS 9  
-#define FANTOME_SPEED 0.5f 
+#define NB_LEVELS 9 
+#define PLAYER_SPEED 2.0f 
+
+
+// #define FANTOME_SPEED 0.5f 
+
+
 
 typedef struct {
     float x, y;     
@@ -30,6 +34,8 @@ typedef struct{
 
 extern Joueur player;
 extern Fantome fantome;
+
+extern float FANTOME_SPEED;
 
 extern int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH];
 
