@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <math.h>
 
+Joueur player;
+Fantome fantome;
+
 void SpawnFantomeRandom() {
     int validPosition = 0;
     int maxEssais = 100; // Sécurité pour ne pas boucler à l'infini
