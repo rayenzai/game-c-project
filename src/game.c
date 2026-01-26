@@ -81,46 +81,61 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 58 = coussin bas 
 59,60 = coussins 
 61 = digicode 0
-62 = monstre vue de gauche
+78 = hanse basket
+79 = ballon de basket
+80,81 = commode mur droit
+........................
+62 = monstre vu de gauche
 63 = monstre de face
+64 = monstre vu de droite
+.........................
+65, 66 = haut tapis 
+67, 68 = tapis 
+69, 70 = bas mur 
+71 72 = table
+73 = vase
+74, 75 = lampe murale gauche
+76, 77 = lampe murale droite
+
+
 */
 
 // --- LA CARTE DU NIVEAU ---
 int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
  {      //carte 1 (chambre)
-        {2, 2,  2,  2,  2,  2,  2,  2,  0,  0, 0, 0, 2,  2,  5,  2,  8,  9,  2, 2}, // Trou en haut   
-        {2, 2,  2, 36, 37,  2,  2,  2,  0,  1, 0, 0, 2,  2, 41,  2, 10, 11,  2, 2}, 
-        {2, 1,  0, 32, 33, 21,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
-        {2, 1,  0, 34, 35,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
-        {2, 1, 30, 31,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
-        {2, 1,  0, 20,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2,  2,  2,  2,  2,  2,  2,  2,  0,  0, 0, 0, 2,  2,  5,  2,  8,  9,  2, 2}, // Trou en haut   
+        {2,  2,  2, 36, 37,  2,  2,  2,  0,  1, 0, 0, 2,  2, 41,  2, 10, 11,  2, 2}, 
+        {2,  1,  0, 32, 33, 21,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2,  1,  0, 34, 35,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2,  1, 30, 31,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2,  1,  0, 20,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
         {2, 42, 0,  1,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1, 55, 56, 57, 2},
         {2, 43, 0,  1,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1, 52, 53, 54, 2},
-        {2, 1,  0,  1,  0,  3, 44,  1,  0,  1, 0, 1, 0,  1,  0, 58,  0, 59, 60, 2},
-        {2, 1,  0, 40,  0,  1,  4,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
-        {2, 1,  0,  1, 38, 39,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
-        {2, 1,  0,  1,  0,  1,  0,  1,  0,  1, 0, 1, 0, 27, 28, 29,  0,  1,  0, 2},
-        {2, 1, 0,  1,  0,  1, 51,  1,  0,  1, 0, 1, 0, 24, 25, 26,  0,  1,  0, 2}, // Bas fermé
-        {2, 1,  0,  1,  0,  1, 46, 47, 48, 49, 0, 1, 0, 22, 23,  0,  0,  1,  0, 2},
-        {2, 2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2}  // Bas fermé
+        {2,  1,  0,  1,  0,  3, 44,  1,  0,  1, 0, 1, 0,  1,  0, 58,  0, 59, 60, 2},
+        {2,  1,  0, 40,  0,  1,  4,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2,  1,  0,  1, 38, 39,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2, 78,  0,  1,  0,  1,  0,  1,  0,  1, 0, 1, 0, 27, 28, 29,  0,  1, 81, 2},
+        {2,  1, 79,  1,  0,  1, 51,  1,  0,  1, 0, 1, 0, 24, 25, 26,  0,  1, 80, 2}, // Bas fermé
+        {2,  1,  0,  1,  0,  1, 46, 47, 48, 49, 0, 1, 0, 22, 23,  0,  0,  1,  0, 2},
+        {2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2}  // Bas fermé
     },
     // CARTE 2 : COULOIR (Niveau 1)
     {
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Haut (Suite)
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Toits cotés
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Murs cotés
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Vide (Sol)
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Bas (Entrée)
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}
+        {2, 2, 2, 2, 2, 2, 2,  2,  0, 69, 70,  0,  2,  2, 2, 2, 2, 2, 2, 2}, // Haut (Suite)
+        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2}, // Toits cotés
+        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2}, // Murs cotés
+        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68, 76, 77,  2, 2, 2, 2, 2, 2, 2}, // Vide (Sol)
+        {2, 2, 2, 2, 2, 2, 2, 74, 75, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2,  2, 72, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2,  2, 71, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68, 76, 77,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 74, 75, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68, 73,  2,  2, 2, 2, 2, 2, 2, 2}, // Bas (Entrée)
+        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2,  2,  0, 65, 66,  0,  2,  2, 2, 2, 2, 2, 2, 2}
     }, 
     // CARTE 3 : HALL (Niveau 2)
     {       
@@ -475,14 +490,24 @@ void UpdateGame(void) {
         return;
     }
 
-    float nextX = player.x;
-    float nextY = player.y;
+    float dirX = 0;
+    float dirY = 0;
 
-    if (state[SDL_SCANCODE_UP])    nextY -= PLAYER_SPEED;
-    if (state[SDL_SCANCODE_DOWN])  nextY += PLAYER_SPEED;
-    if (state[SDL_SCANCODE_LEFT])  nextX -= PLAYER_SPEED;
-    if (state[SDL_SCANCODE_RIGHT]) nextX += PLAYER_SPEED;
+    if (state[SDL_SCANCODE_UP])    dirY -= 1;
+    if (state[SDL_SCANCODE_DOWN])  dirY += 1;
+    if (state[SDL_SCANCODE_LEFT])  dirX -= 1;
+    if (state[SDL_SCANCODE_RIGHT]) dirX += 1;
 
+    // Si on bouge sur les deux axes en même temps (Diagonale)
+    if (dirX != 0 && dirY != 0) {
+        // On multiplie par 0.707 (environ 1/racine(2)) pour ralentir
+        dirX *= 0.7071f;
+        dirY *= 0.7071f;
+    }
+
+    // 3. On applique la VITESSE
+    float nextX = player.x + (dirX * PLAYER_SPEED);
+    float nextY = player.y + (dirY * PLAYER_SPEED);
     // Collision X
     int touchWallX = 0;
     if (isWall(nextX, player.y)) touchWallX = 1;
@@ -747,6 +772,53 @@ void UpdateGame(void) {
     // printf("lvl: %d \n", currentLevel);
 }
 
+float getLuminosite(int gridX, int gridY, int rayonPx) {
+    float maxIntensite = 0.0f;
+
+    // --- 1. Lumière du JOUEUR (Calcul en pixels) ---
+    int tileCenterX = (gridX * TILE_SIZE) + (TILE_SIZE / 2);
+    int tileCenterY = (gridY * TILE_SIZE) + (TILE_SIZE / 2);
+    int playerCenterX = (int)player.x + (player.w / 2);
+    int playerCenterY = (int)player.y + (player.h / 2);
+
+    float dx = (float)(tileCenterX - playerCenterX);
+    float dy = (float)(tileCenterY - playerCenterY);
+    float distPx = sqrtf(dx*dx + dy*dy);
+
+    // Formule : Plus on est proche, plus c'est fort (1.0). Plus on s'éloigne, plus ça baisse.
+    
+    if (distPx < rayonPx) {
+        float i = 1.0f - (distPx / (float)rayonPx);
+        if (i > maxIntensite) maxIntensite = i;
+    }
+    /*
+    // formule expo:
+    if (distPx < rayonPx) {
+        float ratio = distPx / (float)rayonPx; // 0.0 (proche) à 1.0 (loin)
+        
+        // Formule "Carrée" : La lumière reste forte près du joueur et tombe vite à la fin
+        float i = 1.0f - (ratio * ratio); 
+        
+        if (i > maxIntensite) maxIntensite = i;
+    }
+    */
+    // --- 2. Lumière des LAMPES (Calcul en cases) ---
+    for (int ly = 0; ly < MAP_HEIGHT; ly++) {
+        for (int lx = 0; lx < MAP_WIDTH; lx++) {
+             if (maps[currentLevel][ly][lx] == 21 || (maps[currentLevel][ly][lx] >= 74 && maps[currentLevel][ly][lx] <= 77)) { // Si c'est une lampe
+                 float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
+                 float rayonLampe = 2.5f; // Rayon d'une lampe (2.5 cases)
+                 
+                 if (distGrid < rayonLampe) {
+                     float i = 1.0f - (distGrid / rayonLampe);
+                     if (i > maxIntensite) maxIntensite = i;
+                 }
+             }
+        }
+    }
+    
+    return maxIntensite; // Retourne la lumière la plus forte trouvée
+}
 
 // Retourne 1 si la case est dans la lumière sinon 0.
 int estEclaire(int gridX, int gridY, int rayon) {
@@ -771,14 +843,25 @@ int estEclaire(int gridX, int gridY, int rayon) {
     return 0; // C'est éteint
 }
 
-void DrawTuiles(float x, float y, int indexTuile, SDL_Renderer *renderer, int rayon){
-    if(estEclaire(x, y, rayon))
-    {   
-        SDL_Rect srcTuile = { TILE_SIZE * indexTuile, 0, TILE_SIZE, TILE_SIZE };
-        SDL_Rect destTuile = { x * TILE_SIZE, y * TILE_SIZE , TILE_SIZE, TILE_SIZE };
-        SDL_RenderCopy(renderer, tilesetTexture, &srcTuile, &destTuile);
+
+int estVisible(int x, int y, int rayonJoueur) {
+    if (getLuminosite(x, y, rayonJoueur) > 0.0f) {
+        return 1;
     }
+    return 0;
 }
+
+void DrawTuiles(float x, float y, int indexTuile, SDL_Renderer *renderer, int luminosite){
+    SDL_SetTextureColorMod(tilesetTexture, luminosite, luminosite, luminosite);
+
+    SDL_Rect srcTuile = { TILE_SIZE * indexTuile, 0, TILE_SIZE, TILE_SIZE };
+    SDL_Rect destTuile = { (int)x * TILE_SIZE, (int)y * TILE_SIZE , TILE_SIZE, TILE_SIZE };
+    SDL_RenderCopy(renderer, tilesetTexture, &srcTuile, &destTuile);
+    
+    SDL_SetTextureColorMod(tilesetTexture, 255, 255, 255);
+    
+}
+
 
 int IsTuileSpecial(int index){
     for (int i = 0; i < tailleTuilesNotSpecial; ++i)
@@ -809,48 +892,43 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         
         for (int y = 0; y < MAP_HEIGHT; y++) {
             for (int x = 0; x < MAP_WIDTH; x++) {
-                
-                if (estEclaire(x, y, rayon) == 0) {
+                float intensite = getLuminosite(x, y, rayon);
+
+                // Si c'est totalement noir, on ne dessine rien (opti)
+                if (intensite <= 0.0f) {
                     continue; 
                 }
 
-                // --- A. DESSINER LA TUILE --- (avec le tableau)
+                // 2. On convertit en valeur 0-255
+                int lum = (int)(intensite * 255);
+
+                // --- A. DESSINER LA TUILE ---
                 int type = maps_patern[currentLevel][y][x]; 
-                DrawTuiles(x, y, type, renderer, rayon);
+                DrawTuiles(x, y, type, renderer, lum); // On passe 'lum'
 
                 int type_maps = maps[currentLevel][y][x];
                 if(IsTuileSpecial(type_maps)){
-                    DrawTuiles(x, y, type_maps, renderer, rayon);
+                    DrawTuiles(x, y, type_maps, renderer, lum); // On passe 'lum'
                 }
 
-                // --- B. DESSINER LE CONTOUR (Bords pixelisés) ---
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // Blanc
+                // --- B. DESSINER LE CONTOUR (Lignes) ---
+                // On utilise aussi 'lum' pour que les lignes blanches s'assombrissent 
+                /*SDL_SetRenderDrawColor(renderer, lum, lum, lum, 255); 
 
                 int px = x * TILE_SIZE;
                 int py = y * TILE_SIZE;
-                int ts = TILE_SIZE; // 16
-
-                // 1. Vérifier le voisin du HAUT (y-1)
-                // Si le voisin du haut est éteint, on dessine une ligne en haut de notre case
-                if (estEclaire(x, y - 1, rayon) == 0) {
-                    SDL_RenderDrawLine(renderer, px, py, px + ts, py);
+                int ts = TILE_SIZE;
+                
+                // On garde estVisible juste pour savoir si le voisin est NOIR ou pas
+                // (Si le voisin a une intensité <= 0, on dessine le trait)
+                
+                if (getLuminosite(x, y - 1, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px, py, px + ts, py);       // Haut
+                if (getLuminosite(x, y + 1, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px, py + ts, px + ts, py + ts); // Bas
+                if (getLuminosite(x - 1, y, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px, py, px, py + ts);       // Gauche
+                if (getLuminosite(x + 1, y, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px + ts, py, px + ts, py + ts); // Droite
+                */
                 }
-
-                // 2. Vérifier le voisin du BAS (y+1)
-                if (estEclaire(x, y + 1, rayon) == 0) {
-                    SDL_RenderDrawLine(renderer, px, py + ts, px + ts, py + ts);
-                }
-
-                // 3. Vérifier le voisin de GAUCHE (x-1)
-                if (estEclaire(x - 1, y, rayon) == 0) {
-                    SDL_RenderDrawLine(renderer, px, py, px, py + ts);
-                }
-
-                // 4. Vérifier le voisin de DROITE (x+1)
-                if (estEclaire(x + 1, y, rayon) == 0) {
-                    SDL_RenderDrawLine(renderer, px + ts, py, px + ts, py + ts);
-                }
-            }
+            
         }
     }
     //dialogues
