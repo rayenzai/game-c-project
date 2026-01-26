@@ -293,8 +293,8 @@ int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesN
 
 // --- INITIALISATION ---
 void InitGame(SDL_Renderer *renderer) {
-    player.x = 100; 
-    player.y = 100; 
+    player.x = 80; 
+    player.y = 50; 
     player.w = 12; 
     player.h = 12;
     dialogueStep = 1;
