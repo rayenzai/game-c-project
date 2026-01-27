@@ -700,13 +700,13 @@ void UpdateGame(void) {
     }
 
     // 3. Passage 5 -> 6
-    if(IsLocationRight(12, 14, 5, 20)){
+    if(IsLocationRight(11, 14, 5, 20)){
         currentLevel = 6;
         player.x = 3;
         SpawnFantomeRandom(); // <--- NOUVEAU
     }
     // Retour 6 -> 5
-    else if (IsLocationLeft(12, 14, 6, 5)) {
+    else if (IsLocationLeft(11, 14, 6, 5)) {
         currentLevel = 5;
         player.x = (MAP_WIDTH * TILE_SIZE) - 20;
         SpawnFantomeRandom(); // <--- NOUVEAU (Le fantôme change de place quand on revient !)
@@ -726,13 +726,13 @@ void UpdateGame(void) {
     }
 
     // 5. Passage 7 -> 8 (Dernier niveau)
-    if(IsLocationLeft(12, 14, 7, 5)){
+    if(IsLocationLeft(11, 14, 7, 5)){
         currentLevel = 8;
         player.x = (MAP_WIDTH * TILE_SIZE) - 20;
         SpawnFantomeRandom(); // <--- NOUVEAU
     }
     // Retour 8 -> 7
-    else if(IsLocationRight(12, 14, 8, 20)){
+    else if(IsLocationRight(11, 14, 8, 20)){
         currentLevel = 7;
         player.x = 3;
         SpawnFantomeRandom(); // <--- NOUVEAU
