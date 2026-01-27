@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <math.h>
 
- 
+#define VOLUME_MUSIQUE 32
 
 // -- Pour les sons -- 
 
@@ -305,7 +305,7 @@ void InitGame(SDL_Renderer *renderer) {
     sonPickUp = chargement_son_item_pick_up();
     sonOpenDoor = chargement_son_door_open();
     sonCloseDoor = chargement_son_door_close();
-    MusicInterior = chargement_son_ambiance();
+    // MusicInterior = chargement_son_ambiance();
     MusicExterior = chargement_son_exterieur();
     
     // currentLevel = 5;
@@ -431,7 +431,7 @@ void ManageMusic() {
 
     // Si la zone a changé (ex: on passe de 4 à 5, ou au démarrage du jeu)
     if (newZoneState != currentZoneState) {
-        Mix_VolumeMusic(32);
+        Mix_VolumeMusic(VOLUME_MUSIQUE);
         if (newZoneState == 1) {
             if (MusicExterior) Mix_FadeInMusic(MusicExterior, -1, 1000); 
         } 
