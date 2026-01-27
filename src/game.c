@@ -151,8 +151,8 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  86, 2, 2},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  84, 2, 2},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 85, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 84, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0},
@@ -205,12 +205,12 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         { 2, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83, 82, 83}, 
         { 2, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 83, 82, 83},
         { 2, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 82, 83}, 
-        { 2, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 83}, 
-        { 2, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83}, 
+        { 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 83}, 
+        { 82, 82, 82, 82, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83}, 
         { 2, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 83},
         { 2, 82, 83, 83, 83, 83, 83, 82, 83, 82, 83, 83, 83, 82, 83, 83, 83, 83, 82, 83}, 
-        {82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 83, 82, 83},
-        {82, 82, 83, 82, 83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 82, 83, 83, 82, 82}, // SORTIE DROITE
+        { 2, 82, 83, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 83, 82, 83},
+        { 2, 82, 83, 82, 83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 82, 83, 83, 82, 82}, // SORTIE DROITE
         { 2, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 83}, 
         { 2, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83}
 
@@ -686,14 +686,14 @@ void UpdateGame(void) {
 
 
     // 1. Entrée dans le labyrinthe (Niveau 2 -> 5)
-    if(IsLocationRight(10, 14, 2, 20)){
+    if(IsLocationRight(6, 10, 2, 20)){
         currentLevel = 5;
         player.x = 5;
         SpawnFantomeRandom(); // <--- NOUVEAU
     }
 
     // 2. Retour couloir (5 -> 2)
-    else if (IsLocationLeft(10, 14, 5, 5)) {
+    else if (IsLocationLeft(6, 10, 5, 5)) {
         currentLevel = 2;
         player.x = (MAP_WIDTH * TILE_SIZE) - 20;
         // Pas de fantôme dans le couloir, on le laisse où il est (invisible)
@@ -944,96 +944,19 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         if (dialogueStep == 1) texteAffiche = "Maman ? Papa ? Il fait tout noir...";
         if (dialogueStep == 2) texteAffiche = "J'ai peur... Ou est mon Doudou ?";
 
-        SDL_Rect rectBulle = { 20, 180, 280, 50 };
-        
-        // Fond blanc
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderFillRect(renderer, &rectBulle);
-        
-        // Bordure noire
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderDrawRect(renderer, &rectBulle);
-
-        // 3. Dessiner le Texte
-        SDL_Color couleurNoire = {0, 0, 0, 255};
-        SDL_Surface *surfaceTexte = TTF_RenderText_Solid(font, texteAffiche, couleurNoire);
-        if (surfaceTexte) {
-            SDL_Texture *textureTexte = SDL_CreateTextureFromSurface(renderer, surfaceTexte);
-            SDL_Rect rectTexte = { 
-                rectBulle.x + 10, 
-                rectBulle.y + 15, 
-                surfaceTexte->w, 
-                surfaceTexte->h 
-            };
-            SDL_RenderCopy(renderer, textureTexte, NULL, &rectTexte);
-            
-            SDL_FreeSurface(surfaceTexte);
-            SDL_DestroyTexture(textureTexte);
-        }
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
     }
     if (dialogueStep_sortie1 > 0) {
         char *texteAffiche = "";
         if (dialogueStep_sortie1 == 1) texteAffiche = "je peux pas sortir sans mon doudou...";
-
-        SDL_Rect rectBulle = { 20, 180, 280, 50 };
-        
-        // Fond blanc
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderFillRect(renderer, &rectBulle);
-        
-        // Bordure noire
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderDrawRect(renderer, &rectBulle);
-
-        // 3. Dessiner le Texte
-        SDL_Color couleurNoire = {0, 0, 0, 255};
-        SDL_Surface *surfaceTexte = TTF_RenderText_Solid(font, texteAffiche, couleurNoire);
-        if (surfaceTexte) {
-            SDL_Texture *textureTexte = SDL_CreateTextureFromSurface(renderer, surfaceTexte);
-            SDL_Rect rectTexte = { 
-                rectBulle.x + 10, 
-                rectBulle.y + 15, 
-                surfaceTexte->w, 
-                surfaceTexte->h 
-            };
-            SDL_RenderCopy(renderer, textureTexte, NULL, &rectTexte);
-            
-            SDL_FreeSurface(surfaceTexte);
-            SDL_DestroyTexture(textureTexte);
-        }
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
     }
     if (dialogue_hasDoudou > 0) {
         char *texteAffiche = "";
         if (dialogue_hasDoudou == 1) texteAffiche = "je te tiens";
         if (dialogue_hasDoudou == 2) texteAffiche = "OH...";
         if (dialogue_hasDoudou == 3) texteAffiche = "De la lumiere !";
-
-        SDL_Rect rectBulle = { 20, 180, 280, 50 };
-        
-        // Fond blanc
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderFillRect(renderer, &rectBulle);
-        
-        // Bordure noire
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderDrawRect(renderer, &rectBulle);
-
-        // 3. Dessiner le Texte
-        SDL_Color couleurNoire = {0, 0, 0, 255};
-        SDL_Surface *surfaceTexte = TTF_RenderText_Solid(font, texteAffiche, couleurNoire);
-        if (surfaceTexte) {
-            SDL_Texture *textureTexte = SDL_CreateTextureFromSurface(renderer, surfaceTexte);
-            SDL_Rect rectTexte = { 
-                rectBulle.x + 10, 
-                rectBulle.y + 15, 
-                surfaceTexte->w, 
-                surfaceTexte->h 
-            };
-            SDL_RenderCopy(renderer, textureTexte, NULL, &rectTexte);
-            
-            SDL_FreeSurface(surfaceTexte);
-            SDL_DestroyTexture(textureTexte);
-        }
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
     }
 
     
@@ -1053,96 +976,79 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         SDL_RenderCopy(renderer, tilesetTexture, &src, &dest);
     }
 
-   if (showInteractPrompt == 1) {
+    if (showInteractPrompt == 1) {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Ouvrir", cBlanc);
-        
-        if (sText) {
-            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
-            
-            // 1. Calcul de la position théorique
-            int posX = (int)player.x - (sText->w / 2) + 8;
-            int posY = (int)player.y + 20;
-
-            // 2. CORRECTION (Clamping) pour ne pas sortir de l'écran
-            if (posX < 2) { 
-                posX = 2; // Bloque à gauche
-            } 
-            else if (posX + sText->w > LOGICAL_WIDTH - 2) {
-                posX = LOGICAL_WIDTH - sText->w - 2; // Bloque à droite
-            }
-
-            // 3. On applique la position corrigée
-            SDL_Rect rText = { posX, posY, sText->w, sText->h };
-
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150); 
-            SDL_Rect rFond = { rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2 };
-            SDL_RenderFillRect(renderer, &rFond);
-
-            SDL_RenderCopy(renderer, tText, NULL, &rText);
-            
-            SDL_FreeSurface(sText);
-            SDL_DestroyTexture(tText);
-        }
+        if (sText) DrawInteractions(renderer, sText);
     }
 
      if (showInteractPrompt2 == 1) {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[ENTER] Interagir", cBlanc);
         
-        if (sText) {
-            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
-            
-            // 1. Calcul position
-            int posX = (int)player.x - (sText->w / 2) + 8;
-            int posY = (int)player.y + 20;
-
-            // 2. Correction (Clamping)
-            if (posX < 2) posX = 2;
-            else if (posX + sText->w > LOGICAL_WIDTH - 2) posX = LOGICAL_WIDTH - sText->w - 2;
-            
-            // 3. Application
-            SDL_Rect rText = { posX, posY, sText->w, sText->h };
-            
-
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150); 
-            SDL_Rect rFond = { rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2 };
-            SDL_RenderFillRect(renderer, &rFond);
-
-            SDL_RenderCopy(renderer, tText, NULL, &rText);
-            
-            SDL_FreeSurface(sText);
-            SDL_DestroyTexture(tText);
-        }
+        if (sText) DrawInteractions(renderer, sText);
     }
     if (showInteractPrompt3 == 1) {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Fermer", cBlanc);
         
-        if (sText) {
-            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
-            
-            // 1. Calcul position
-            int posX = (int)player.x - (sText->w / 2) + 8;
-            int posY = (int)player.y + 20;
-
-            // 2. Correction (Clamping)
-            if (posX < 2) posX = 2;
-            else if (posX + sText->w > LOGICAL_WIDTH - 2) posX = LOGICAL_WIDTH - sText->w - 2;
-            
-            // 3. Application
-            SDL_Rect rText = { posX, posY, sText->w, sText->h };
-            
-
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150); 
-            SDL_Rect rFond = { rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2 };
-            SDL_RenderFillRect(renderer, &rFond);
-
-            SDL_RenderCopy(renderer, tText, NULL, &rText);
-            
-            SDL_FreeSurface(sText);
-            SDL_DestroyTexture(tText);
-        }
+        if (sText) DrawInteractions(renderer, sText);
     }
 }
 
+void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText){
+    SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+    
+    // 1. Calcul de la position théorique
+    int posX = (int)player.x - (sText->w / 2) + 8;
+    int posY = (int)player.y + 20;
+
+    // 2. CORRECTION (Clamping) pour ne pas sortir de l'écran
+    if (posX < 2) { 
+        posX = 2; // Bloque à gauche
+    } 
+    else if (posX + sText->w > LOGICAL_WIDTH - 2) {
+        posX = LOGICAL_WIDTH - sText->w - 2; // Bloque à droite
+    }
+
+    // 3. On applique la position corrigée
+    SDL_Rect rText = { posX, posY, sText->w, sText->h };
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150); 
+    SDL_Rect rFond = { rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2 };
+    SDL_RenderFillRect(renderer, &rFond);
+
+    SDL_RenderCopy(renderer, tText, NULL, &rText);
+    
+    SDL_FreeSurface(sText);
+    SDL_DestroyTexture(tText);
+}
+
+void DrawTexte(char *texteAffiche, SDL_Renderer *renderer,TTF_Font *font, int x, int y, int w, int h){
+        SDL_Rect rectBulle = { x, y, w, h };
+        
+        // Fond blanc
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderFillRect(renderer, &rectBulle);
+        
+        // Bordure noire
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderDrawRect(renderer, &rectBulle);
+
+        // 3. Dessiner le Texte
+        SDL_Color couleurNoire = {0, 0, 0, 255};
+        SDL_Surface *surfaceTexte = TTF_RenderText_Solid(font, texteAffiche, couleurNoire);
+        if (surfaceTexte) {
+            SDL_Texture *textureTexte = SDL_CreateTextureFromSurface(renderer, surfaceTexte);
+            SDL_Rect rectTexte = { 
+                rectBulle.x + 10, 
+                rectBulle.y + 15, 
+                surfaceTexte->w, 
+                surfaceTexte->h 
+            };
+            SDL_RenderCopy(renderer, textureTexte, NULL, &rectTexte);
+            
+            SDL_FreeSurface(surfaceTexte);
+            SDL_DestroyTexture(textureTexte);
+        }
+}

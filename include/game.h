@@ -44,6 +44,8 @@ void UpdateGame(void);
 void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini);
 void ActionFantome();
 void SpawnFantomeRandom();
+void DrawTexte(char *texteAffiche, SDL_Renderer *renderer,TTF_Font *font, int x, int y, int w, int h);
+void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText);
 
 extern int currentLevel; 
 
