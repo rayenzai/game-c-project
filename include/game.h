@@ -13,7 +13,7 @@
 #define MAP_WIDTH 20        
 #define MAP_HEIGHT 15  
 #define NB_LEVELS 9 
-#define PLAYER_SPEED 2.0f 
+#define PLAYER_SPEED 0.8f 
 
 
 // #define FANTOME_SPEED 0.5f 
