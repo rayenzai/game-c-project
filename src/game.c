@@ -9,7 +9,7 @@
 
 // --- CONSTANTES ---
 #define TILE_SIZE 16        
-#define PLAYER_SPEED 2.0f   
+#define PLAYER_SPEED 0.7f   
 #define LOGICAL_WIDTH 320
 #define LOGICAL_HEIGHT 240
 #define MAP_WIDTH 20        
@@ -678,7 +678,7 @@ void UpdateGame(void) {
     // Transition du niveau 2 au premier niveau du labyrinthe (niveau 5)
     if(IsLocationRight(11, 14, 2, 20)){
         currentLevel = 5;
-        player.x = 3;
+        player.x = 5;
         // Mix_FreeMusic(bgm);
     }
 
