@@ -115,7 +115,7 @@ void SpawnFantomeRandom() {
         int type = maps[currentLevel][ry][rx];
 
         // Si c'est un sol (0 ou 1)
-        if (type == 0 || type == 1) {
+        if (type == 82) {
             
             // 3. On vérifie que ce n'est pas trop près du joueur (Spawn kill)
             float fx = rx * TILE_SIZE;
