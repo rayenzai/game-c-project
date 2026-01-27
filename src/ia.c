@@ -8,6 +8,100 @@ Fantome fantome;
 
 float FANTOME_SPEED;
 
+// Structure simple pour les coordonnées de la grille
+typedef struct {
+    int x, y;
+} Point;
+
+// Fonction BFS pour trouver la direction vers le joueur
+// Retourne la direction (0: Haut, 1: Bas, 2: Gauche, 3: Droite, -1: Stop)
+int ObtenirDirectionBFS(int startX, int startY, int targetX, int targetY) {
+    // Si on est déjà sur la case (ou très proche), on ne bouge pas
+    if (startX == targetX && startY == targetY) return -1;
+
+    // Tableaux pour suivre les parents (d'où on vient) pour reconstruire le chemin
+    // predecesseur[y][x] stocke la direction qu'on a prise pour arriver sur la case x,y
+    static int predecesseur[MAP_HEIGHT][MAP_WIDTH]; 
+    static int visited[MAP_HEIGHT][MAP_WIDTH];
+
+    // Reset des tableaux
+    for(int y=0; y<MAP_HEIGHT; y++) {
+        for(int x=0; x<MAP_WIDTH; x++) {
+            visited[y][x] = 0;
+            predecesseur[y][x] = -1;
+        }
+    }
+
+    // File d'attente pour le BFS (taille max = taille carte)
+    Point queue[MAP_WIDTH * MAP_HEIGHT];
+    int head = 0;
+    int tail = 0;
+
+    // On ajoute le point de départ
+    queue[tail++] = (Point){startX, startY};
+    visited[startY][startX] = 1;
+
+    int found = 0;
+
+    // Directions : 0=Haut, 1=Bas, 2=Gauche, 3=Droite
+    int dx[] = {0, 0, -1, 1};
+    int dy[] = {-1, 1, 0, 0};
+
+    // --- ALGORITHME DE PROPAGATION (INONDATION) ---
+    while (head < tail) {
+        Point current = queue[head++];
+
+        // Si on a atteint la cible (le joueur)
+        if (current.x == targetX && current.y == targetY) {
+            found = 1;
+            break;
+        }
+
+        // On teste les 4 voisins
+        for (int i = 0; i < 4; i++) {
+            int nx = current.x + dx[i];
+            int ny = current.y + dy[i];
+
+            // Vérifications : dans la carte ? pas un mur ? pas déjà visité ?
+            if (nx >= 0 && nx < MAP_WIDTH && ny >= 0 && ny < MAP_HEIGHT) {
+                // ATTENTION : On utilise ta logique de mur (0, 1 et 82 sont traversables)
+                int type = maps[currentLevel][ny][nx];
+                int isWalkable = (type == 0 || type == 1 || type == 82);
+
+                if (isWalkable && !visited[ny][nx]) {
+                    visited[ny][nx] = 1;
+                    predecesseur[ny][nx] = i; // On note la direction prise pour arriver ici
+                    queue[tail++] = (Point){nx, ny};
+                }
+            }
+        }
+    }
+
+    // --- RECONSTRUCTION DU CHEMIN ---
+    if (found) {
+        // On part de la cible (le joueur) et on remonte jusqu'au fantôme
+        int currX = targetX;
+        int currY = targetY;
+        int directionFinale = -1;
+
+        while (currX != startX || currY != startY) {
+            int dirToGetHere = predecesseur[currY][currX];
+            
+            // C'est la direction que le fantôme devra prendre
+            directionFinale = dirToGetHere;
+
+            // On remonte au parent (inverse de la direction)
+            if (dirToGetHere == 0) currY++;      // Si on est venu du haut, on redescend
+            else if (dirToGetHere == 1) currY--; // Si on est venu du bas, on remonte
+            else if (dirToGetHere == 2) currX++; // Si on est venu de gauche, on va droite
+            else if (dirToGetHere == 3) currX--; // Si on est venu de droite, on va gauche
+        }
+        return directionFinale;
+    }
+
+    return -1; // Pas de chemin trouvé
+}
+
 void SpawnFantomeRandom() {
     int validPosition = 0;
     int maxEssais = 100; // Sécurité pour ne pas boucler à l'infini
@@ -117,20 +211,21 @@ int CheckLineOfSight(float x1, float y1, float x2, float y2) {
 void ActionFantome(int rayonDetection) {
     static int isChasing = 0; 
     
-    // --- 1. ANALYSE ---
     float dx = player.x - fantome.x;
     float dy = player.y - fantome.y;
     double distance = sqrt(dx*dx + dy*dy);
 
-    // SECURITÉ : Si le fantôme est téléporté (changement salle), on reset son cerveau
+    // Reset si téléportation
     if (distance > 200) { 
         isChasing = 0;
         fantome.timer = 0;
     }
 
+    // --- GESTION ÉTAT CHASSE ---
     if (isChasing) {
-        FANTOME_SPEED = 0.75f; // Il accélère quand il te voit
-        if (distance > (5 * TILE_SIZE) || currentLevel < 4) {
+        FANTOME_SPEED = 0.75f;
+        // Si trop loin, on arrête la chasse
+        if (distance > (8 * TILE_SIZE) || currentLevel < 4) { // J'ai augmenté un peu la distance de perte de vue
             isChasing = 0;
             fantome.timer = 0; 
             FANTOME_SPEED = 0.5f;
@@ -139,6 +234,7 @@ void ActionFantome(int rayonDetection) {
     else {
         FANTOME_SPEED = 0.5f;
         if (distance < rayonDetection && currentLevel >= 4) {
+            // Ici tu peux garder le LineOfSight pour ne déclencher la chasse QUE si vu
             if (CheckLineOfSight(fantome.x + fantome.w/2, fantome.y + fantome.h/2, 
                                  player.x + player.w/2, player.y + player.h/2)) {
                 isChasing = 1;
@@ -147,10 +243,10 @@ void ActionFantome(int rayonDetection) {
         }
     }
 
-    // --- 2. COLLISIONS & TIMER ---
+    // --- COLLISIONS ---
     float testX = fantome.x;
     float testY = fantome.y;
-
+    // Prédiction simple
     if (fantome.direction == 0) testY -= FANTOME_SPEED;
     else if (fantome.direction == 1) testY += FANTOME_SPEED;
     else if (fantome.direction == 2) testX -= FANTOME_SPEED;
@@ -159,73 +255,42 @@ void ActionFantome(int rayonDetection) {
     int hitWall = !CheckCollisionFantome(testX, testY);
     fantome.timer--;
 
-    // Si on est en chasse, on réfléchit très souvent (dès qu'on touche une case ou un mur)
+    // Est-ce qu'on est parfaitement centré sur une case ?
+    // C'est important pour le BFS de ne changer de direction qu'aux intersections
     int onGrid = (((int)fantome.x % TILE_SIZE == (TILE_SIZE - fantome.w)/2) && 
                   ((int)fantome.y % TILE_SIZE == (TILE_SIZE - fantome.h)/2));
     
+    // Si on chasse et qu'on est sur la grille (ou bloqué), on recalcule le chemin
     if (isChasing && (onGrid || hitWall)) {
         fantome.timer = 0;
     }
 
-    // --- 3. CERVEAU (NOUVELLE LOGIQUE DE GLISSEMENT) ---
+    // --- CERVEAU ---
     if (hitWall || fantome.timer <= 0) {
         
         int bestDir = -1;
-        float marge = 4.0f; // Marge pour anticiper les murs
+        float marge = 4.0f;
 
-        // >>> MODE CHASSEUR INTELLIGENT (AXIS PRIORITY) <<<
+        // >>> NOUVEAU MODE CHASSEUR (BFS / PATHFINDING) <<<
         if (isChasing) {
-            // 1. Quelles directions mènent vers le joueur ?
-            int dirH = (dx > 0) ? 3 : 2; // 3=Droite, 2=Gauche
-            int dirV = (dy > 0) ? 1 : 0; // 1=Bas, 0=Haut
-            
-            // 2. Vérifions si ces directions sont libres (sans murs)
-            int freeH = 0;
-            // On vérifie si aller horizontalement est possible
-            if (dirH == 2 && CheckCollisionFantome(fantome.x - marge, fantome.y)) freeH = 1;
-            if (dirH == 3 && CheckCollisionFantome(fantome.x + marge, fantome.y)) freeH = 1;
+            // Conversion coordonnées pixels -> coordonnées grille
+            int gx = (int)((fantome.x + fantome.w/2) / TILE_SIZE);
+            int gy = (int)((fantome.y + fantome.h/2) / TILE_SIZE);
+            int px = (int)((player.x + player.w/2) / TILE_SIZE);
+            int py = (int)((player.y + player.h/2) / TILE_SIZE);
 
-            int freeV = 0;
-            // On vérifie si aller verticalement est possible
-            if (dirV == 0 && CheckCollisionFantome(fantome.x, fantome.y - marge)) freeV = 1;
-            if (dirV == 1 && CheckCollisionFantome(fantome.x, fantome.y + marge)) freeV = 1;
+            // On demande au GPS la direction à prendre
+            bestDir = ObtenirDirectionBFS(gx, gy, px, py);
 
-            // 3. PRISE DE DÉCISION (GLISSEMENT)
-            // On privilégie l'axe où le joueur est le plus loin (fabs)
-            if (fabs(dx) > fabs(dy)) {
-                // Le joueur est plus loin horizontalement que verticalement
-                if (freeH) {
-                    bestDir = dirH; // On fonce horizontalement
-                } else if (freeV) {
-                    bestDir = dirV; // Bloqué horizontalement ? On glisse verticalement !
-                } else {
-                    // Cul de sac ? On tente l'opposé vertical pour débloquer
-                    int opposeV = (dirV == 0) ? 1 : 0;
-                    if (CheckCollisionFantome(fantome.x, fantome.y + (opposeV==1?marge:-marge))) 
-                        bestDir = opposeV;
-                }
-            } 
-            else {
-                // Le joueur est plus loin verticalement
-                if (freeV) {
-                    bestDir = dirV; // On fonce verticalement
-                } else if (freeH) {
-                    bestDir = dirH; // Bloqué verticalement ? On glisse horizontalement !
-                } else {
-                    // Cul de sac ? On tente l'opposé horizontal
-                    int opposeH = (dirH == 2) ? 3 : 2;
-                    if (CheckCollisionFantome(fantome.x + (opposeH==3?marge:-marge), fantome.y)) 
-                        bestDir = opposeH;
-                }
-            }
-            
-            // Timer très court pour réagir vite aux changements
-            fantome.timer = (int)(8 / FANTOME_SPEED); 
+            // On met un timer pour ne pas recalculer à chaque frame (optimisation)
+            // Mais assez court pour réagir si le joueur bouge vite
+            fantome.timer = (int)(TILE_SIZE / FANTOME_SPEED); 
         }
         
-        // >>> MODE PATROUILLE (ALEATOIRE) <<<
+        // >>> MODE PATROUILLE (ALEATOIRE) - Inchangé <<<
+        // Si le BFS échoue (pas de chemin) ou si on ne chasse pas
         if (bestDir == -1) { 
-            // On liste les directions possibles
+            // Ta logique aléatoire existante...
             int dirs[4]; int nbDirs = 0;
             if (CheckCollisionFantome(fantome.x, fantome.y - marge)) dirs[nbDirs++] = 0;
             if (CheckCollisionFantome(fantome.x, fantome.y + marge)) dirs[nbDirs++] = 1;
@@ -233,15 +298,13 @@ void ActionFantome(int rayonDetection) {
             if (CheckCollisionFantome(fantome.x + marge, fantome.y)) dirs[nbDirs++] = 3;
 
             if (nbDirs > 0) {
-                // On évite le demi-tour sauf si cul-de-sac
                 int oppose = -1;
+                // ... (ton code d'opposé ici) ...
                 if (fantome.direction == 0) oppose = 1; else if (fantome.direction == 1) oppose = 0;
                 else if (fantome.direction == 2) oppose = 3; else if (fantome.direction == 3) oppose = 2;
 
                 int validDirs[4]; int nbValid = 0;
-                for(int i=0; i<nbDirs; i++) {
-                    if (dirs[i] != oppose) validDirs[nbValid++] = dirs[i];
-                }
+                for(int i=0; i<nbDirs; i++) if (dirs[i] != oppose) validDirs[nbValid++] = dirs[i];
 
                 if (nbValid > 0) bestDir = validDirs[rand() % nbValid];
                 else bestDir = dirs[0];
@@ -249,10 +312,12 @@ void ActionFantome(int rayonDetection) {
             fantome.timer = 30 + rand() % 60; 
         }
 
-        // 4. APPLICATION
+        // 4. APPLICATION DE LA DIRECTION
         if (bestDir != -1) {
             fantome.direction = bestDir;
-            // Snapping (Centrage) pour éviter de frotter les murs
+            
+            // Snapping (Centrage très important pour que le BFS marche bien)
+            // Cela aligne le fantôme parfaitement au centre du couloir
             if (fantome.direction <= 1) { // Vertical
                 int col = (int)((fantome.x + fantome.w/2) / TILE_SIZE);
                 fantome.x = (float)(col * TILE_SIZE + (TILE_SIZE - fantome.w)/2.0f);
@@ -261,11 +326,11 @@ void ActionFantome(int rayonDetection) {
                 fantome.y = (float)(lig * TILE_SIZE + (TILE_SIZE - fantome.h)/2.0f);
             }
         } else {
-            fantome.timer = 10; // Bloqué totalement
+            fantome.timer = 10;
         }
     } 
     
-    // --- 4. MOUVEMENT FINAL ---
+    // --- MOUVEMENT FINAL ---
     float moveX = fantome.x;
     float moveY = fantome.y;
 
