@@ -14,6 +14,15 @@
 #define LOGICAL_HEIGHT 240
 #define MAP_WIDTH 20        
 #define MAP_HEIGHT 15     
+#define BED_TILE_X 3
+#define BED_TILE_Y 1
+#define BED_TILE_W 2
+#define BED_TILE_H 3
+#define PLAYER_HITBOX_INSET 2
+#define CHAIR_TILE_X 6
+#define CHAIR_TILE_Y 12
+#define CHAIR_TILE_W 1
+#define CHAIR_TILE_H 1
 
 // -- Pour les sons -- 
 
@@ -30,6 +39,17 @@ static Mix_Music *MusicExterior = NULL;
 // Pour les touches
 static int toucheE_Relache = 1;
 static int toucheEnter_Relache = 1;
+static int toucheSpace_Relache = 1;
+static int toucheX_Relache = 1;
+static int toucheI_Relache = 1;
+static int toucheT_Relache = 1;
+static int isSleeping = 0;
+static int isSitting = 0;
+static int isHidingInTent = 0;
+static int showSleepPrompt = 0;
+static int showSitPrompt = 0;
+static int showPhone = 0;
+static int showTentPrompt = 0;
 
 // --- VARIABLES GLOBALES ---
 typedef struct {
@@ -88,64 +108,44 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 51 = haut chaise 
 52,53,54 = bas tente
 55,56,57 = haut tente
-58 = coussin bas 
-59,60 = coussins 
-61 = digicode 0
-78 = hanse basket
-79 = ballon de basket
-80,81 = commode mur droit
-........................
-62 = monstre vu de gauche
-63 = monstre de face
-64 = monstre vu de droite
-.........................
-65, 66 = haut tapis 
-67, 68 = tapis 
-69, 70 = bas mur 
-71 72 = table
-73 = vase
-74, 75 = lampe murale gauche
-76, 77 = lampe murale droite
-
-
 */
 
 // --- LA CARTE DU NIVEAU ---
 static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
  {      //carte 1 (chambre)
-        {2,  2,  2,  2,  2,  2,  2,  2,  0,  0, 0, 0, 2,  2,  5,  2,  8,  9,  2, 2}, // Trou en haut   
-        {2,  2,  2, 36, 37,  2,  2,  2,  0,  1, 0, 0, 2,  2, 41,  2, 10, 11,  2, 2}, 
-        {2,  1,  0, 32, 33, 21,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
-        {2,  1,  0, 34, 35,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
-        {2,  1, 30, 31,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
-        {2,  1,  0, 20,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2, 2,  2,  2,  2,  2,  2,  2,  0,  0, 0, 0, 2,  2,  5,  2,  8,  9,  2, 2}, // Trou en haut   
+        {2, 2,  2, 36, 37,  2,  2,  2,  0,  1, 0, 0, 2,  2, 41,  2, 10, 11,  2, 2}, 
+        {2, 1,  0, 32, 33, 21,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2, 1,  0, 34, 35,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2, 1, 30, 31,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2, 1,  0, 20,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
         {2, 42, 0,  1,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1, 55, 56, 57, 2},
         {2, 43, 0,  1,  0,  1,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1, 52, 53, 54, 2},
-        {2,  1,  0,  1,  0,  3, 44,  1,  0,  1, 0, 1, 0,  1,  0, 58,  0, 59, 60, 2},
-        {2,  1,  0, 40,  0,  1,  4,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
-        {2,  1,  0,  1, 38, 39,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
-        {2, 78,  0,  1,  0,  1,  0,  1,  0,  1, 0, 1, 0, 27, 28, 29,  0,  1, 81, 2},
-        {2,  1, 79,  1,  0,  1, 51,  1,  0,  1, 0, 1, 0, 24, 25, 26,  0,  1, 80, 2}, // Bas fermé
-        {2,  1,  0,  1,  0,  1, 46, 47, 48, 49, 0, 1, 0, 22, 23,  0,  0,  1,  0, 2},
-        {2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2}  // Bas fermé
+        {2, 1,  0,  1,  0,  3, 44,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2, 1,  0, 40,  0,  1,  4,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2, 1,  0,  1, 38, 39,  0,  1,  0,  1, 0, 1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2, 1,  0,  1,  0,  1,  0,  1,  0,  1, 0, 1, 0, 27, 28, 29,  0,  1,  0, 2},
+        {2, 1,  0,  1,  0,  1, 51,  1,  0,  1, 0, 1, 0, 24, 25, 26,  0,  1,  0, 2}, // Bas fermé
+        {2, 1,  0,  1,  0,  1, 46, 47, 48, 49, 0, 1, 0, 22, 23,  0,  0,  1,  0, 2},
+        {2, 2,  2,  2,  2,  2,  2,  2,  2,  2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2}  // Bas fermé
     },
     // CARTE 2 : COULOIR (Niveau 1)
     {
-        {2, 2, 2, 2, 2, 2, 2,  2,  0, 69, 70,  0,  2,  2, 2, 2, 2, 2, 2, 2}, // Haut (Suite)
-        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2}, // Toits cotés
-        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2}, // Murs cotés
-        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68, 76, 77,  2, 2, 2, 2, 2, 2, 2}, // Vide (Sol)
-        {2, 2, 2, 2, 2, 2, 2, 74, 75, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2,  2, 72, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2,  2, 71, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68, 76, 77,  2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2, 74, 75, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68, 73,  2,  2, 2, 2, 2, 2, 2, 2}, // Bas (Entrée)
-        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2,  2,  0, 65, 66,  0,  2,  2, 2, 2, 2, 2, 2, 2}
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Haut (Suite)
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Toits cotés
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Murs cotés
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Vide (Sol)
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Bas (Entrée)
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}
     }, 
     // CARTE 3 : HALL (Niveau 2)
     {       
@@ -154,11 +154,11 @@ static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  76, 77, 2},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  76, 77, 2},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Bas fermé
@@ -288,13 +288,25 @@ int showInteractPrompt2 = 0;
 int showInteractPrompt3 = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
 
+static int isBedTileIndex(int type) {
+    return (type >= 32 && type <= 37);
+}
+
+static int isDeskTileIndex(int type) {
+    return (type >= 46 && type <= 49) || type == 51;
+}
+
+static int isCabinetTileIndex(int type) {
+    return (type >= 42 && type <= 43);
+}
+
 int TuilesNotSpecial[] = {0, 1, 2};
 int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
 
 // --- INITIALISATION ---
 void InitGame(SDL_Renderer *renderer) {
-    player.x = 80; 
-    player.y = 50; 
+    player.x = 100; 
+    player.y = 100; 
     player.w = 12; 
     player.h = 12;
     dialogueStep = 1;
@@ -329,31 +341,74 @@ int isWall(float x, float y) {
     int caseY = y / TILE_SIZE;
     if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
     int type = maps[currentLevel][caseY][caseX];
-    int type_pattern = maps_patern[currentLevel][caseY][caseX];
+    // int type_pattern = maps_patern[currentLevel][caseY][caseX];
 
-    // --- TYPE 1 : MURS CLASSIQUES (Tout le bloc est solide) ---
-    // Les murs, les bords, le vide...
+    if (isBedTileIndex(type) || isDeskTileIndex(type) || isCabinetTileIndex(type)) {
+        return 1;
+    }
+    
+    // Collision avec la tente (tiles 52-57) - sauf si le joueur est caché dedans
+    if ((type >= 52 && type <= 57) && !isHidingInTent) {
+        return 1;
+    }
 
-    if (type == 2 || type_pattern == 2){
-        // VERIFICATION DU MUR "DU DESSOUS"
-        // Si la case en dessous est un autre mur (type 2), alors c'est un "mur de coté" ou un "mur plein".
-        
+    // --- TYPE 1 : MURS AVEC EFFET 3D/PERSPECTIVE ---
+    // Les murs ont une profondeur : on peut passer "derrière" mais pas à travers
+
+    if (type == 2 || type == 5){
+        // Vérifier les cases adjacentes dans toutes les directions
         int caseY_Below = caseY + 1;
+        int caseY_Above = caseY - 1;
+        int caseX_Left = caseX - 1;
+        int caseX_Right = caseX + 1;
+        
+        int typeBelow = -1;
+        int typeAbove = -1;
+        int typeLeft = -1;
+        int typeRight = -1;
+        
         if (caseY_Below < MAP_HEIGHT) {
-            int typeBelow = maps[currentLevel][caseY_Below][caseX];
-            if (typeBelow == 2 || typeBelow == 5) {
-                return 1;
-            }
-        } else {
-             return 1;
+            typeBelow = maps[currentLevel][caseY_Below][caseX];
         }
-
+        if (caseY_Above >= 0) {
+            typeAbove = maps[currentLevel][caseY_Above][caseX];
+        }
+        if (caseX_Left >= 0) {
+            typeLeft = maps[currentLevel][caseY][caseX_Left];
+        }
+        if (caseX_Right < MAP_WIDTH) {
+            typeRight = maps[currentLevel][caseY][caseX_Right];
+        }
+        
+        // --- PRIORITÉ 1 : MURS VERTICAUX (gauche, droite, bas) ---
+        // Si le mur a un voisin au-dessus OU en dessous, c'est un mur vertical → solide
+        if (typeBelow == 2 || typeBelow == 5 || typeAbove == 2 || typeAbove == 5) {
+            return 1; // Complètement solide
+        }
+        
+        // --- PRIORITÉ 2 : MURS LATÉRAUX (bordures gauche/droite) ---
+        // Si le mur a du vide/sol à gauche OU à droite, c'est une bordure latérale → solide
+        if (typeLeft != 2 && typeLeft != 5 && typeLeft != -1) {
+            return 1; // Mur de gauche = complètement solide
+        }
+        if (typeRight != 2 && typeRight != 5 && typeRight != -1) {
+            return 1; // Mur de droite = complètement solide
+        }
+        
+        // Bords de la carte = complètement solides
+        if (caseX_Left < 0 || caseX_Right >= MAP_WIDTH || caseY_Below >= MAP_HEIGHT || caseY_Above < 0) {
+            return 1;
+        }
+        
+        // --- PRIORITÉ 3 : MURS DE FACE (horizontaux du haut) - Effet 3D ---
+        // Si le mur n'a que des voisins murs ou est isolé, c'est un "mur de face"
+        // Effet de profondeur : on peut passer derrière la partie basse
         int localY = (int)y % TILE_SIZE; 
 
-        if (localY < 4) {
-            return 1;
+        if (localY < 6) {
+            return 1; // Partie haute = solide
         } else {
-            return 0;
+            return 0; // Partie basse = traversable (effet 3D)
         }
     }
 
@@ -440,6 +495,19 @@ void ManageMusic() {
 
 }
 
+static int touchesWall(float x, float y, int w, int h) {
+    float left   = x + PLAYER_HITBOX_INSET;
+    float right  = x + w - PLAYER_HITBOX_INSET;
+    float top    = y + PLAYER_HITBOX_INSET;
+    float bottom = y + h - PLAYER_HITBOX_INSET;
+
+    if (isWall(left, top)) return 1;
+    if (isWall(right, top)) return 1;
+    if (isWall(left, bottom)) return 1;
+    if (isWall(right, bottom)) return 1;
+    return 0;
+}
+
 // --- UPDATE ---
 void UpdateGame(void) {
     const Uint8 *state = SDL_GetKeyboardState(NULL);
@@ -487,42 +555,111 @@ void UpdateGame(void) {
         return;
     }
 
-    float dirX = 0;
-    float dirY = 0;
+    SDL_Rect bedRectPx = { BED_TILE_X * TILE_SIZE, BED_TILE_Y * TILE_SIZE, BED_TILE_W * TILE_SIZE, BED_TILE_H * TILE_SIZE };
+    int nearBed = 0;
+    if (currentLevel == 0) {
+        SDL_Rect playerRect = { (int)player.x, (int)player.y, player.w, player.h };
+        SDL_Rect bedReachRect = { bedRectPx.x - 8, bedRectPx.y - 8, bedRectPx.w + 16, bedRectPx.h + 16 };
+        nearBed = SDL_HasIntersection(&playerRect, &bedReachRect);
+    }
+    showSleepPrompt = (nearBed && !isSleeping);
 
-    if (state[SDL_SCANCODE_UP])    dirY -= 1;
-    if (state[SDL_SCANCODE_DOWN])  dirY += 1;
-    if (state[SDL_SCANCODE_LEFT])  dirX -= 1;
-    if (state[SDL_SCANCODE_RIGHT]) dirX += 1;
-
-    // Si on bouge sur les deux axes en même temps (Diagonale)
-    if (dirX != 0 && dirY != 0) {
-        // On multiplie par 0.707 (environ 1/racine(2)) pour ralentir
-        dirX *= 0.7071f;
-        dirY *= 0.7071f;
+    if (isSleeping) {
+        if (state[SDL_SCANCODE_SPACE]) {
+            if (toucheSpace_Relache) {
+                isSleeping = 0;
+                toucheSpace_Relache = 0;
+                player.x = bedRectPx.x + (bedRectPx.w / 2) - (player.w / 2);
+                player.y = bedRectPx.y + bedRectPx.h + 2; // Wake up at foot of bed
+            }
+        } else {
+            toucheSpace_Relache = 1;
+        }
+        return;
     }
 
-    // 3. On applique la VITESSE
-    float nextX = player.x + (dirX * PLAYER_SPEED);
-    float nextY = player.y + (dirY * PLAYER_SPEED);
-    // Collision X
-    int touchWallX = 0;
-    if (isWall(nextX, player.y)) touchWallX = 1;
-    if (isWall(nextX + player.w, player.y)) touchWallX = 1;
-    if (isWall(nextX, player.y + player.h)) touchWallX = 1;
-    if (isWall(nextX + player.w, player.y + player.h)) touchWallX = 1;
+    if (nearBed && state[SDL_SCANCODE_SPACE]) {
+        if (toucheSpace_Relache) {
+            isSleeping = 1;
+            toucheSpace_Relache = 0;
+            player.x = bedRectPx.x + (bedRectPx.w / 2) - (player.w / 2);
+            player.y = bedRectPx.y + TILE_SIZE; // Place player on bed
+        }
+        return;
+    } else if (!state[SDL_SCANCODE_SPACE]) {
+        toucheSpace_Relache = 1;
+    }
 
-    if (!touchWallX) player.x = nextX;
+    SDL_Rect chairRectPx = { CHAIR_TILE_X * TILE_SIZE, CHAIR_TILE_Y * TILE_SIZE, CHAIR_TILE_W * TILE_SIZE, CHAIR_TILE_H * TILE_SIZE };
+    int nearChair = 0;
+    if (currentLevel == 0) {
+        SDL_Rect playerRect = { (int)player.x, (int)player.y, player.w, player.h };
+        SDL_Rect chairReachRect = { chairRectPx.x - 6, chairRectPx.y - 6, chairRectPx.w + 12, chairRectPx.h + 12 };
+        nearChair = SDL_HasIntersection(&playerRect, &chairReachRect);
+    }
+    showSitPrompt = (nearChair && !isSitting && !isSleeping);
 
+    if (isSitting) {
+        if (state[SDL_SCANCODE_X]) {
+            if (toucheX_Relache) {
+                isSitting = 0;
+                toucheX_Relache = 0;
+                player.x = chairRectPx.x + (chairRectPx.w / 2) - (player.w / 2);
+                player.y = chairRectPx.y - player.h - 2; // Se relève au-dessus pour éviter le bureau
+            }
+        } else {
+            toucheX_Relache = 1;
+        }
+        return;
+    }
+
+    if (nearChair && state[SDL_SCANCODE_X]) {
+        if (toucheX_Relache) {
+            isSitting = 1;
+            toucheX_Relache = 0;
+            player.x = chairRectPx.x + (chairRectPx.w / 2) - (player.w / 2);
+            player.y = chairRectPx.y + (chairRectPx.h / 2) - (player.h / 2) + 4; // Position assise
+        }
+        return;
+    } else if (!state[SDL_SCANCODE_X]) {
+        toucheX_Relache = 1;
+    }
+
+    if (state[SDL_SCANCODE_I]) {
+        if (toucheI_Relache) {
+            showPhone = !showPhone;
+            toucheI_Relache = 0;
+        }
+    } else {
+        toucheI_Relache = 1;
+    }
+
+    if (showPhone) {
+        return;
+    }
     
-    // Collision Y
-    int touchWallY = 0;
-    if (isWall(player.x, nextY)) touchWallY = 1;
-    if (isWall(player.x + player.w, nextY)) touchWallY = 1;
-    if (isWall(player.x, nextY + player.h)) touchWallY = 1;
-    if (isWall(player.x + player.w, nextY + player.h)) touchWallY = 1;
+    // --- BLOQUER LE MOUVEMENT SI CACHÉ DANS LA TENTE ---
+    if (isHidingInTent) {
+        // Le joueur est immobile quand il est caché, on skip le mouvement
+        // Seule la touche T peut le faire sortir (gérée plus bas)
+    } else {
+        // Mouvement normal du joueur
+        float nextX = player.x;
+        float nextY = player.y;
 
-    if (!touchWallY) player.y = nextY;
+        if (state[SDL_SCANCODE_UP])    nextY -= PLAYER_SPEED;
+        if (state[SDL_SCANCODE_DOWN])  nextY += PLAYER_SPEED;
+        if (state[SDL_SCANCODE_LEFT])  nextX -= PLAYER_SPEED;
+        if (state[SDL_SCANCODE_RIGHT]) nextX += PLAYER_SPEED;
+
+        // Collision X
+        int touchWallX = touchesWall(nextX, player.y, player.w, player.h);
+        if (!touchWallX) player.x = nextX;
+
+        // Collision Y
+        int touchWallY = touchesWall(player.x, nextY, player.w, player.h);
+        if (!touchWallY) player.y = nextY;
+    }
 
     float armoireX = 256 + 16; 
     float armoireY = 16 + 16; 
@@ -616,6 +753,42 @@ void UpdateGame(void) {
             toucheEnter_Relache = 1;
     }
     
+    // --- GESTION DE LA TENTE (touche T pour se cacher) ---
+    // Position de la tente : colonnes 16,17,18 / lignes 6,7 (selon la map)
+    float tentX = 17 * TILE_SIZE;  // Centre de la tente
+    float tentY = 7 * TILE_SIZE;   // Bas de la tente
+    
+    float dxTent = (player.x + player.w / 2) - tentX;
+    float dyTent = (player.y + player.h / 2) - tentY;
+    float distanceTent = sqrt(dxTent*dxTent + dyTent*dyTent);
+    
+    // Afficher le prompt si proche de la tente (ou si déjà caché)
+    if ((distanceTent < 24 && currentLevel == 0) || isHidingInTent) {
+        showTentPrompt = 1;
+    } else {
+        showTentPrompt = 0;
+    }
+    
+    // Gestion de la touche T pour se cacher/sortir
+    if (state[SDL_SCANCODE_T]) {
+        if (toucheT_Relache && currentLevel == 0) {
+            if (!isHidingInTent && distanceTent < 24) {
+                // Se cacher : positionner le joueur À L'INTÉRIEUR de la tente
+                isHidingInTent = 1;
+                player.x = tentX - (player.w / 2);
+                player.y = tentY - 4;  // Position à l'intérieur, pieds visibles
+                toucheT_Relache = 0;
+            } else if (isHidingInTent) {
+                // Sortir : repositionner DEVANT la tente, en dehors de la zone des tuiles
+                isHidingInTent = 0;
+                player.x = tentX - (player.w / 2);
+                player.y = tentY + 20;  // Plus loin devant pour éviter les collisions
+                toucheT_Relache = 0;
+            }
+        }
+    } else {
+        toucheT_Relache = 1;
+    }
 
     // 1. Quitter la CHAMBRE (Niveau 0) par le HAUT
     // On vérifie si on est au niveau 0 ET si on dépasse le haut de l'écran (y < 5)
@@ -676,14 +849,14 @@ void UpdateGame(void) {
     // --- TRANSITIONS DU LABYRINTHE ---
 
     // Transition du niveau 2 au premier niveau du labyrinthe (niveau 5)
-    if(IsLocationRight(10, 14, 2, 20)){
+    if(IsLocationRight(11, 14, 2, 20)){
         currentLevel = 5;
-        player.x = 5;
+        player.x = 3;
         // Mix_FreeMusic(bgm);
     }
 
     // Transition du premier niveau du labyrinthe (niveau 5) au niveau 2
-    else if (IsLocationLeft(10, 14, 5, 5))
+    else if (IsLocationLeft(11, 14, 5, 5))
     {
         currentLevel = 2;
         player.x = (MAP_WIDTH * TILE_SIZE) - 20;
@@ -728,56 +901,6 @@ void UpdateGame(void) {
     // printf("lvl: %d \n", currentLevel);
 }
 
-
-float getLuminosite(int gridX, int gridY, int rayonPx) {
-    float maxIntensite = 0.0f;
-
-    // --- 1. Lumière du JOUEUR (Calcul en pixels) ---
-    int tileCenterX = (gridX * TILE_SIZE) + (TILE_SIZE / 2);
-    int tileCenterY = (gridY * TILE_SIZE) + (TILE_SIZE / 2);
-    int playerCenterX = (int)player.x + (player.w / 2);
-    int playerCenterY = (int)player.y + (player.h / 2);
-
-    float dx = (float)(tileCenterX - playerCenterX);
-    float dy = (float)(tileCenterY - playerCenterY);
-    float distPx = sqrtf(dx*dx + dy*dy);
-
-    // Formule : Plus on est proche, plus c'est fort (1.0). Plus on s'éloigne, plus ça baisse.
-    
-    if (distPx < rayonPx) {
-        float i = 1.0f - (distPx / (float)rayonPx);
-        if (i > maxIntensite) maxIntensite = i;
-    }
-    /*
-    // formule expo:
-    if (distPx < rayonPx) {
-        float ratio = distPx / (float)rayonPx; // 0.0 (proche) à 1.0 (loin)
-        
-        // Formule "Carrée" : La lumière reste forte près du joueur et tombe vite à la fin
-        float i = 1.0f - (ratio * ratio); 
-        
-        if (i > maxIntensite) maxIntensite = i;
-    }
-    */
-    // --- 2. Lumière des LAMPES (Calcul en cases) ---
-    for (int ly = 0; ly < MAP_HEIGHT; ly++) {
-        for (int lx = 0; lx < MAP_WIDTH; lx++) {
-             if (maps[currentLevel][ly][lx] == 21 || (maps[currentLevel][ly][lx] >= 75 && maps[currentLevel][ly][lx] <= 76)) { // Si c'est une lampe
-                 float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
-                 float rayonLampe = 2.5f; // Rayon d'une lampe (2.5 cases)
-                 
-                 if (distGrid < rayonLampe) {
-                     float i = 1.0f - (distGrid / rayonLampe);
-                     if (i > maxIntensite) maxIntensite = i;
-                 }
-             }
-        }
-    }
-    
-    return maxIntensite; // Retourne la lumière la plus forte trouvée
-}
-
-
 // Retourne 1 si la case est dans la lumière sinon 0.
 int estEclaire(int gridX, int gridY, int rayon) {
     
@@ -801,25 +924,14 @@ int estEclaire(int gridX, int gridY, int rayon) {
     return 0; // C'est éteint
 }
 
-
-int estVisible(int x, int y, int rayonJoueur) {
-    if (getLuminosite(x, y, rayonJoueur) > 0.0f) {
-        return 1;
+void DrawTuiles(float x, float y, int indexTuile, SDL_Renderer *renderer, int rayon){
+    if(estEclaire(x, y, rayon))
+    {   
+        SDL_Rect srcTuile = { TILE_SIZE * indexTuile, 0, TILE_SIZE, TILE_SIZE };
+        SDL_Rect destTuile = { x * TILE_SIZE, y * TILE_SIZE , TILE_SIZE, TILE_SIZE };
+        SDL_RenderCopy(renderer, tilesetTexture, &srcTuile, &destTuile);
     }
-    return 0;
 }
-
-void DrawTuiles(float x, float y, int indexTuile, SDL_Renderer *renderer, int luminosite){
-    SDL_SetTextureColorMod(tilesetTexture, luminosite, luminosite, luminosite);
-
-    SDL_Rect srcTuile = { TILE_SIZE * indexTuile, 0, TILE_SIZE, TILE_SIZE };
-    SDL_Rect destTuile = { (int)x * TILE_SIZE, (int)y * TILE_SIZE , TILE_SIZE, TILE_SIZE };
-    SDL_RenderCopy(renderer, tilesetTexture, &srcTuile, &destTuile);
-    
-    SDL_SetTextureColorMod(tilesetTexture, 255, 255, 255);
-    
-}
-
 
 int IsTuileSpecial(int index){
     for (int i = 0; i < tailleTuilesNotSpecial; ++i)
@@ -850,43 +962,48 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         
         for (int y = 0; y < MAP_HEIGHT; y++) {
             for (int x = 0; x < MAP_WIDTH; x++) {
-                float intensite = getLuminosite(x, y, rayon);
-
-                // Si c'est totalement noir, on ne dessine rien (opti)
-                if (intensite <= 0.0f) {
+                
+                if (estEclaire(x, y, rayon) == 0) {
                     continue; 
                 }
 
-                // 2. On convertit en valeur 0-255
-                int lum = (int)(intensite * 255);
-
-                // --- A. DESSINER LA TUILE ---
+                // --- A. DESSINER LA TUILE --- (avec le tableau)
                 int type = maps_patern[currentLevel][y][x]; 
-                DrawTuiles(x, y, type, renderer, lum); // On passe 'lum'
+                DrawTuiles(x, y, type, renderer, rayon);
 
                 int type_maps = maps[currentLevel][y][x];
                 if(IsTuileSpecial(type_maps)){
-                    DrawTuiles(x, y, type_maps, renderer, lum); // On passe 'lum'
+                    DrawTuiles(x, y, type_maps, renderer, rayon);
                 }
 
-                // --- B. DESSINER LE CONTOUR (Lignes) ---
-                // On utilise aussi 'lum' pour que les lignes blanches s'assombrissent 
-                /*SDL_SetRenderDrawColor(renderer, lum, lum, lum, 255); 
+                // --- B. DESSINER LE CONTOUR (Bords pixelisés) ---
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // Blanc
 
                 int px = x * TILE_SIZE;
                 int py = y * TILE_SIZE;
-                int ts = TILE_SIZE;
-                
-                // On garde estVisible juste pour savoir si le voisin est NOIR ou pas
-                // (Si le voisin a une intensité <= 0, on dessine le trait)
-                
-                if (getLuminosite(x, y - 1, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px, py, px + ts, py);       // Haut
-                if (getLuminosite(x, y + 1, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px, py + ts, px + ts, py + ts); // Bas
-                if (getLuminosite(x - 1, y, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px, py, px, py + ts);       // Gauche
-                if (getLuminosite(x + 1, y, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px + ts, py, px + ts, py + ts); // Droite
-                */
+                int ts = TILE_SIZE; // 16
+
+                // 1. Vérifier le voisin du HAUT (y-1)
+                // Si le voisin du haut est éteint, on dessine une ligne en haut de notre case
+                if (estEclaire(x, y - 1, rayon) == 0) {
+                    SDL_RenderDrawLine(renderer, px, py, px + ts, py);
                 }
-            
+
+                // 2. Vérifier le voisin du BAS (y+1)
+                if (estEclaire(x, y + 1, rayon) == 0) {
+                    SDL_RenderDrawLine(renderer, px, py + ts, px + ts, py + ts);
+                }
+
+                // 3. Vérifier le voisin de GAUCHE (x-1)
+                if (estEclaire(x - 1, y, rayon) == 0) {
+                    SDL_RenderDrawLine(renderer, px, py, px, py + ts);
+                }
+
+                // 4. Vérifier le voisin de DROITE (x+1)
+                if (estEclaire(x + 1, y, rayon) == 0) {
+                    SDL_RenderDrawLine(renderer, px + ts, py, px + ts, py + ts);
+                }
+            }
         }
     }
     //dialogues
@@ -989,9 +1106,18 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
 
     
 
-    SDL_Rect srcPlayer = { 112, 0, 16, 16 };
-    SDL_Rect destPlayer = { (int)player.x - 2, (int)player.y - 2, 16, 16 };
-    SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
+    // Affichage du joueur (avec gestion de l'état caché dans la tente)
+    if (isHidingInTent) {
+        // Joueur caché : afficher seulement les pieds (partie basse 6 pixels)
+        SDL_Rect srcPlayerFeet = { 112, 10, 16, 6 };  // 6 pixels du bas du sprite
+        SDL_Rect destPlayerFeet = { (int)player.x - 2, (int)player.y + 8, 16, 6 };
+        SDL_RenderCopy(renderer, tilesetTexture, &srcPlayerFeet, &destPlayerFeet);
+    } else {
+        // Joueur normal : afficher en entier
+        SDL_Rect srcPlayer = { 112, 0, 16, 16 };
+        SDL_Rect destPlayer = { (int)player.x - 2, (int)player.y - 2, 16, 16 };
+        SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
+    }
 
    if (showInteractPrompt == 1) {
         SDL_Color cBlanc = {255, 255, 255, 255};
@@ -1055,6 +1181,35 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
             SDL_DestroyTexture(tText);
         }
     }
+    
+    // --- PROMPT POUR LA TENTE ---
+    if (showTentPrompt == 1) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        const char* textePrompt = isHidingInTent ? "[T] Sortir" : "[T] Se cacher";
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, textePrompt, cBlanc);
+        
+        if (sText) {
+            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+            
+            int posX = (int)player.x - (sText->w / 2) + 8;
+            int posY = (int)player.y + 20;
+
+            if (posX < 2) posX = 2;
+            else if (posX + sText->w > LOGICAL_WIDTH - 2) posX = LOGICAL_WIDTH - sText->w - 2;
+            
+            SDL_Rect rText = { posX, posY, sText->w, sText->h };
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150); 
+            SDL_Rect rFond = { rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2 };
+            SDL_RenderFillRect(renderer, &rFond);
+
+            SDL_RenderCopy(renderer, tText, NULL, &rText);
+            
+            SDL_FreeSurface(sText);
+            SDL_DestroyTexture(tText);
+        }
+    }
+    
     if (showInteractPrompt3 == 1) {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Fermer", cBlanc);
@@ -1082,6 +1237,185 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
             
             SDL_FreeSurface(sText);
             SDL_DestroyTexture(tText);
+        }
+    }
+
+    if (showSleepPrompt && !isSleeping) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[ESPACE] Dormir", cBlanc);
+        if (sText) {
+            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+            int posX = (int)player.x - (sText->w / 2) + 8;
+            int posY = (int)player.y + 34;
+            if (posX < 2) posX = 2;
+            else if (posX + sText->w > LOGICAL_WIDTH - 2) posX = LOGICAL_WIDTH - sText->w - 2;
+            SDL_Rect rText = { posX, posY, sText->w, sText->h };
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150);
+            SDL_Rect rFond = { rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2 };
+            SDL_RenderFillRect(renderer, &rFond);
+            SDL_RenderCopy(renderer, tText, NULL, &rText);
+            SDL_FreeSurface(sText);
+            SDL_DestroyTexture(tText);
+        }
+    }
+
+    if (showSitPrompt && !isSitting) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] S'asseoir", cBlanc);
+        if (sText) {
+            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+            int posX = (int)player.x - (sText->w / 2) + 8;
+            int posY = (int)player.y + 34;
+            if (posX < 2) posX = 2;
+            else if (posX + sText->w > LOGICAL_WIDTH - 2) posX = LOGICAL_WIDTH - sText->w - 2;
+            SDL_Rect rText = { posX, posY, sText->w, sText->h };
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150);
+            SDL_Rect rFond = { rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2 };
+            SDL_RenderFillRect(renderer, &rFond);
+            SDL_RenderCopy(renderer, tText, NULL, &rText);
+            SDL_FreeSurface(sText);
+            SDL_DestroyTexture(tText);
+        }
+    }
+
+    if (isSleeping) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "Zzz...", cBlanc);
+        if (sText) {
+            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+            SDL_Rect rText = { (int)player.x - 4, (int)player.y - 12, sText->w, sText->h };
+            SDL_RenderCopy(renderer, tText, NULL, &rText);
+            SDL_FreeSurface(sText);
+            SDL_DestroyTexture(tText);
+        }
+    }
+
+    if (isSitting) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "Assis", cBlanc);
+        if (sText) {
+            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+            SDL_Rect rText = { (int)player.x - 4, (int)player.y - 12, sText->w, sText->h };
+            SDL_RenderCopy(renderer, tText, NULL, &rText);
+            SDL_FreeSurface(sText);
+            SDL_DestroyTexture(tText);
+        }
+    }
+
+    if (showPhone) {
+        SDL_Rect phoneRect = { 50, 30, 220, 180 };
+        
+        // Fond du téléphone (noir)
+        SDL_SetRenderDrawColor(renderer, 15, 15, 20, 255);
+        SDL_RenderFillRect(renderer, &phoneRect);
+        
+        // Barre de titre (header coloré)
+        SDL_Rect headerRect = { phoneRect.x, phoneRect.y, phoneRect.w, 20 };
+        SDL_SetRenderDrawColor(renderer, 50, 100, 150, 255);
+        SDL_RenderFillRect(renderer, &headerRect);
+        
+        // Bordure du téléphone
+        SDL_SetRenderDrawColor(renderer, 80, 120, 160, 255);
+        SDL_RenderDrawRect(renderer, &phoneRect);
+        
+        // Écran principal
+        SDL_Rect screenRect = { phoneRect.x + 5, phoneRect.y + 25, phoneRect.w - 10, phoneRect.h - 30 };
+        SDL_SetRenderDrawColor(renderer, 25, 30, 40, 255);
+        SDL_RenderFillRect(renderer, &screenRect);
+        
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Color cGris = {180, 180, 180, 255};
+        
+        // Titre dans le header
+        SDL_Surface *sTitle = TTF_RenderText_Solid(fontMini, "TELEPHONE", cBlanc);
+        if (sTitle) {
+            SDL_Texture *tTitle = SDL_CreateTextureFromSurface(renderer, sTitle);
+            SDL_Rect rTitle = { phoneRect.x + 8, phoneRect.y + 5, sTitle->w, sTitle->h };
+            SDL_RenderCopy(renderer, tTitle, NULL, &rTitle);
+            SDL_FreeSurface(sTitle);
+            SDL_DestroyTexture(tTitle);
+        }
+        
+        // Section Contacts
+        SDL_Surface *sContacts = TTF_RenderText_Solid(fontMini, "CONTACTS:", cBlanc);
+        if (sContacts) {
+            SDL_Texture *tContacts = SDL_CreateTextureFromSurface(renderer, sContacts);
+            SDL_Rect rContacts = { screenRect.x + 5, screenRect.y + 5, sContacts->w, sContacts->h };
+            SDL_RenderCopy(renderer, tContacts, NULL, &rContacts);
+            SDL_FreeSurface(sContacts);
+            SDL_DestroyTexture(tContacts);
+        }
+        
+        // Contact Père
+        SDL_Surface *sPere = TTF_RenderText_Solid(fontMini, "- Pere", cGris);
+        if (sPere) {
+            SDL_Texture *tPere = SDL_CreateTextureFromSurface(renderer, sPere);
+            SDL_Rect rPere = { screenRect.x + 10, screenRect.y + 22, sPere->w, sPere->h };
+            SDL_RenderCopy(renderer, tPere, NULL, &rPere);
+            SDL_FreeSurface(sPere);
+            SDL_DestroyTexture(tPere);
+        }
+        
+        // Contact Mère
+        SDL_Surface *sMere = TTF_RenderText_Solid(fontMini, "- Mere", cGris);
+        if (sMere) {
+            SDL_Texture *tMere = SDL_CreateTextureFromSurface(renderer, sMere);
+            SDL_Rect rMere = { screenRect.x + 10, screenRect.y + 37, sMere->w, sMere->h };
+            SDL_RenderCopy(renderer, tMere, NULL, &rMere);
+            SDL_FreeSurface(sMere);
+            SDL_DestroyTexture(tMere);
+        }
+        
+        // Ligne de séparation
+        SDL_SetRenderDrawColor(renderer, 60, 70, 80, 255);
+        SDL_RenderDrawLine(renderer, screenRect.x + 5, screenRect.y + 55, screenRect.x + screenRect.w - 5, screenRect.y + 55);
+        
+        // Section Inventaire
+        SDL_Surface *sInv = TTF_RenderText_Solid(fontMini, "INVENTAIRE:", cBlanc);
+        if (sInv) {
+            SDL_Texture *tInv = SDL_CreateTextureFromSurface(renderer, sInv);
+            SDL_Rect rInv = { screenRect.x + 5, screenRect.y + 62, sInv->w, sInv->h };
+            SDL_RenderCopy(renderer, tInv, NULL, &rInv);
+            SDL_FreeSurface(sInv);
+            SDL_DestroyTexture(tInv);
+        }
+        
+        if (hasDoudou) {
+            SDL_Surface *sDoudou = TTF_RenderText_Solid(fontMini, "- Doudou", cGris);
+            if (sDoudou) {
+                SDL_Texture *tDoudou = SDL_CreateTextureFromSurface(renderer, sDoudou);
+                SDL_Rect rDoudou = { screenRect.x + 10, screenRect.y + 79, sDoudou->w, sDoudou->h };
+                SDL_RenderCopy(renderer, tDoudou, NULL, &rDoudou);
+                SDL_FreeSurface(sDoudou);
+                SDL_DestroyTexture(tDoudou);
+            }
+        } else {
+            SDL_Surface *sEmpty = TTF_RenderText_Solid(fontMini, "(vide)", cGris);
+            if (sEmpty) {
+                SDL_Texture *tEmpty = SDL_CreateTextureFromSurface(renderer, sEmpty);
+                SDL_Rect rEmpty = { screenRect.x + 10, screenRect.y + 79, sEmpty->w, sEmpty->h };
+                SDL_RenderCopy(renderer, tEmpty, NULL, &rEmpty);
+                SDL_FreeSurface(sEmpty);
+                SDL_DestroyTexture(tEmpty);
+            }
+        }
+        
+        // Bouton de fermeture en bas
+        SDL_Rect btnRect = { screenRect.x + 5, screenRect.y + screenRect.h - 18, screenRect.w - 10, 15 };
+        SDL_SetRenderDrawColor(renderer, 50, 100, 150, 255);
+        SDL_RenderFillRect(renderer, &btnRect);
+        SDL_SetRenderDrawColor(renderer, 80, 120, 160, 255);
+        SDL_RenderDrawRect(renderer, &btnRect);
+        
+        SDL_Surface *sClose = TTF_RenderText_Solid(fontMini, "[I] FERMER", cBlanc);
+        if (sClose) {
+            SDL_Texture *tClose = SDL_CreateTextureFromSurface(renderer, sClose);
+            SDL_Rect rClose = { btnRect.x + (btnRect.w - sClose->w) / 2, btnRect.y + 2, sClose->w, sClose->h };
+            SDL_RenderCopy(renderer, tClose, NULL, &rClose);
+            SDL_FreeSurface(sClose);
+            SDL_DestroyTexture(tClose);
         }
     }
 
