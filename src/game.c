@@ -4,16 +4,11 @@
 #include "game.h"
 #include "sons.h"
 #include "map.h"
+#include "ia.h"
 #include <stdio.h>
 #include <math.h>
 
-// --- CONSTANTES ---
-#define TILE_SIZE 16        
-#define PLAYER_SPEED 2.0f   
-#define LOGICAL_WIDTH 320
-#define LOGICAL_HEIGHT 240
-#define MAP_WIDTH 20        
-#define MAP_HEIGHT 15     
+#define VOLUME_MUSIQUE 32
 
 // -- Pour les sons -- 
 
@@ -32,18 +27,13 @@ static int toucheE_Relache = 1;
 static int toucheEnter_Relache = 1;
 
 // --- VARIABLES GLOBALES ---
-typedef struct {
-    float x, y;     
-    int w, h;       
-} Joueur;
 
-static Joueur player;
 static SDL_Texture *tilesetTexture = NULL; 
 // static SDL_Texture *playerTexture = NULL; 
 
 int rayon = 0;
 
-#define NB_LEVELS 9   
+ 
 int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 
 
@@ -111,7 +101,7 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 */
 
 // --- LA CARTE DU NIVEAU ---
-static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
+int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
  {      //carte 1 (chambre)
         {2,  2,  2,  2,  2,  2,  2,  2,  0,  0, 0, 0, 2,  2,  5,  2,  8,  9,  2, 2}, // Trou en haut   
         {2,  2,  2, 36, 37,  2,  2,  2,  0,  1, 0, 0, 2,  2, 41,  2, 10, 11,  2, 2}, 
@@ -201,26 +191,26 @@ static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}
     },
-    // --- LABYRINTHE 1 (Index 4) ---
+    // --- LABYRINTHE 1 (Index 5) ---
     {
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, 
-        {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 2}, 
+        {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2}, 
         {2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2},
         {2, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 2},
         {2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 2}, 
         {2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 2},
         {2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1, 2}, 
-        {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2}, 
+        {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 2}, 
         {2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2}, 
         {2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2},
         {2, 1, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2}, 
-        {1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 2},
+        {1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 2},
         {1, 1, 2, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 1, 1}, // SORTIE DROITE (Ligne 12)
-        {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2}, 
+        {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2}, 
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}  
     },
 
-    // --- LABYRINTHE 2 (Index 5) ---
+    // --- LABYRINTHE 2 (Index 6) ---
     {
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Mur Haut
         {2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2},
@@ -239,7 +229,7 @@ static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2}  // SORTIE BAS (Ligne 14, Colonnes 10-11)
     },
 
-    // --- LABYRINTHE 3 (Index 6) ---
+    // --- LABYRINTHE 3 (Index 7) ---
     {
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2}, // ENTRÉE HAUT (Alignée avec sortie précédente)
         {2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2}, // Zone ouverte pour tromper
@@ -258,7 +248,7 @@ static int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}  // Mur Bas fermé
     },
 
-    // --- LABYRINTHE 4 (Index 7) ---
+    // --- LABYRINTHE 4 (Index 8) ---
     {
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Mur Haut
         {2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2}, // Chemin du haut
@@ -301,14 +291,27 @@ void InitGame(SDL_Renderer *renderer) {
     toucheRelache = 0;
     hasDoudou = 0;
 
+
+    // Test pour le fantome
+    fantome.x = 8 * TILE_SIZE; 
+    fantome.y = 11 * TILE_SIZE;
+    fantome.w = 15;
+    fantome.h = 15;
+    fantome.direction = 0; 
+    fantome.timer = 0;     
+
     // Chargement des sons
     // sonTransition = chargement_son_transition();
     sonPickUp = chargement_son_item_pick_up();
     sonOpenDoor = chargement_son_door_open();
     sonCloseDoor = chargement_son_door_close();
-    MusicInterior = chargement_son_ambiance();
+    // MusicInterior = chargement_son_ambiance();
     MusicExterior = chargement_son_exterieur();
     
+    // currentLevel = 5;
+    // player.x = 20; 
+    // player.y = 12*TILE_SIZE ;
+    // hasDoudou = 1;
 
     // Chargement du Tileset
     SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");
@@ -428,7 +431,7 @@ void ManageMusic() {
 
     // Si la zone a changé (ex: on passe de 4 à 5, ou au démarrage du jeu)
     if (newZoneState != currentZoneState) {
-        Mix_VolumeMusic(32);
+        Mix_VolumeMusic(VOLUME_MUSIQUE);
         if (newZoneState == 1) {
             if (MusicExterior) Mix_FadeInMusic(MusicExterior, -1, 1000); 
         } 
@@ -675,59 +678,100 @@ void UpdateGame(void) {
 
     // --- TRANSITIONS DU LABYRINTHE ---
 
-    // Transition du niveau 2 au premier niveau du labyrinthe (niveau 5)
+
+    // 1. Entrée dans le labyrinthe (Niveau 2 -> 5)
     if(IsLocationRight(10, 14, 2, 20)){
         currentLevel = 5;
         player.x = 5;
-        // Mix_FreeMusic(bgm);
+        SpawnFantomeRandom(); // <--- NOUVEAU
     }
 
-    // Transition du premier niveau du labyrinthe (niveau 5) au niveau 2
-    else if (IsLocationLeft(10, 14, 5, 5))
-    {
+    // 2. Retour couloir (5 -> 2)
+    else if (IsLocationLeft(10, 14, 5, 5)) {
         currentLevel = 2;
         player.x = (MAP_WIDTH * TILE_SIZE) - 20;
+        // Pas de fantôme dans le couloir, on le laisse où il est (invisible)
     }
 
+    // 3. Passage 5 -> 6
     if(IsLocationRight(12, 14, 5, 20)){
         currentLevel = 6;
         player.x = 3;
+        SpawnFantomeRandom(); // <--- NOUVEAU
     }
-
-    else if (IsLocationLeft(12, 14, 6, 5))
-    {
+    // Retour 6 -> 5
+    else if (IsLocationLeft(12, 14, 6, 5)) {
         currentLevel = 5;
         player.x = (MAP_WIDTH * TILE_SIZE) - 20;
+        SpawnFantomeRandom(); // <--- NOUVEAU (Le fantôme change de place quand on revient !)
     }
 
+    // 4. Passage 6 -> 7
     if(IsLocationDown(10, 13, 6, 20)){
         currentLevel = 7;
         player.y = 10;
+        SpawnFantomeRandom(); // <--- NOUVEAU
     }
-
+    // Retour 7 -> 6
     else if(IsLocationUp(10, 13, 7, 5)){
         currentLevel = 6;
         player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
+        SpawnFantomeRandom(); // <--- NOUVEAU
     }
 
+    // 5. Passage 7 -> 8 (Dernier niveau)
     if(IsLocationLeft(12, 14, 7, 5)){
         currentLevel = 8;
         player.x = (MAP_WIDTH * TILE_SIZE) - 20;
+        SpawnFantomeRandom(); // <--- NOUVEAU
     }
-
+    // Retour 8 -> 7
     else if(IsLocationRight(12, 14, 8, 20)){
         currentLevel = 7;
         player.x = 3;
+        SpawnFantomeRandom(); // <--- NOUVEAU
     }
 
 
     // Changement de son d'ambiance
     ManageMusic();
 
+    if (currentLevel >= 5) {
+        ActionFantome(200); 
+    }
+
+    // --- GESTION COLLISION JOUEUR / FANTOME (GAME OVER / RESET) ---
+    if (currentLevel >= 5) {
+        
+        // 1. On définit la hitbox d'attaque du fantôme
+        // On veut qu'il attrape plus haut (pour la perspective) et un peu plus large
+        float killZoneHaut = fantome.y - 12; // Il attrape 12 pixels au-dessus de sa tête !
+        float killZoneBas  = fantome.y + fantome.h; 
+        float killZoneGauche = fantome.x; 
+        float killZoneDroite = fantome.x + fantome.w;
+
+        // 2. On vérifie si le joueur est dans cette zone
+        if (player.x < killZoneDroite &&
+            player.x + player.w > killZoneGauche &&
+            player.y < killZoneBas &&
+            player.y + player.h > killZoneHaut) // C'est cette ligne qui change tout
+        {
+            printf("GAME OVER - ATTRAPE !\n");
+            
+            // RESET
+            currentLevel = 5; 
+            player.x = 20; 
+            player.y = 12 * TILE_SIZE;
+            
+            fantome.x = 8 * TILE_SIZE; 
+            fantome.y = 11 * TILE_SIZE;
+            fantome.timer = 0; 
+        }
+    }
+
 
     // printf("lvl: %d \n", currentLevel);
 }
-
 
 float getLuminosite(int gridX, int gridY, int rayonPx) {
     float maxIntensite = 0.0f;
@@ -776,7 +820,6 @@ float getLuminosite(int gridX, int gridY, int rayonPx) {
     
     return maxIntensite; // Retourne la lumière la plus forte trouvée
 }
-
 
 // Retourne 1 si la case est dans la lumière sinon 0.
 int estEclaire(int gridX, int gridY, int rayon) {
@@ -991,7 +1034,18 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
 
     SDL_Rect srcPlayer = { 112, 0, 16, 16 };
     SDL_Rect destPlayer = { (int)player.x - 2, (int)player.y - 2, 16, 16 };
-    SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
+    SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);  
+
+
+    int caseX = (int)(fantome.x / TILE_SIZE);
+    int caseY = (int)(fantome.y / TILE_SIZE);
+
+    // On l'affiche s'il est éclairé ET qu'on est dans un niveau de labyrinthe
+    if (estEclaire(caseX, caseY, rayon) && currentLevel >= 5) {
+        SDL_Rect src = { 63 * TILE_SIZE, 0, 16, 16 }; 
+        SDL_Rect dest = { (int)fantome.x, (int)fantome.y, 16, 16 }; 
+        SDL_RenderCopy(renderer, tilesetTexture, &src, &dest);
+    }
 
    if (showInteractPrompt == 1) {
         SDL_Color cBlanc = {255, 255, 255, 255};
@@ -1084,7 +1138,5 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
             SDL_DestroyTexture(tText);
         }
     }
-
-
 }
 
