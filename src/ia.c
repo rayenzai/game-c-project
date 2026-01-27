@@ -8,7 +8,6 @@ Fantome fantome;
 
 float FANTOME_SPEED;
 
-// Structure simple pour les coordonnées de la grille
 typedef struct {
     int x, y;
 } Point;
@@ -16,7 +15,6 @@ typedef struct {
 // Fonction BFS pour trouver la direction vers le joueur
 // Retourne la direction (0: Haut, 1: Bas, 2: Gauche, 3: Droite, -1: Stop)
 int ObtenirDirectionBFS(int startX, int startY, int targetX, int targetY) {
-    // Si on est déjà sur la case (ou très proche), on ne bouge pas
     if (startX == targetX && startY == targetY) return -1;
 
     // Tableaux pour suivre les parents (d'où on vient) pour reconstruire le chemin
@@ -64,7 +62,6 @@ int ObtenirDirectionBFS(int startX, int startY, int targetX, int targetY) {
 
             // Vérifications : dans la carte ? pas un mur ? pas déjà visité ?
             if (nx >= 0 && nx < MAP_WIDTH && ny >= 0 && ny < MAP_HEIGHT) {
-                // ATTENTION : On utilise ta logique de mur (0, 1 et 82 sont traversables)
                 int type = maps[currentLevel][ny][nx];
                 int isWalkable = (type == 0 || type == 1 || type == 82);
 
@@ -114,7 +111,6 @@ void SpawnFantomeRandom() {
         // 2. On vérifie le type de la case dans le niveau actuel
         int type = maps[currentLevel][ry][rx];
 
-        // Si c'est un sol (0 ou 1)
         if (type == 82) {
             
             // 3. On vérifie que ce n'est pas trop près du joueur (Spawn kill)
@@ -156,28 +152,22 @@ int isWallSimple(float x, float y) {
     // 2. Lecture de la tuile
     int type = maps[currentLevel][caseY][caseX];
 
-    // 3. Logique binaire pour le labyrinthe :
-    // Les sols sont 0 et 1. Tout le reste (2, meubles, etc.) bloque le fantôme.
     if (type == 0 || type == 1 || type == 82) {
         return 0; // C'est libre
     }
-    
-    // Si tu as des passages secrets ou portes ouvertes (12, 13..), ajoute-les ici :
-    // if (type >= 12 && type <= 19) return 0; 
 
     return 1; // C'est un mur
 }
 
 // Fonction utilitaire collision (avec marge de sécurité +1 pixel)
 int CheckCollisionFantome(float x, float y) {
-    // On utilise isWallSimple au lieu de isWall
     // On vérifie les 4 coins du fantôme
     if (isWallSimple(x + 1, y + 1)) return 0;
     if (isWallSimple(x + fantome.w - 1, y + 1)) return 0;
     if (isWallSimple(x + 1, y + fantome.h - 1)) return 0;
     if (isWallSimple(x + fantome.w - 1, y + fantome.h - 1)) return 0;
     
-    return 1; // 1 = La voie est libre (c'est inversé dans ta logique actuelle)
+    return 1; // 1 = La voie est libre 
 }
 
 // Vérifie si un mur bloque la vue entre (x1,y1) et (x2,y2)
@@ -196,7 +186,6 @@ int CheckLineOfSight(float x1, float y1, float x2, float y2) {
     while (1) {
         if (x0 < 0 || x0 >= MAP_WIDTH || y0 < 0 || y0 >= MAP_HEIGHT) return 0;
         
-        // On utilise ta fonction isWallSimple ou on vérifie le type directement
         int type = maps[currentLevel][y0][x0];
         if (type != 0 && type != 1 && type != 82) return 0; // Mur détecté !
 
@@ -225,7 +214,7 @@ void ActionFantome(int rayonDetection) {
     if (isChasing) {
         FANTOME_SPEED = 0.75f;
         // Si trop loin, on arrête la chasse
-        if (distance > (8 * TILE_SIZE) || currentLevel < 4) { // J'ai augmenté un peu la distance de perte de vue
+        if (distance > (8 * TILE_SIZE) || currentLevel < 4) {
             isChasing = 0;
             fantome.timer = 0; 
             FANTOME_SPEED = 0.5f;
@@ -234,7 +223,6 @@ void ActionFantome(int rayonDetection) {
     else {
         FANTOME_SPEED = 0.5f;
         if (distance < rayonDetection && currentLevel >= 4) {
-            // Ici tu peux garder le LineOfSight pour ne déclencher la chasse QUE si vu
             if (CheckLineOfSight(fantome.x + fantome.w/2, fantome.y + fantome.h/2, 
                                  player.x + player.w/2, player.y + player.h/2)) {
                 isChasing = 1;
@@ -271,7 +259,6 @@ void ActionFantome(int rayonDetection) {
         int bestDir = -1;
         float marge = 4.0f;
 
-        // >>> NOUVEAU MODE CHASSEUR (BFS / PATHFINDING) <<<
         if (isChasing) {
             // Conversion coordonnées pixels -> coordonnées grille
             int gx = (int)((fantome.x + fantome.w/2) / TILE_SIZE);
@@ -287,10 +274,9 @@ void ActionFantome(int rayonDetection) {
             fantome.timer = (int)(TILE_SIZE / FANTOME_SPEED); 
         }
         
-        // >>> MODE PATROUILLE (ALEATOIRE) - Inchangé <<<
+        // >>> MODE PATROUILLE (ALEATOIRE) <<<
         // Si le BFS échoue (pas de chemin) ou si on ne chasse pas
         if (bestDir == -1) { 
-            // Ta logique aléatoire existante...
             int dirs[4]; int nbDirs = 0;
             if (CheckCollisionFantome(fantome.x, fantome.y - marge)) dirs[nbDirs++] = 0;
             if (CheckCollisionFantome(fantome.x, fantome.y + marge)) dirs[nbDirs++] = 1;
@@ -299,7 +285,6 @@ void ActionFantome(int rayonDetection) {
 
             if (nbDirs > 0) {
                 int oppose = -1;
-                // ... (ton code d'opposé ici) ...
                 if (fantome.direction == 0) oppose = 1; else if (fantome.direction == 1) oppose = 0;
                 else if (fantome.direction == 2) oppose = 3; else if (fantome.direction == 3) oppose = 2;
 
