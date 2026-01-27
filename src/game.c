@@ -9,7 +9,7 @@
 
 // --- CONSTANTES ---
 #define TILE_SIZE 16        
-#define PLAYER_SPEED 0.7f   
+#define PLAYER_SPEED 2.0f   
 #define LOGICAL_WIDTH 320
 #define LOGICAL_HEIGHT 240
 #define MAP_WIDTH 20        
