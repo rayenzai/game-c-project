@@ -64,7 +64,7 @@ int isWallSimple(float x, float y) {
 
     // 3. Logique binaire pour le labyrinthe :
     // Les sols sont 0 et 1. Tout le reste (2, meubles, etc.) bloque le fantôme.
-    if (type == 0 || type == 1) {
+    if (type == 0 || type == 1 || type == 82) {
         return 0; // C'est libre
     }
     
@@ -104,7 +104,7 @@ int CheckLineOfSight(float x1, float y1, float x2, float y2) {
         
         // On utilise ta fonction isWallSimple ou on vérifie le type directement
         int type = maps[currentLevel][y0][x0];
-        if (type != 0 && type != 1) return 0; // Mur détecté !
+        if (type != 0 && type != 1 && type != 82) return 0; // Mur détecté !
 
         if (x0 == xEnd && y0 == yEnd) break;
         e2 = 2 * err;
