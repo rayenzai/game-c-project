@@ -676,14 +676,14 @@ void UpdateGame(void) {
     // --- TRANSITIONS DU LABYRINTHE ---
 
     // Transition du niveau 2 au premier niveau du labyrinthe (niveau 5)
-    if(IsLocationRight(11 && 12, 14, 2, 20)){
+    if(IsLocationRight(10, 14, 2, 20)){
         currentLevel = 5;
         player.x = 5;
         // Mix_FreeMusic(bgm);
     }
 
     // Transition du premier niveau du labyrinthe (niveau 5) au niveau 2
-    else if (IsLocationLeft(11 && 12, 14, 5, 5))
+    else if (IsLocationLeft(10, 14, 5, 5))
     {
         currentLevel = 2;
         player.x = (MAP_WIDTH * TILE_SIZE) - 20;
