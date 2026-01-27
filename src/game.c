@@ -310,7 +310,7 @@ void InitGame(SDL_Renderer *renderer) {
     sonPickUp = chargement_son_item_pick_up();
     sonOpenDoor = chargement_son_door_open();
     sonCloseDoor = chargement_son_door_close();
-    // MusicInterior = chargement_son_ambiance();
+    MusicInterior = chargement_son_ambiance();
     MusicExterior = chargement_son_exterieur();
     
     // currentLevel = 5;

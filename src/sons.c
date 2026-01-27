@@ -7,9 +7,9 @@
 #include "sons.h"
 
 Mix_Music *chargement_son_ambiance(){
-	// Mix_Music *bgm = Mix_LoadMUS("assets/sound/scary-ambience.ogg");
+	Mix_Music *bgm = Mix_LoadMUS("assets/sound/scary-ambience.ogg");
 	// Mix_Music *bgm = Mix_LoadMUS("assets/sound/horror-background-atmosphere.ogg");
-	Mix_Music *bgm = Mix_LoadMUS("assets/sound/horror-ambient.ogg");
+	// Mix_Music *bgm = Mix_LoadMUS("assets/sound/horror-ambient.ogg");
 	if (!bgm) printf("Erreur chargement musique : %s\n", Mix_GetError());
 
 	// Mettre le volume des bruitages à 50%
