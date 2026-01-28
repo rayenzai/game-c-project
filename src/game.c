@@ -640,7 +640,7 @@ void UpdateGame(void) {
             else if(distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55){
                 currentLevel = 9;
                 player.x = 7 * TILE_SIZE;
-                player.y = 8 * TILE_SIZE;
+                player.y = 7 * TILE_SIZE;
             }
             toucheE_Relache = 0; // On verrouille tant qu'on n'a pas lâché E
         }
