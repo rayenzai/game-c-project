@@ -577,6 +577,7 @@ void UpdateGame(void) {
     else{
         showInteractPrompt2 = 0;
     }
+
     if (distance < 16 && currentLevel == 0 && maps[0][0][16] == 12) {
         showInteractPrompt3 = 1;
     }
@@ -591,6 +592,8 @@ void UpdateGame(void) {
     float dx_tente = (player.x + player.w / 2) - tenteX;
     float dy_tente = (player.y + player.h / 2) - tenteY;
     float distance_tente = sqrt(dx_tente*dx_tente + dy_tente*dy_tente);
+
+
 
     if(distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55){
         showInteractPromptTente = 1;
@@ -826,6 +829,7 @@ void UpdateGame(void) {
 
     // printf("lvl: %d \n", currentLevel);
 }
+
 
 float getLuminosite(int gridX, int gridY, int rayonPx) {
     float maxIntensite = 0.0f;
