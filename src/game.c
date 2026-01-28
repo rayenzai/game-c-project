@@ -374,19 +374,50 @@ int isWall(float x, float y) {
             int typeBelow = maps[currentLevel][caseY_Below][caseX];
             int typeBelow_pattern = maps_patern[currentLevel][caseY_Below][caseX];
             if (typeBelow_pattern == 2 || typeBelow == 83) {
-                return 1;
+                return 1;  // Mur de côté complet - complètement solide
             }
         } else {
              return 1;
         }
+        
 
-        int localY = (int)y % TILE_SIZE; 
-
-        if (localY < 4) {
-            return 1;
-        } else {
-            return 0;
+        // C'est un mur de face (avec effet 3D)
+        // Vérifier si c'est un mur latéral (bord gauche ou droit)
+        int caseX_Left = caseX - 1;
+        int caseX_Right = caseX + 1;
+        int isMurLateral = 0;
+        
+        // C'est un mur de GAUCHE si : espace libre à gauche ET mur/obstacle à droite
+        if (caseX_Left >= 0 && caseX_Right < MAP_WIDTH) {
+            int typeLeft = maps[currentLevel][caseY][caseX_Left];
+            int typeLeft_pattern = maps_patern[currentLevel][caseY][caseX_Left];
+            int typeRight = maps[currentLevel][caseY][caseX_Right];
+            int typeRight_pattern = maps_patern[currentLevel][caseY][caseX_Right];
+            
+            // Mur de gauche : libre à gauche, mur à droite
+            if ((typeLeft != 2 && typeLeft_pattern != 2 && typeLeft != 83) &&
+                (typeRight == 2 || typeRight_pattern == 2 || typeRight == 83)) {
+                isMurLateral = 1;
+            }
+            // Mur de droite : mur à gauche, libre à droite
+            else if ((typeLeft == 2 || typeLeft_pattern == 2 || typeLeft == 83) &&
+                     (typeRight != 2 && typeRight_pattern != 2 && typeRight != 83)) {
+                isMurLateral = 1;
+            }
         }
+        
+        // Si c'est un mur latéral, il est COMPLÈTEMENT SOLIDE
+        if (isMurLateral) {
+            return 1;
+        }
+
+        // Sinon, c'est un mur de face avec effet 3D
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 4) {
+            return 1; // Bas du mur solide
+        }
+
+        return 0; // Haut traversable (effet 3D)
     }
 
 
