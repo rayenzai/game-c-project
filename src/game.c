@@ -379,39 +379,35 @@ int isWall(float x, float y) {
         } else {
              return 1;
         }
-        
 
-        // C'est un mur de face (avec effet 3D)
-        // Vérifier si c'est un mur latéral (bord gauche ou droit)
-        int caseX_Left = caseX - 1;
-        int caseX_Right = caseX + 1;
-        int isMurLateral = 0;
-        
-        // C'est un mur de GAUCHE si : espace libre à gauche ET mur/obstacle à droite
-        if (caseX_Left >= 0 && caseX_Right < MAP_WIDTH) {
-            int typeLeft = maps[currentLevel][caseY][caseX_Left];
-            int typeLeft_pattern = maps_patern[currentLevel][caseY][caseX_Left];
-            int typeRight = maps[currentLevel][caseY][caseX_Right];
-            int typeRight_pattern = maps_patern[currentLevel][caseY][caseX_Right];
+        // LOGIQUE DIFFÉRENTE POUR LES MURS DU LABYRINTHE (type 83)
+        if (type == 83) {
+            // Pour les murs du labyrinthe, vérifier si c'est un mur latéral
+            int caseX_Left = caseX - 1;
+            int caseX_Right = caseX + 1;
+            int isMurLateral = 0;
             
-            // Mur de gauche : libre à gauche, mur à droite
-            if ((typeLeft != 2 && typeLeft_pattern != 2 && typeLeft != 83) &&
-                (typeRight == 2 || typeRight_pattern == 2 || typeRight == 83)) {
-                isMurLateral = 1;
+            if (caseX_Left >= 0 && caseX_Right < MAP_WIDTH) {
+                int typeLeft = maps[currentLevel][caseY][caseX_Left];
+                int typeRight = maps[currentLevel][caseY][caseX_Right];
+                
+                // Mur de gauche : libre à gauche, mur à droite
+                if (typeLeft != 83 && typeRight == 83) {
+                    isMurLateral = 1;
+                }
+                // Mur de droite : mur à gauche, libre à droite
+                else if (typeLeft == 83 && typeRight != 83) {
+                    isMurLateral = 1;
+                }
             }
-            // Mur de droite : mur à gauche, libre à droite
-            else if ((typeLeft == 2 || typeLeft_pattern == 2 || typeLeft == 83) &&
-                     (typeRight != 2 && typeRight_pattern != 2 && typeRight != 83)) {
-                isMurLateral = 1;
+            
+            // Si c'est un mur latéral du labyrinthe, il est COMPLÈTEMENT SOLIDE
+            if (isMurLateral) {
+                return 1;
             }
-        }
-        
-        // Si c'est un mur latéral, il est COMPLÈTEMENT SOLIDE
-        if (isMurLateral) {
-            return 1;
         }
 
-        // Sinon, c'est un mur de face avec effet 3D
+        // Pour TOUS les murs de face (type 2 ET type 83), effet 3D uniforme
         int localY = (int)y % TILE_SIZE;
         if (localY < 4) {
             return 1; // Bas du mur solide
