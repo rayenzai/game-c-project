@@ -12,7 +12,7 @@
 #define LOGICAL_HEIGHT 240
 #define MAP_WIDTH 20        
 #define MAP_HEIGHT 15  
-#define NB_LEVELS 9 
+#define NB_LEVELS 10 
 #define PLAYER_SPEED 2.0f 
 
 

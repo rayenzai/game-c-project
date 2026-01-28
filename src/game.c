@@ -105,9 +105,12 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 
 */
 
+
+
 // --- LA CARTE DU NIVEAU ---
 int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
- {      //carte 1 (chambre)
+
+ {      //carte 1 (chambre) index 0
         {2,  2,  2,  2,  2,  2,  2,  2,  0,  0,  0,  0, 2,  2,  5,  2,  8,  9,  2, 2}, // Trou en haut   
         {2,  2,  2, 36, 37,  2,  2,  2,  0,  1,  0,  0, 2,  2, 41,  2, 10, 11,  2, 2}, 
         {2,  1,  0, 32, 33, 21,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
@@ -124,7 +127,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2,  1,  0,  1,  0,  1, 46, 47, 48, 49,  0,  1, 0, 22, 23,  0,  0,  1,  0, 2},
         {2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2,  2,  2,  2,  2,  2,  2, 2}  // Bas fermé
     },
-    // CARTE 2 : COULOIR (Niveau 1)
+    // CARTE 2 : COULOIR (Niveau 1) index 1
     {
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 69, 70,  0,  2,  2, 2, 2, 2, 2, 2, 2}, // Haut (Suite)
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
@@ -142,7 +145,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 65, 66,  0,  2,  2, 2, 2, 2, 2, 2, 2}
     }, 
-    // CARTE 3 : HALL (Niveau 2)
+    // CARTE 3 : HALL (Niveau 2) index 2
     {       
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  2, 2, 2}, // Trou en haut (tout fermé en 2 ici ?)
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2,  8, 2, 2},
@@ -160,7 +163,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2},
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2,  2, 2, 2}
     },
-    // CARTE 4 (Niveau 3)
+    // CARTE 4 (Niveau 3) index 3
     {       
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 8, 2, 2},
@@ -178,7 +181,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
     },
-    // CARTE 5 (Niveau 4 - dernière du bloc précédent)
+    // CARTE 5 (Niveau 4 - dernière du bloc précédent) index 4
     {    
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 8, 2, 2},
@@ -196,7 +199,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}
     },
-    // --- LABYRINTHE 1 (Index 5) ---
+    // --- LABYRINTHE 1 (Index 5) --- 
     {
         { 2, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83}, 
         { 2, 82, 82, 82, 83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 83}, 
@@ -216,7 +219,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
 
     },
 
-    // --- LABYRINTHE 2 (Index 5) ---
+    // --- LABYRINTHE 2 (Index 6) ---
     {
         {83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83}, // Mur Haut
         {83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 83},
@@ -234,7 +237,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83},
         {83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 82, 82, 83, 83, 83, 83, 83, 83, 83, 83}  // SORTIE BAS (Ligne 14, Colonnes 10-11)
     },
-    // --- LABYRINTHE 3 (Index 6) ---
+    // --- LABYRINTHE 3 (Index 7) ---
     {
         {83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 82, 82, 83, 83, 83, 83, 83, 83, 83, 83}, // ENTRÉE HAUT (Alignée avec sortie précédente)
         {83, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83}, // Zone ouverte pour tromper
@@ -253,7 +256,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83}  // Mur Bas fermé
     },
 
-    // --- LABYRINTHE 4 (Index 7) ---
+    // --- LABYRINTHE 4 (Index 8) ---
     {
         {83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83}, // Mur Haut
         {83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83}, // Chemin du haut
@@ -271,6 +274,25 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83}, // Fausse piste en bas
         {83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83}
     },
+
+    // TENTE (index 9)
+    {
+        {50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50}, // Marge Haut
+        {50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50}, 
+        {50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50},
+        {50, 50, 50, 50, 50, 2,  2,  2,  2,  2,  2,  2, 2, 2, 50, 50, 50, 50, 50, 50}, // Début Rectangle
+        {50, 50, 50, 50, 50, 2,  1,  0,  1,  0,  1,  0, 1, 2, 50, 50, 50, 50, 50, 50}, 
+        {50, 50, 50, 50, 50, 2,  1,  0,  1,  0,  1,  0, 1, 2, 50, 50, 50, 50, 50, 50},
+        {50, 50, 50, 50, 50, 50,  1,  0,  1,  0,  1,  0, 1, 2, 50, 50, 50, 50, 50, 50}, 
+        {50, 50, 50, 50, 50, 50,  1,  0,  1,  0,  1,  0, 1, 2, 50, 50, 50, 50, 50, 50}, 
+        {50, 50, 50, 50, 50, 50,  1,  0,  1,  0,  1,  0, 1, 2, 50, 50, 50, 50, 50, 50}, 
+        {50, 50, 50, 50, 50, 2,  1,  0,  1,  0,  1,  0, 1, 2, 50, 50, 50, 50, 50, 50},
+        {50, 50, 50, 50, 50, 2,  1,  0,  1,  0,  1,  0, 1, 2, 50, 50, 50, 50, 50, 50},
+        {50, 50, 50, 50, 50, 2,  2,  2,  2,  2,  2,  2, 2, 2, 50, 50, 50, 50, 50, 50}, // Fin Rectangle
+        {50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50}, // Marge Bas
+        {50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50}, 
+        {50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50}
+    },
 };
 
 int dialogueStep = 0;
@@ -281,6 +303,7 @@ int hasDoudou = 0;
 int showInteractPrompt = 0;
 int showInteractPrompt2 = 0;
 int showInteractPrompt3 = 0;
+int showInteractPromptTente = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
 
 int TuilesNotSpecial[] = {0, 1, 2};
@@ -349,8 +372,8 @@ int isWall(float x, float y) {
         int caseY_Below = caseY + 1;
         if (caseY_Below < MAP_HEIGHT) {
             int typeBelow = maps[currentLevel][caseY_Below][caseX];
-            // int typeBelow = maps_patern[currentLevel][caseY_Below][caseX];
-            if (typeBelow == 2 || typeBelow == 83) {
+            int typeBelow_pattern = maps_patern[currentLevel][caseY_Below][caseX];
+            if (typeBelow_pattern == 2 || typeBelow == 83) {
                 return 1;
             }
         } else {
@@ -561,6 +584,25 @@ void UpdateGame(void) {
         showInteractPrompt3 = 0;
     }
 
+    float tenteX = 16 * TILE_SIZE + 8; 
+    float tenteY = 7 * TILE_SIZE + 8; 
+
+    // Calcul de la distance entre le joueur et l'armoire
+    float dx_tente = (player.x + player.w / 2) - tenteX;
+    float dy_tente = (player.y + player.h / 2) - tenteY;
+    float distance_tente = sqrt(dx_tente*dx_tente + dy_tente*dy_tente);
+
+    if(distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55){
+        showInteractPromptTente = 1;
+    }
+    else{
+        showInteractPromptTente = 0;
+    }
+
+    if(IsLocationLeft(6, 10, 9, 6*TILE_SIZE-8)){
+        player.x = 15 * TILE_SIZE;
+        currentLevel = 0;
+    }
 
     if (state[SDL_SCANCODE_E]) {
         if (toucheE_Relache) {
@@ -593,6 +635,12 @@ void UpdateGame(void) {
                     maps[0][1][16] = 14; 
                     maps[0][1][17] = 15; 
                 }
+            }
+
+            else if(distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55){
+                currentLevel = 9;
+                player.x = 7 * TILE_SIZE;
+                player.y = 8 * TILE_SIZE;
             }
             toucheE_Relache = 0; // On verrouille tant qu'on n'a pas lâché E
         }
@@ -747,7 +795,7 @@ void UpdateGame(void) {
     }
 
     // --- GESTION COLLISION JOUEUR / FANTOME (GAME OVER / RESET) ---
-    if (currentLevel >= 5) {
+    if (currentLevel >= 5 && currentLevel <=8) {
         
         // 1. On définit la hitbox d'attaque du fantôme
         // On veut qu'il attrape plus haut (pour la perspective) et un peu plus large
@@ -970,7 +1018,7 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     int caseY = (int)(fantome.y / TILE_SIZE);
 
     // On l'affiche s'il est éclairé ET qu'on est dans un niveau de labyrinthe
-    if (estEclaire(caseX, caseY, rayon) && currentLevel >= 5) {
+    if (estEclaire(caseX, caseY, rayon) && currentLevel >= 5 && currentLevel <= 8) {
         SDL_Rect src = { 63 * TILE_SIZE, 0, 16, 16 }; 
         SDL_Rect dest = { (int)fantome.x, (int)fantome.y, 16, 16 }; 
         SDL_RenderCopy(renderer, tilesetTexture, &src, &dest);
@@ -991,6 +1039,13 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     if (showInteractPrompt3 == 1) {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Fermer", cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (showInteractPromptTente == 1)            
+    {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Entrer", cBlanc);
         
         if (sText) DrawInteractions(renderer, sText);
     }
