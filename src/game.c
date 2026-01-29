@@ -215,7 +215,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         { 2, 82, 83, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 83, 82, 83},
         { 2, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83, 82, 83}, 
         { 2, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 83, 82, 83},
-        { 2, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 82, 83}, 
+        { 2, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 82, 83, 83, 83, 82, 83}, 
         { 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 83, 83, 82, 82, 82, 82, 82, 83}, 
         { 82, 82, 82, 82, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83}, 
         { 2, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 83},
@@ -789,6 +789,7 @@ void UpdateGame(void) {
             toucheEnter_Relache = 1;
     }
     
+    
 
     // 1. Quitter la CHAMBRE (Niveau 0) par le HAUT
     // On vérifie si on est au niveau 0 ET si on dépasse le haut de l'écran (y < 5)
@@ -911,33 +912,45 @@ void UpdateGame(void) {
     }
 
     // --- GESTION COLLISION JOUEUR / FANTOME (GAME OVER / RESET) ---
-    // if (currentLevel >= 5 && currentLevel <=8) {
+    if (currentLevel >= 5 && currentLevel <=8) {
         
-    //     // 1. On définit la hitbox d'attaque du fantôme
-    //     // On veut qu'il attrape plus haut (pour la perspective) et un peu plus large
-    //     float killZoneHaut = fantome.y - 12; // Il attrape 12 pixels au-dessus de sa tête !
-    //     float killZoneBas  = fantome.y + fantome.h; 
-    //     float killZoneGauche = fantome.x; 
-    //     float killZoneDroite = fantome.x + fantome.w;
+        // 1. On définit la hitbox d'attaque du fantôme
+        // On veut qu'il attrape plus haut (pour la perspective) et un peu plus large
+        float killZoneHaut = fantome.y - 12; 
+        float killZoneBas  = fantome.y + fantome.h; 
+        float killZoneGauche = fantome.x; 
+        float killZoneDroite = fantome.x + fantome.w;
 
-    //     // 2. On vérifie si le joueur est dans cette zone
-    //     if (player.x < killZoneDroite &&
-    //         player.x + player.w > killZoneGauche &&
-    //         player.y < killZoneBas &&
-    //         player.y + player.h > killZoneHaut) // C'est cette ligne qui change tout
-    //     {
-    //         printf("GAME OVER - ATTRAPE !\n");
+        // 2. On vérifie si le joueur est dans cette zone
+        if (player.x < killZoneDroite &&
+            player.x + player.w > killZoneGauche &&
+            player.y < killZoneBas &&
+            player.y + player.h > killZoneHaut) // C'est cette ligne qui change tout
+        {
+            printf("GAME OVER - ATTRAPE !\n");
             
-    //         // RESET
-    //         currentLevel = 0; 
-    //         player.x = 80; 
-    //         player.y = 50;
+            // RESET
+            currentLevel = 0; 
+            player.x = 80; 
+            player.y = 50;
             
-    //         fantome.x = 8 * TILE_SIZE; 
-    //         fantome.y = 11 * TILE_SIZE;
-    //         fantome.timer = 0; 
-    //     }
-    // }
+            fantome.x = 8 * TILE_SIZE; 
+            fantome.y = 11 * TILE_SIZE;
+            fantome.timer = 0; 
+
+            if(whichTableauPiece != 0){
+                if (whichTableauPiece == 1) maps[5][1][18] = 117;
+                
+                if (whichTableauPiece == 2) maps[6][3][13] = 118;
+            
+                if (whichTableauPiece == 3) maps[7][13][17] = 115; 
+
+                if (whichTableauPiece == 4) maps[8][3][1] = 116;
+
+                whichTableauPiece = 0;
+            }
+        }
+    }
 
 
     // printf("lvl: %d \n", currentLevel);
