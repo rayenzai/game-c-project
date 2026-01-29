@@ -101,7 +101,15 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 ...........................
 84(bas), 85(tete rouge) = statue mur gauche 
 86 = tete statue yeux verts 
-
+87,88,89,90,91 = bas tapis
+92,93,94,95,96 = mid tapis v1
+97,98,99,100,101 = mid tapis v2
+102,103,104,105,106 = fin tapis
+107, 108 = bas tableau 
+109, 110 = haut tableau
+111,112 = bas tableau vide 
+113,114 = haut tableau vide
+115(bas gauche),116(bas droit),117,118 = morceaux tableau
 
 */
 
@@ -145,23 +153,23 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 65, 66,  0,  2,  2, 2, 2, 2, 2, 2, 2}
     }, 
-    // CARTE 3 : HALL (Niveau 2) index 2
-    {       
-        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  2, 2, 2}, // Trou en haut (tout fermé en 2 ici ?)
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2,  8, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  86, 2, 2},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  84, 2, 2},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 85, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 84, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2}, // Bas fermé
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2,  2, 2, 2}
+    // CARTE 3 : HALL (Niveau 2)
+    {        
+        {2, 2, 2,   2, 2, 109, 110, 2,   2, 2, 2,  2,   0,   0,   2,   2,   2,  2, 2, 2}, // Trou en haut (tout fermé en 2 ici ?)
+        {2, 2, 2,   2, 2, 107, 108, 2,   0, 0, 0,  0,   0,   0,   2,   2,   2,  2, 2, 2},
+        {2, 2, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0,   0,   0,   0,   0,   0,  0, 2, 2},
+        {2, 2, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0,   0,   0,   0,   0,   0,  0, 2, 2},
+        {2, 2, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0,   0,   0,   0,   0,   0,  0, 2, 2},
+        {0, 0, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0, 102, 103, 104, 105, 106,  86, 2, 2},
+        {0, 0, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0,  97,  98,  99, 100, 101,  84, 2, 2},
+        {0, 0, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0,  92,  93,  94,  95,  96,  0, 0, 0},
+        {0, 0, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0,  97,  98,  99, 100, 101,  0, 0, 0},
+        {2, 2, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0,  92,  93,  94,  95,  96, 85, 2, 2},
+        {2, 2, 0,  0,  0,   0,   0, 0,   0, 0, 0,  0,  87,  88,  89,  90,  91, 84, 2, 2},
+        {2, 2, 0,  0,  0,   0,   0, 0,   0, 0, 0,  0,   0,   0,   0,   0,   0,  0, 0, 2},
+        {2, 2, 0,  0,  0,   0,   0, 0,   0, 0, 0,  0,   0,   0,   0,   0,   0,  0, 0, 2}, // Bas fermé
+        {2, 2, 0,  0,  0,   0,   0, 0,   0, 0, 0,  0,   0,   0,   0,   0,   0,  0, 2, 2},
+        {2, 2, 2,  2,  2,   2,   2, 2,   0, 0, 0,  0,   2,   2,   2,   2,   2,  2, 2, 2}
     },
     // CARTE 4 (Niveau 3) index 3
     {       
@@ -577,6 +585,7 @@ void UpdateGame(void) {
     else{
         showInteractPrompt2 = 0;
     }
+
     if (distance < 16 && currentLevel == 0 && maps[0][0][16] == 12) {
         showInteractPrompt3 = 1;
     }
@@ -591,6 +600,8 @@ void UpdateGame(void) {
     float dx_tente = (player.x + player.w / 2) - tenteX;
     float dy_tente = (player.y + player.h / 2) - tenteY;
     float distance_tente = sqrt(dx_tente*dx_tente + dy_tente*dy_tente);
+
+
 
     if(distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55){
         showInteractPromptTente = 1;
@@ -827,6 +838,7 @@ void UpdateGame(void) {
     // printf("lvl: %d \n", currentLevel);
 }
 
+
 float getLuminosite(int gridX, int gridY, int rayonPx) {
     float maxIntensite = 0.0f;
 
@@ -860,7 +872,7 @@ float getLuminosite(int gridX, int gridY, int rayonPx) {
     // --- 2. Lumière des LAMPES (Calcul en cases) ---
     for (int ly = 0; ly < MAP_HEIGHT; ly++) {
         for (int lx = 0; lx < MAP_WIDTH; lx++) {
-             if (maps[currentLevel][ly][lx] == 21 || (maps[currentLevel][ly][lx] >= 75 && maps[currentLevel][ly][lx] <= 76) || maps[currentLevel][ly][lx] >= 85 || maps[currentLevel][ly][lx] >= 86 ) { // Si c'est une lampe
+             if (maps[currentLevel][ly][lx] == 21 || (maps[currentLevel][ly][lx] >= 75 && maps[currentLevel][ly][lx] <= 76) || maps[currentLevel][ly][lx] == 85 || maps[currentLevel][ly][lx] == 86 ) { // Si c'est une lampe
                  float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
                  float rayonLampe = 2.5f; // Rayon d'une lampe (2.5 cases)
                  
