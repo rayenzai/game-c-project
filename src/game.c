@@ -371,19 +371,117 @@ void InitGame(SDL_Renderer *renderer) {
 
 // Fonction utilitaire collision
 int isWall(float x, float y) {
-    int caseX = x / TILE_SIZE;
-    int caseY = y / TILE_SIZE;
-    if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
+    int caseX = (int)x / TILE_SIZE;
+    int caseY = (int)y / TILE_SIZE;
+
+    // Sécurité bornes map
+    if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) {
+        return 1;
+    }
+
     int type = maps[currentLevel][caseY][caseX];
     int type_pattern = maps_patern[currentLevel][caseY][caseX];
 
-    // --- TYPE 1 : MURS CLASSIQUES (Tout le bloc est solide) ---
-    // Les murs, les bords, le vide...
+    // --- LOGIQUE SPÉCIALE LABYRINTHE (83) ---
+    if (type == 83) {
 
-    if (type_pattern == 2 || type == 83){
-        // VERIFICATION DU MUR "DU DESSOUS"
-        // Si la case en dessous est un autre mur (type 2), alors c'est un "mur de coté" ou un "mur plein".
+        // 1. TOIT (Perspective : Le haut est toujours solide)
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 6) {
+            return 1;
+        }
+
+        // 2. ANALYSE ENVIRONNEMENT (haut dessus 82 et en dessous 82)
+        int upIs82 = 0;
+        int downIs82 = 0;
+
+        if (caseY - 1 >= 0) {
+            if (maps[currentLevel][caseY - 1][caseX] == 82) {
+                upIs82 = 1;
+            }
+        }
+        if (caseY + 1 < MAP_HEIGHT) {
+            if (maps[currentLevel][caseY + 1][caseX] == 82) {
+                downIs82 = 1;
+            }
+        }
+
+        if (upIs82 && downIs82) {
+            
+            // On regarde si les pieds sont physiquement plus bas que le mur.
+            float wallPixelBottom = (caseY + 1) * TILE_SIZE;
+
+            if ((player.y + player.h) >= wallPixelBottom) {
+                return 0; // Je suis devant le mur, je passe.
+            }
+
+            // --- SINON, C'EST SOLIDE, MAIS ON TESTE LA GLISSADE ---
+            
+            int localX = (int)x % TILE_SIZE;
+            float wallPixelLeft = caseX * TILE_SIZE;
+            float wallPixelRight = (caseX + 1) * TILE_SIZE;
+
+            // Test Bord GAUCHE
+            if (localX < 4) {
+                int leftIs82 = 0;
+                if (caseX > 0) {
+                    if (maps[currentLevel][caseY][caseX - 1] == 82) {
+                        leftIs82 = 1;
+                    }
+                }
+
+                if (leftIs82) {
+                    // Si épaule DROITE est encore DANS le mur (+ marge 2px)
+                    if ((player.x + player.w) > (wallPixelLeft + 2)) {
+                        return 0; 
+                    }
+                    return 1; // Sinon je tape
+                }
+            }
+
+            // Test Bord DROIT
+            if (localX > 12) {
+                int rightIs82 = 0;
+                if (caseX < MAP_WIDTH - 1) {
+                    if (maps[currentLevel][caseY][caseX + 1] == 82) {
+                        rightIs82 = 1;
+                    }
+                }
+
+                if (rightIs82) {
+                    // Si épaule GAUCHE est encore DANS le mur (- marge 2px)
+                    if (player.x < (wallPixelRight - 2)) {
+                        return 0; 
+                    }
+                    return 1; // Sinon je tape
+                }
+            }
+
+            // Si on n'est ni devant (pieds), ni en train de glisser (côtés), 
+            // alors on est DANS le mur -> COLLISION
+            return 1;
+        }
         
+        // --- CAS STANDARD (Gros murs sans passage haut/bas) ---
+        int isSolidBelow = 0;
+        if (caseY + 1 < MAP_HEIGHT) {
+            int typeBelow = maps[currentLevel][caseY + 1][caseX];
+            if (typeBelow == 83 || maps_patern[currentLevel][caseY + 1][caseX] == 2) {
+                isSolidBelow = 1;
+            }
+        } else {
+            isSolidBelow = 1;
+        }
+
+        if (isSolidBelow) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    // --- RESTE DU CODE (Chambre...) ---
+    if (type_pattern == 2) {
         int caseY_Below = caseY + 1;
         if (caseY_Below < MAP_HEIGHT) {
             int typeBelow = maps[currentLevel][caseY_Below][caseX];
@@ -392,51 +490,33 @@ int isWall(float x, float y) {
                 return 1;
             }
         } else {
-             return 1;
-        }
-
-        int localY = (int)y % TILE_SIZE; 
-
-        if (localY < 4) {
             return 1;
-        } else {
-            return 0;
         }
+        
+        if ((int)y % TILE_SIZE < 4) {
+            return 1;
+        }
+        return 0;
     }
 
-
-    // --- TYPE 2 : MEUBLES AVEC PROFONDEUR (Placard 8 et 9) ---
-    // On veut que le haut du meuble soit traversable (effet de perspective)
-    // et que seul le bas bloque les pieds du joueur.
     if (type == 10 || type == 11 || type == 14 || type == 15 || type == 18 || type == 19) {
-        int localY = (int)y % TILE_SIZE; // Position de 0 à 15 dans la case
-
-        // Hitbox : Seulement les 8 pixels du bas sont solides
-        if (localY < 4) {
+        if ((int)y % TILE_SIZE < 4) {
             return 1;
-        } else {
-            return 0; // Le haut est traversable (on passe "derrière")
-        }
+        } 
+        return 0;
     }
 
-    if (type == 22 || type == 23)
-    {
-         int localY = (int)y % TILE_SIZE; // Position de 0 à 15 dans la case
-
-        // Hitbox : Seulement les 8 pixels du bas sont solides
-        if (localY > 2) {
+    if (type == 22 || type == 23) {
+        if ((int)y % TILE_SIZE > 2) {
             return 1;
-        } else {
-            return 0; // Le haut est traversable (on passe "derrière")
-        }
+        } 
+        return 0;
     }
-    if (type == 20)
-    {
+
+    if (type == 20 || type == 21) {
         return 1;
     }
-    if (type == 21){
-        return 1;
-    }
+
     return 0;
 }
 
@@ -579,6 +659,13 @@ void UpdateGame(void) {
     if (isWall(player.x + player.w, nextY + player.h)) touchWallY = 1;
 
     if (!touchWallY) player.y = nextY;
+
+    // if (dirX != 0 || dirY != 0) {
+    //     Mix_Volume(2, 64); // On met le son si on bouge
+    // } else {
+    //     Mix_Volume(2, 0);  // On coupe le son si on arrête
+    // }
+
 
     float distance;
 
