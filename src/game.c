@@ -408,14 +408,12 @@ int isWall(float x, float y) {
 
         if (upIs82 && downIs82) {
             
-            // On regarde si les pieds sont physiquement plus bas que le mur.
+            // On regarde si les pieds sont physiquement plus bas que le mur
             float wallPixelBottom = (caseY + 1) * TILE_SIZE;
 
             if ((player.y + player.h) >= wallPixelBottom) {
-                return 0; // Je suis devant le mur, je passe.
+                return 0; // Je suis devant le mur, je passe
             }
-
-            // --- SINON, C'EST SOLIDE, MAIS ON TESTE LA GLISSADE ---
             
             int localX = (int)x % TILE_SIZE;
             float wallPixelLeft = caseX * TILE_SIZE;
