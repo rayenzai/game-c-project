@@ -63,7 +63,7 @@ int ObtenirDirectionBFS(int startX, int startY, int targetX, int targetY) {
             // Vérifications : dans la carte ? pas un mur ? pas déjà visité ?
             if (nx >= 0 && nx < MAP_WIDTH && ny >= 0 && ny < MAP_HEIGHT) {
                 int type = maps[currentLevel][ny][nx];
-                int isWalkable = (type == 0 || type == 1 || type == 82);
+                int isWalkable = (type == 0 || type == 1 || type == 82 || type == 115 || type == 116 || type == 117 || type == 118);
 
                 if (isWalkable && !visited[ny][nx]) {
                     visited[ny][nx] = 1;
@@ -152,7 +152,7 @@ int isWallSimple(float x, float y) {
     // 2. Lecture de la tuile
     int type = maps[currentLevel][caseY][caseX];
 
-    if (type == 0 || type == 1 || type == 82) {
+    if (type == 0 || type == 1 || type == 82 || type == 115 || type == 116 || type == 117 || type == 118) {
         return 0; // C'est libre
     }
 
