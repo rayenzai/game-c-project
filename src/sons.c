@@ -29,7 +29,7 @@ Mix_Music *chargement_son_exterieur(){
 
 
 Mix_Chunk *chargement_son_pas(){
-	Mix_Chunk *sonPas = Mix_LoadWAV("assets/sound/foot-step_.wav");
+	Mix_Chunk *sonPas = Mix_LoadWAV("assets/sound/foot-step.wav");
 
     if (!sonPas) printf("Erreur chargement WAV: %s\n", Mix_GetError());
 

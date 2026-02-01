@@ -101,7 +101,15 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 ...........................
 84(bas), 85(tete rouge) = statue mur gauche 
 86 = tete statue yeux verts 
-
+87,88,89,90,91 = bas tapis
+92,93,94,95,96 = mid tapis v1
+97,98,99,100,101 = mid tapis v2
+102,103,104,105,106 = fin tapis
+107, 108 = bas tableau 
+109, 110 = haut tableau
+111,112 = bas tableau vide 
+113,114 = haut tableau vide
+115(bas gauche),116(bas droit),117,118 = morceaux tableau
 
 */
 
@@ -145,23 +153,23 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 65, 66,  0,  2,  2, 2, 2, 2, 2, 2, 2}
     }, 
-    // CARTE 3 : HALL (Niveau 2) index 2
-    {       
-        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  2, 2, 2}, // Trou en haut (tout fermé en 2 ici ?)
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2,  8, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  86, 2, 2},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  84, 2, 2},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 85, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 84, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2}, // Bas fermé
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2,  2, 2, 2}
+    // CARTE 3 : HALL (Niveau 2)
+    {        
+        {2, 2, 2,   2, 2, 113, 114, 2,   2, 2, 2,  2,   0,   0,   2,   2,   2,  2, 2, 2}, // Trou en haut (tout fermé en 2 ici ?)
+        {2, 2, 2,   2, 2, 111, 112, 2,   0, 0, 0,  0,   0,   0,   2,   2,   2,  2, 2, 2},
+        {2, 2, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0,   0,   0,   0,   0,   0,  0, 2, 2},
+        {2, 2, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0,   0,   0,   0,   0,   0,  0, 2, 2},
+        {2, 2, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0,   0,   0,   0,   0,   0,  0, 2, 2},
+        {2, 2, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0, 102, 103, 104, 105, 106,  86, 2, 2},
+        {2, 2, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0,  97,  98,  99, 100, 101,  84, 2, 2},
+        {2, 2, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0,  92,  93,  94,  95,  96,  0, 0, 0},
+        {2, 2, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0,  97,  98,  99, 100, 101,  0, 0, 0},
+        {2, 2, 0,   0, 0,   0,   0, 0,   0, 0, 0,  0,  92,  93,  94,  95,  96, 85, 2, 2},
+        {2, 2, 0,  0,  0,   0,   0, 0,   0, 0, 0,  0,  87,  88,  89,  90,  91, 84, 2, 2},
+        {2, 2, 0,  0,  0,   0,   0, 0,   0, 0, 0,  0,   0,   0,   0,   0,   0,  0, 0, 2},
+        {2, 2, 0,  0,  0,   0,   0, 0,   0, 0, 0,  0,   0,   0,   0,   0,   0,  0, 0, 2}, // Bas fermé
+        {2, 2, 0,  0,  0,   0,   0, 0,   0, 0, 0,  0,   0,   0,   0,   0,   0,  0, 2, 2},
+        {2, 2, 2,  2,  2,   2,   2, 2,   0, 0, 0,  0,   2,   2,   2,   2,   2,  2, 2, 2}
     },
     // CARTE 4 (Niveau 3) index 3
     {       
@@ -202,21 +210,20 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
     // --- LABYRINTHE 1 (Index 5) --- 
     {
         { 2, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83}, 
-        { 2, 82, 82, 82, 83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 83}, 
-        { 2, 82, 83, 82, 83, 82, 83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 82, 83},
-        { 2, 82, 83, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 83, 82, 83},
-        { 2, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83, 82, 83}, 
-        { 2, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 83, 82, 83},
-        { 2, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 82, 83}, 
-        { 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 83, 83, 82, 82, 82, 82, 82, 83}, 
-        { 82, 82, 82, 82, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83}, 
-        { 2, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 83},
-        { 2, 82, 83, 83, 83, 83, 83, 82, 83, 82, 83, 83, 83, 82, 83, 83, 82, 83, 82, 83}, 
-        { 2, 82, 83, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 83, 82, 83},
-        { 2, 82, 83, 82, 83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 82, 82, 82, 82, 82}, // SORTIE DROITE
-        { 2, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 83}, 
+        { 2, 82, 82, 82, 83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 83, 117, 83}, 
+        { 2, 83, 83, 82, 83, 82, 83, 83, 83, 82, 83, 82, 83, 82, 83, 82, 83, 83, 82, 83},
+        { 2, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 83},
+        { 2, 82, 83, 83, 83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 82, 83}, 
+        { 2, 82, 83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 83},
+        { 2, 82, 83, 82, 83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 82, 83, 82, 83}, 
+        { 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83}, 
+        { 82, 82, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83}, 
+        { 2, 82, 82, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 82, 83},
+        { 2, 83, 83, 83, 83, 82, 83, 82, 83, 82, 83, 82, 83, 82, 83, 83, 83, 83, 82, 83}, 
+        { 2, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 83},
+        { 2, 82, 83, 82, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 82, 82}, 
+        { 2, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83}, 
         { 2, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83}
-
     },
 
     // --- LABYRINTHE 2 (Index 6) ---
@@ -224,7 +231,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83}, // Mur Haut
         {83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 83},
         {83, 82, 83, 83, 83, 82, 83, 82, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 82, 83},
-        {83, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 83, 82, 83},
+        {83, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83, 118, 82, 82, 82, 83, 82, 83},
         {83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 82, 83}, // Gros bloc central
         {83, 82, 82, 82, 83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 83},
         {83, 83, 83, 82, 83, 82, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83},
@@ -252,26 +259,26 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 82, 83},
         {83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 83},
         {82, 82, 82, 82, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83}, // SORTIE GAUCHE (Ligne 12)
-        {83, 83, 83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83},
+        {83, 83, 83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 115, 82, 83},
         {83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83}  // Mur Bas fermé
     },
 
     // --- LABYRINTHE 4 (Index 8) ---
     {
-        {83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83}, // Mur Haut
-        {83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83}, // Chemin du haut
-        {83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83},
-        {83, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 83},
-        {83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83, 82, 83},
-        {83, 82, 83, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 83, 82, 83},
-        {83, 82, 83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83, 82, 83, 82, 83},
-        {83, 82, 83, 82, 83, 82, 83, 82, 82, 82, 82, 82, 82, 83, 82, 83, 82, 83, 82, 83}, // <--- LE DOUDOU (6) EST ICI
-        {83, 82, 83, 82, 83, 82, 83, 83, 83, 82, 83, 83, 82, 83, 82, 83, 82, 83, 82, 83},
-        {83, 82, 83, 82, 83, 82, 82, 82, 82, 82, 82, 83, 82, 83, 82, 83, 82, 82, 82, 83},
-        {83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 83, 82, 83},
-        {83, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 83, 82, 83},
-        {83, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 82, 82, 82, 82}, // ENTRÉE DROITE (Ligne 12)
-        {83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83}, // Fausse piste en bas
+        {83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83},
+        {83, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83},
+        {83, 82, 83, 83, 83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83},
+        {83, 116, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 83},
+        {83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 82, 82, 83, 82, 83},
+        {83, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 83, 82, 83},
+        {83, 82, 83, 83, 83, 82, 83, 83, 83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 82, 83},
+        {83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83},
+        {83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 82, 83},
+        {83, 82, 83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 82, 83, 82, 83},
+        {83, 82, 83, 82, 83, 83, 83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 82, 83, 82, 83},
+        {83, 82, 82, 82, 83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 83, 82, 83},
+        {83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 82, 82, 82, 82},
+        {83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83},
         {83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83}
     },
 
@@ -305,6 +312,13 @@ int showInteractPrompt2 = 0;
 int showInteractPrompt3 = 0;
 int showInteractPromptTente = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
+    
+int showInteractPromptObjetTableau = 0;
+int showInteractTableau = 0;
+int showInteractImpossibleObjet = 0;
+int whichTableauPiece = 0;
+
+int cpt_piece_tableau = 0;
 
 int TuilesNotSpecial[] = {0, 1, 2};
 int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
@@ -356,19 +370,115 @@ void InitGame(SDL_Renderer *renderer) {
 
 // Fonction utilitaire collision
 int isWall(float x, float y) {
-    int caseX = x / TILE_SIZE;
-    int caseY = y / TILE_SIZE;
-    if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
+    int caseX = (int)x / TILE_SIZE;
+    int caseY = (int)y / TILE_SIZE;
+
+    // Sécurité bornes map
+    if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) {
+        return 1;
+    }
+
     int type = maps[currentLevel][caseY][caseX];
     int type_pattern = maps_patern[currentLevel][caseY][caseX];
 
-    // --- TYPE 1 : MURS CLASSIQUES (Tout le bloc est solide) ---
-    // Les murs, les bords, le vide...
+    // --- LOGIQUE SPÉCIALE LABYRINTHE (83) ---
+    if (type == 83) {
 
-    if (type == 2 || type_pattern == 2 || type == 83){
-        // VERIFICATION DU MUR "DU DESSOUS"
-        // Si la case en dessous est un autre mur (type 2), alors c'est un "mur de coté" ou un "mur plein".
+        // 1. TOIT (Perspective : Le haut est toujours solide)
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 6) {
+            return 1;
+        }
+
+        // 2. ANALYSE ENVIRONNEMENT (haut dessus 82 et en dessous 82)
+        int upIs82 = 0;
+        int downIs82 = 0;
+
+        if (caseY - 1 >= 0) {
+            if (maps[currentLevel][caseY - 1][caseX] == 82) {
+                upIs82 = 1;
+            }
+        }
+        if (caseY + 1 < MAP_HEIGHT) {
+            if (maps[currentLevel][caseY + 1][caseX] == 82) {
+                downIs82 = 1;
+            }
+        }
+
+        if (upIs82 && downIs82) {
+            
+            // On regarde si les pieds sont physiquement plus bas que le mur
+            float wallPixelBottom = (caseY + 1) * TILE_SIZE;
+
+            if ((player.y + player.h) >= wallPixelBottom) {
+                return 0; // Je suis devant le mur, je passe
+            }
+            
+            int localX = (int)x % TILE_SIZE;
+            float wallPixelLeft = caseX * TILE_SIZE;
+            float wallPixelRight = (caseX + 1) * TILE_SIZE;
+
+            // Test Bord GAUCHE
+            if (localX < 4) {
+                int leftIs82 = 0;
+                if (caseX > 0) {
+                    if (maps[currentLevel][caseY][caseX - 1] == 82) {
+                        leftIs82 = 1;
+                    }
+                }
+
+                if (leftIs82) {
+                    // Si épaule DROITE est encore DANS le mur (+ marge 2px)
+                    if ((player.x + player.w) > (wallPixelLeft + 2)) {
+                        return 0; 
+                    }
+                    return 1; // Sinon je tape
+                }
+            }
+
+            // Test Bord DROIT
+            if (localX > 12) {
+                int rightIs82 = 0;
+                if (caseX < MAP_WIDTH - 1) {
+                    if (maps[currentLevel][caseY][caseX + 1] == 82) {
+                        rightIs82 = 1;
+                    }
+                }
+
+                if (rightIs82) {
+                    // Si épaule GAUCHE est encore DANS le mur (- marge 2px)
+                    if (player.x < (wallPixelRight - 2)) {
+                        return 0; 
+                    }
+                    return 1; // Sinon je tape
+                }
+            }
+
+            // Si on n'est ni devant (pieds), ni en train de glisser (côtés), 
+            // alors on est DANS le mur -> COLLISION
+            return 1;
+        }
         
+        // --- CAS STANDARD (Gros murs sans passage haut/bas) ---
+        int isSolidBelow = 0;
+        if (caseY + 1 < MAP_HEIGHT) {
+            int typeBelow = maps[currentLevel][caseY + 1][caseX];
+            if (typeBelow == 83 || maps_patern[currentLevel][caseY + 1][caseX] == 2) {
+                isSolidBelow = 1;
+            }
+        } else {
+            isSolidBelow = 1;
+        }
+
+        if (isSolidBelow) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    // --- RESTE DU CODE (Chambre...) ---
+    if (type_pattern == 2) {
         int caseY_Below = caseY + 1;
         if (caseY_Below < MAP_HEIGHT) {
             int typeBelow = maps[currentLevel][caseY_Below][caseX];
@@ -377,51 +487,33 @@ int isWall(float x, float y) {
                 return 1;
             }
         } else {
-             return 1;
-        }
-
-        int localY = (int)y % TILE_SIZE; 
-
-        if (localY < 4) {
             return 1;
-        } else {
-            return 0;
         }
+        
+        if ((int)y % TILE_SIZE < 4) {
+            return 1;
+        }
+        return 0;
     }
 
-
-    // --- TYPE 2 : MEUBLES AVEC PROFONDEUR (Placard 8 et 9) ---
-    // On veut que le haut du meuble soit traversable (effet de perspective)
-    // et que seul le bas bloque les pieds du joueur.
     if (type == 10 || type == 11 || type == 14 || type == 15 || type == 18 || type == 19) {
-        int localY = (int)y % TILE_SIZE; // Position de 0 à 15 dans la case
-
-        // Hitbox : Seulement les 8 pixels du bas sont solides
-        if (localY < 4) {
+        if ((int)y % TILE_SIZE < 4) {
             return 1;
-        } else {
-            return 0; // Le haut est traversable (on passe "derrière")
-        }
+        } 
+        return 0;
     }
 
-    if (type == 22 || type == 23)
-    {
-         int localY = (int)y % TILE_SIZE; // Position de 0 à 15 dans la case
-
-        // Hitbox : Seulement les 8 pixels du bas sont solides
-        if (localY > 2) {
+    if (type == 22 || type == 23) {
+        if ((int)y % TILE_SIZE > 2) {
             return 1;
-        } else {
-            return 0; // Le haut est traversable (on passe "derrière")
-        }
+        } 
+        return 0;
     }
-    if (type == 20)
-    {
+
+    if (type == 20 || type == 21) {
         return 1;
     }
-    if (type == 21){
-        return 1;
-    }
+
     return 0;
 }
 
@@ -465,6 +557,7 @@ void ManageMusic() {
             if (MusicExterior) Mix_FadeInMusic(MusicExterior, -1, 1000); 
         } 
         else {
+            Mix_VolumeMusic(16);
             if (MusicInterior) Mix_FadeInMusic(MusicInterior, -1, 1000);
         }
         currentZoneState = newZoneState;
@@ -518,6 +611,15 @@ void UpdateGame(void) {
         }
         return;
     }
+    if(showInteractImpossibleObjet >0){
+        if(state[SDL_SCANCODE_RETURN]){
+            if(toucheRelache){
+                showInteractImpossibleObjet = 0;
+                toucheRelache = 0;
+            }
+        }else{toucheRelache=1;}
+        return;
+    }   
 
     float dirX = 0;
     float dirY = 0;
@@ -533,6 +635,12 @@ void UpdateGame(void) {
         dirX *= 0.7071f;
         dirY *= 0.7071f;
     }
+
+    // if (dirX != 0 || dirY != 0) {
+    //     Mix_Volume(2, 32); 
+    // } else {
+    //     Mix_Volume(2, 0);
+    // }
 
     // 3. On applique la VITESSE
     float nextX = player.x + (dirX * PLAYER_SPEED);
@@ -556,49 +664,94 @@ void UpdateGame(void) {
 
     if (!touchWallY) player.y = nextY;
 
-    float armoireX = 256 + 16; 
-    float armoireY = 16 + 16; 
+    // if (dirX != 0 || dirY != 0) {
+    //     Mix_Volume(2, 64); // On met le son si on bouge
+    // } else {
+    //     Mix_Volume(2, 0);  // On coupe le son si on arrête
+    // }
 
-    // Calcul de la distance entre le joueur et l'armoire
-    float dx = (player.x + player.w / 2) - armoireX;
-    float dy = (player.y + player.h / 2) - armoireY;
-    float distance = sqrt(dx*dx + dy*dy);
 
-    if (distance < 16 && currentLevel == 0 && maps[0][0][16] == 8) {
+    float distance;
+
+    showInteractPrompt = 0;
+    showInteractPrompt2 = 0;
+    showInteractPrompt3 = 0;
+
+    if (IsLocationObjet(24, 0, 8, &distance)) {
         showInteractPrompt = 1;
     }
-    else{
-        showInteractPrompt = 0;
-    }
 
-    if (distance < 16 && currentLevel == 0 && maps[0][0][16] == 16) {
+    else if (IsLocationObjet(24, 0, 16, &distance)) {
         showInteractPrompt2 = 1;
     }
-    else{
-        showInteractPrompt2 = 0;
-    }
-    if (distance < 16 && currentLevel == 0 && maps[0][0][16] == 12) {
+
+    else if (IsLocationObjet(24, 0, 12, &distance)) {
         showInteractPrompt3 = 1;
     }
-    else{
-        showInteractPrompt3 = 0;
-    }
 
-    float tenteX = 16 * TILE_SIZE + 8; 
-    float tenteY = 7 * TILE_SIZE + 8; 
-
-    // Calcul de la distance entre le joueur et l'armoire
-    float dx_tente = (player.x + player.w / 2) - tenteX;
-    float dy_tente = (player.y + player.h / 2) - tenteY;
-    float distance_tente = sqrt(dx_tente*dx_tente + dy_tente*dy_tente);
-
-    if(distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55){
+    float distance_tente;
+    showInteractPromptTente = 0;
+    if(IsLocationObjet(24, 0, 55, &distance_tente)){
         showInteractPromptTente = 1;
     }
-    else{
-        showInteractPromptTente = 0;
+
+    // --- Calcul pour les pièces du tableau dans le labyrinthe ---
+    showInteractPromptObjetTableau=0;
+
+    // Calcul distance entre joueur et première pièce du tableau (117)
+    int morceauTableau1x;
+    int morceauTableau1y;
+    TrouveCoordonnees(&morceauTableau1x, &morceauTableau1y, 117, 5);
+
+    float distance_morceauTableau1;
+    if(IsLocationObjet(16, 5, 117, &distance_morceauTableau1)) showInteractPromptObjetTableau = 1;
+
+    // Calcul distance entre joueur et deuxième pièce du tableau (118)
+    int morceauTableau2x;
+    int morceauTableau2y;
+    TrouveCoordonnees(&morceauTableau2x, &morceauTableau2y, 118, 6);
+
+    float distance_morceauTableau2;
+    if(IsLocationObjet(16, 6, 118, &distance_morceauTableau2)) showInteractPromptObjetTableau = 1;
+
+    // Calcul distance entre joueur et troisième pièce du tableau (115)
+    int morceauTableau3x;
+    int morceauTableau3y;
+    TrouveCoordonnees(&morceauTableau3x, &morceauTableau3y, 115, 7);
+
+    float distance_morceauTableau3;
+    if(IsLocationObjet(16, 7, 115, &distance_morceauTableau3)) showInteractPromptObjetTableau = 1;
+
+    // Calcul distance entre joueur et quatrième pièce du tableau (116)
+    int morceauTableau4x;
+    int morceauTableau4y;
+    TrouveCoordonnees(&morceauTableau4x, &morceauTableau4y, 116, 8);
+
+    float distance_morceauTableau4;
+    if(IsLocationObjet(16, 8, 116, &distance_morceauTableau4)) showInteractPromptObjetTableau = 1;
+
+    // Ouverture de la salle du niveau 3
+    if(cpt_piece_tableau == 4){
+        maps_patern[2][5][0] = 0;
+        maps_patern[2][6][0] = 0;
+        maps_patern[2][7][0] = 0;
+        maps_patern[2][8][0] = 0;
+
+        maps_patern[2][5][1] = 0;
+        maps_patern[2][6][1] = 0;
+        maps_patern[2][7][1] = 0;
+        maps_patern[2][8][1] = 0;
+
+    }
+    // Calcul distance entre joueur et le tableau
+
+    showInteractTableau=0;
+    float distance_Tableau;
+    if( (IsLocationObjet(24, 2, 113, &distance_Tableau) || IsLocationObjet(24, 2, 109, &distance_Tableau) ) && cpt_piece_tableau != 4){
+        showInteractTableau = 1;
     }
 
+    // Transition tente à la chambre
     if(IsLocationLeft(6, 10, 9, 6*TILE_SIZE-8)){
         player.x = 15 * TILE_SIZE;
         currentLevel = 0;
@@ -642,6 +795,60 @@ void UpdateGame(void) {
                 player.x = 7 * TILE_SIZE;
                 player.y = 7 * TILE_SIZE;
             }
+
+            else if(distance_morceauTableau1 <= 16 && currentLevel == 5 && maps[5][morceauTableau1y][morceauTableau1x] == 117){
+                if(whichTableauPiece != 0){
+                    showInteractImpossibleObjet = 1;
+                }
+                else{
+                    whichTableauPiece = 1;
+                    maps[5][1][18] = 82;
+                }
+                
+            }
+            else if(distance_morceauTableau2 <= 16 && currentLevel == 6 && maps[6][morceauTableau2y][morceauTableau2x] == 118){
+                if(whichTableauPiece != 0){
+                    showInteractImpossibleObjet = 1;
+                }
+                else{
+                    whichTableauPiece = 2;
+                    maps[6][3][13] = 82;
+                }
+            }
+            else if(distance_morceauTableau3 <= 16 && currentLevel == 7 && maps[7][morceauTableau3y][morceauTableau3x] == 115){
+                if(whichTableauPiece != 0){
+                    showInteractImpossibleObjet = 1;
+                }
+                else{
+                    whichTableauPiece = 3;
+                    maps[7][morceauTableau3y][morceauTableau3x] = 82;
+                }
+            }
+            else if(distance_morceauTableau4 <= 16 && currentLevel == 8 && maps[8][morceauTableau4y][morceauTableau4x] == 116){
+                if(whichTableauPiece != 0){
+                    showInteractImpossibleObjet = 1;
+                }
+                else{
+                    whichTableauPiece = 4;
+                    maps[8][morceauTableau4y][morceauTableau4x] = 82;
+                }
+            }
+            else if(distance_Tableau <= 24 && currentLevel == 2 && whichTableauPiece != 0){
+                if(whichTableauPiece == 1){
+                    maps[2][0][5] = 109;
+                }
+                else if(whichTableauPiece == 2){
+                    maps[2][0][6] = 110;
+                }
+                else if(whichTableauPiece == 3){
+                    maps[2][1][5] = 107;
+                }
+                else if(whichTableauPiece == 4){
+                    maps[2][1][6] = 108;
+                }
+                whichTableauPiece = 0;
+                cpt_piece_tableau++;
+            }
             toucheE_Relache = 0; // On verrouille tant qu'on n'a pas lâché E
         }
     } else {
@@ -672,6 +879,7 @@ void UpdateGame(void) {
     else{
             toucheEnter_Relache = 1;
     }
+    
     
 
     // 1. Quitter la CHAMBRE (Niveau 0) par le HAUT
@@ -799,7 +1007,7 @@ void UpdateGame(void) {
         
         // 1. On définit la hitbox d'attaque du fantôme
         // On veut qu'il attrape plus haut (pour la perspective) et un peu plus large
-        float killZoneHaut = fantome.y - 12; // Il attrape 12 pixels au-dessus de sa tête !
+        float killZoneHaut = fantome.y - 12; 
         float killZoneBas  = fantome.y + fantome.h; 
         float killZoneGauche = fantome.x; 
         float killZoneDroite = fantome.x + fantome.w;
@@ -820,11 +1028,73 @@ void UpdateGame(void) {
             fantome.x = 8 * TILE_SIZE; 
             fantome.y = 11 * TILE_SIZE;
             fantome.timer = 0; 
+
+            if(whichTableauPiece != 0){
+                if (whichTableauPiece == 1) maps[5][1][18] = 117;
+                
+                if (whichTableauPiece == 2) maps[6][3][13] = 118;
+            
+                if (whichTableauPiece == 3) maps[7][13][17] = 115; 
+
+                if (whichTableauPiece == 4) maps[8][3][1] = 116;
+
+                whichTableauPiece = 0;
+            }
         }
     }
 
 
     // printf("lvl: %d \n", currentLevel);
+}
+
+int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance){
+    int x = -1, y = -1;
+    TrouveCoordonnees(&x, &y, indexTuile, CurrLvl);
+
+    if (x == -1 || y == -1) {
+        *distance = 9999.0f; 
+        return 0;
+    }
+
+    float targetX = x * TILE_SIZE + 8;
+    float targetY = y * TILE_SIZE + 8;
+
+    switch (indexTuile) {
+        case 8:   
+        case 12:  
+        case 16: 
+            targetX += 8; 
+            targetY += 16; 
+            break;
+        case 55:
+            targetY += 8;
+            break;
+        case 113:
+        case 109:
+            targetY += 8;
+            targetX += 8;
+    }
+
+    // 3. Calcul de la distance avec la position CORRIGÉE
+    float dx = (player.x + player.w / 2) - targetX;
+    float dy = (player.y + player.h / 2) - targetY;
+    *distance = sqrt(dx*dx + dy*dy);
+
+    return (*distance <= rayon && currentLevel == CurrLvl);
+}
+
+void TrouveCoordonnees(int *nvx, int *nvy, int indexObjet, int CurrLvl){
+    for (int y = 0; y < MAP_HEIGHT; ++y)
+    {
+        for (int x = 0; x < MAP_WIDTH; ++x)
+        {
+            if(maps[CurrLvl][y][x] == indexObjet){
+                *nvx = x;
+                *nvy = y;
+                return;
+            }
+        }
+    }
 }
 
 float getLuminosite(int gridX, int gridY, int rayonPx) {
@@ -1046,6 +1316,25 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Entrer", cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if(showInteractImpossibleObjet == 1){
+        char *texteAffiche = "j'ai deja une piece";
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+
+    if(showInteractPromptObjetTableau == 1){
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if(showInteractTableau == 1){
+        char Prompt[100] = "";
+        sprintf(Prompt, "[E] Ajouter la %d e piece", cpt_piece_tableau+1);
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, Prompt, cBlanc);
         
         if (sText) DrawInteractions(renderer, sText);
     }
