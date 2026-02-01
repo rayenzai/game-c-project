@@ -38,10 +38,10 @@ int main(int argc, char* argv[]) {
         printf("Erreur SDL_mixer : %s\n", Mix_GetError());
     }
 
-    Mix_Chunk *sonPasEnBoucle = chargement_son_pas();
+    // Mix_Chunk *sonPasEnBoucle = chargement_son_pas();
 
-    Mix_PlayChannel(2, sonPasEnBoucle, -1); // -1 = boucle infinie
-    Mix_Volume(2, 0); // On commence volume à 0
+    // Mix_PlayChannel(2, sonPasEnBoucle, -1); // -1 = boucle infinie
+    // Mix_Volume(2, 0); // On commence volume à 0
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) return 1;
     if (TTF_Init() < 0) return 1;
