@@ -9,6 +9,7 @@
 #include <math.h>
 
 #define VOLUME_MUSIQUE 32
+#define VOLUME_BRUITAGES 32
 
 // -- Pour les sons -- 
 
@@ -542,7 +543,7 @@ int IsLocationLeft(int yDebut, int yFin, int CurrLvl, int xDiff){
 void ManageMusic() {
     static int currentZoneState = -1; 
     int newZoneState = 0; 
-
+    Mix_Volume(-1, VOLUME_BRUITAGES);
     // Si on est dans les niveaux 5, 6, 7 ou 8, on est à l'EXTERIEUR
     if (currentLevel >= 5 && currentLevel <= 8) {
         newZoneState = 1;
