@@ -7,6 +7,7 @@
 #include "ia.h"
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
 #define VOLUME_MUSIQUE 32
 #define VOLUME_BRUITAGES 32
@@ -340,6 +341,34 @@ int whichTableauPiece = 0;
 
 int cpt_piece_tableau = 0;
 
+// --- VARIABLES POUR LES INTERACTIONS LIT ET BUREAU ---
+int isSleeping = 0;           // 1 = le joueur dort sur le lit
+int isSitting = 0;            // 1 = le joueur est assis sur la chaise
+int sleepAnimFrame = 0;       // Frame d'animation pour le sommeil
+int sleepAnimTimer = 0;       // Timer pour animer le "Zzz"
+float sleepBreathOffset = 0;  // Offset pour l'effet de respiration
+float sitIdleOffset = 0;      // Offset pour mouvement subtil assis
+int sitIdleTimer = 0;         // Timer pour animation assis
+int transitionFrame = 0;      // Frame de transition (coucher/lever)
+int isInTransition = 0;       // 1 = en train de se coucher/lever
+int showInteractPromptLit = 0;    // Affiche "[X] Dormir"
+int showInteractPromptBureau = 0; // Affiche "[X] S'asseoir"
+float savedPlayerX = 0;       // Position sauvegardée du joueur
+float savedPlayerY = 0;
+static int toucheX_Relache = 1;
+
+// --- VARIABLES POUR LE PANNEAU DE BASKET ---
+int showInteractPromptBasket = 0; // Affiche "[X] Lancer le ballon"
+int basketAnimTimer = 0;          // Timer pour animation du filet
+float basketNetSwing = 0;         // Angle de balancement du filet
+int ballInAir = 0;                // 1 = le ballon est en l'air
+float ballX = 0, ballY = 0;       // Position du ballon
+float ballVelX = 0, ballVelY = 0; // Vélocité du ballon
+int ballAnimFrame = 0;            // Frame d'animation du ballon
+int ballScoredBasket = 0;         // 1 = le ballon a marqué un panier
+
+
+
 int TuilesNotSpecial[] = {0, 1, 2};
 int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
 
@@ -530,7 +559,188 @@ int isWall(float x, float y) {
         return 0;
     }
 
-    if (type == 20 || type == 21) {
+    // --- COLLISION 3D RÉALISTE : LAMPE ET TABLE DE NUIT (tuiles 20, 21) ---
+    if (type == 20) {
+        // Partie haute (lampe elle-même)
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 6) {
+            return 1; // Collision sur le "toit" de la lampe
+        }
+        // Si la tuile en dessous est la table de nuit, collision solide
+        if (caseY + 1 < MAP_HEIGHT) {
+            int typeBelow = maps[currentLevel][caseY + 1][caseX];
+            if (typeBelow == 21 || typeBelow == 20) {
+                return 1;
+            }
+        }
+        // On peut passer devant si on est au niveau des pieds
+        float lampePixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= lampePixelBottom) {
+            return 0;
+        }
+        return 1;
+    }
+    if (type == 21) {
+        // Table de nuit (partie basse) : effet 3D - on peut passer devant
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 4) {
+            return 1; // Collision sur le haut de cette tuile
+        }
+        // Si on est assez bas (pieds du joueur sous le bas de la tuile), on passe devant
+        float lampePixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= lampePixelBottom - 2) {
+            return 0;
+        }
+        return 1;
+    }
+
+    // --- COLLISION 3D RÉALISTE : LIT (tuiles 32, 33, 34, 35, 36, 37) ---
+    // Le lit occupe les colonnes 3-4, lignes 1-3 dans la chambre
+    if (type == 32 || type == 33 || type == 36 || type == 37) {
+        // Partie haute du lit : collision totale sauf si on est devant (en bas)
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 6) {
+            return 1; // Collision sur le "toit" du lit
+        }
+        // Si la tuile en dessous fait partie du lit aussi, collision solide
+        if (caseY + 1 < MAP_HEIGHT) {
+            int typeBelow = maps[currentLevel][caseY + 1][caseX];
+            if (typeBelow == 34 || typeBelow == 35 || typeBelow == 32 || typeBelow == 33) {
+                return 1;
+            }
+        }
+        // On peut passer devant si on est au niveau des pieds
+        float litPixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= litPixelBottom) {
+            return 0;
+        }
+        return 1;
+    }
+    if (type == 34 || type == 35) {
+        // Partie basse du lit : effet 3D - on peut passer devant
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 4) {
+            return 1; // Collision sur le haut de cette tuile
+        }
+        // Si on est assez bas (pieds du joueur sous le bas de la tuile), on passe devant
+        float litPixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= litPixelBottom - 2) {
+            return 0;
+        }
+        return 1;
+    }
+
+    // --- COLLISION 3D RÉALISTE : TENTE (tuiles 52-57) ---
+    // La tente occupe les colonnes 16-18, lignes 6-8 dans la chambre
+    if (type == 55 || type == 56 || type == 57) {
+        // Partie haute de la tente : collision comme un mur avec perspective
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 6) {
+            return 1;
+        }
+        // Si la tuile en dessous est aussi la tente, collision solide
+        if (caseY + 1 < MAP_HEIGHT) {
+            int typeBelow = maps[currentLevel][caseY + 1][caseX];
+            if (typeBelow == 52 || typeBelow == 53 || typeBelow == 54 || 
+                typeBelow == 55 || typeBelow == 56 || typeBelow == 57) {
+                return 1;
+            }
+        }
+        float tentePixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= tentePixelBottom) {
+            return 0;
+        }
+        return 1;
+    }
+    if (type == 52 || type == 53 || type == 54) {
+        // Partie basse de la tente
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 4) {
+            return 1;
+        }
+        float tentePixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= tentePixelBottom - 2) {
+            return 0;
+        }
+        return 1;
+    }
+
+    // --- COLLISION 3D RÉALISTE : BUREAU (tuiles 46, 47, 48, 49, 51) ---
+    // Le bureau occupe les colonnes 6-9, lignes 12-13 avec la chaise (51) au-dessus
+    if (type == 51) {
+        // Chaise : collision avec effet 3D
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 6) {
+            return 1;
+        }
+        if (caseY + 1 < MAP_HEIGHT) {
+            int typeBelow = maps[currentLevel][caseY + 1][caseX];
+            if (typeBelow == 46 || typeBelow == 47 || typeBelow == 48 || typeBelow == 49) {
+                return 1;
+            }
+        }
+        float chaisePixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= chaisePixelBottom) {
+            return 0;
+        }
+        return 1;
+    }
+    if (type == 46 || type == 47 || type == 48 || type == 49) {
+        // Bureau : collision avec effet 3D perspective
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 4) {
+            return 1;
+        }
+        float bureauPixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= bureauPixelBottom - 2) {
+            return 0;
+        }
+        return 1;
+    }
+
+    // --- COLLISION 3D RÉALISTE : PETITE ARMOIRE À GAUCHE (tuiles 42, 43) ---
+    // L'armoire occupe la colonne 1, lignes 6-7 dans la chambre
+    if (type == 42) {
+        // Partie haute de l'armoire
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 6) {
+            return 1;
+        }
+        if (caseY + 1 < MAP_HEIGHT) {
+            int typeBelow = maps[currentLevel][caseY + 1][caseX];
+            if (typeBelow == 43 || typeBelow == 42) {
+                return 1;
+            }
+        }
+        float armoirePixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= armoirePixelBottom) {
+            return 0;
+        }
+        return 1;
+    }
+    if (type == 43) {
+        // Partie basse de l'armoire
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 4) {
+            return 1;
+        }
+        float armoirePixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= armoirePixelBottom - 2) {
+            return 0;
+        }
+        return 1;
+    }
+
+    // --- COLLISION 3D : GRANDE ARMOIRE DROITE (tuiles 80, 81) ---
+    if (type == 80 || type == 81) {
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 4) {
+            return 1;
+        }
+        float armoirePixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= armoirePixelBottom - 2) {
+            return 0;
+        }
         return 1;
     }
 
@@ -715,6 +925,29 @@ void UpdateGame(void) {
         showInteractPromptTente = 1;
     }
 
+    // --- DÉTECTION PROXIMITÉ LIT (tuile 34 = bas du lit) ---
+    float distance_lit;
+    showInteractPromptLit = 0;
+    if (IsLocationObjet(28, 0, 34, &distance_lit) && !isSleeping && !isSitting) {
+        showInteractPromptLit = 1;
+    }
+
+    // --- DÉTECTION PROXIMITÉ BUREAU/CHAISE (tuile 51 = chaise) ---
+    float distance_bureau;
+    showInteractPromptBureau = 0;
+    if (IsLocationObjet(24, 0, 51, &distance_bureau) && !isSitting && !isSleeping) {
+        showInteractPromptBureau = 1;
+    }
+    
+    // --- DÉTECTION PROXIMITÉ PANNEAU BASKET (tuile 79 = ballon) ---
+    float distance_basket;
+    showInteractPromptBasket = 0;
+    if (IsLocationObjet(28, 0, 79, &distance_basket) && !isSitting && !isSleeping && !ballInAir) {
+        showInteractPromptBasket = 1;
+    }
+    
+
+
     // --- Calcul pour les pièces du tableau dans le labyrinthe ---
     showInteractPromptObjetTableau=0;
 
@@ -769,6 +1002,103 @@ void UpdateGame(void) {
         currentLevel = 0;
     }
 
+    // --- GESTION INTERACTION TOUCHE X POUR LIT ET BUREAU ---
+    if (state[SDL_SCANCODE_X]) {
+        if (toucheX_Relache) {
+            // --- DORMIR SUR LE LIT ---
+            if (showInteractPromptLit && !isSleeping && !isSitting && currentLevel == 0) {
+                // Sauvegarder position et commencer à dormir
+                savedPlayerX = player.x;
+                savedPlayerY = player.y;
+                isSleeping = 1;
+                sleepAnimFrame = 0;
+                sleepAnimTimer = 0;
+                sleepBreathOffset = 0;
+                // Positionner le joueur précisément sur le lit (centré entre colonnes 3-4, lignes 2-3)
+                player.x = 3.5f * TILE_SIZE;
+                player.y = 2.2f * TILE_SIZE;
+            }
+            // --- SE LEVER DU LIT ---
+            else if (isSleeping) {
+                isSleeping = 0;
+                player.x = savedPlayerX;
+                player.y = savedPlayerY;
+            }
+            // --- S'ASSEOIR SUR LA CHAISE ---
+            else if (showInteractPromptBureau && !isSitting && !isSleeping && currentLevel == 0) {
+                savedPlayerX = player.x;
+                savedPlayerY = player.y;
+                isSitting = 1;
+                sitIdleTimer = 0;
+                // Positionner le joueur précisément sur la chaise (colonne 6, ligne 12)
+                player.x = 6 * TILE_SIZE + 2;
+                player.y = 12 * TILE_SIZE + 2;
+            }
+            // --- SE LEVER DE LA CHAISE ---
+            else if (isSitting) {
+                isSitting = 0;
+                player.x = savedPlayerX;
+                player.y = savedPlayerY;
+            }
+            // --- LANCER LE BALLON AU PANIER ---
+            else if (showInteractPromptBasket && !ballInAir && currentLevel == 0) {
+                // Le ballon décolle !
+                ballInAir = 1;
+                maps[0][12][2] = 1; // Retirer le ballon du sol
+                
+                // Position de départ : position du ballon sur le sol
+                ballX = 2 * TILE_SIZE + 8;  // Centre du ballon au sol
+                ballY = 12 * TILE_SIZE + 8;
+                
+                // Position EXACTE du centre du panier (anneau)
+                // Panneau à (1, 11), l'anneau est légèrement en bas du panneau
+                float targetX = 1 * TILE_SIZE + 8;   // Centre horizontal du panneau
+                float targetY = 11 * TILE_SIZE + 12; // Un peu en bas du panneau (l'anneau)
+                
+                // Calculer la trajectoire parabolique parfaite
+                float dx = targetX - ballX;
+                float dy = targetY - ballY;
+                
+                // Temps de vol estimé (ajusté pour que le ballon arrive pile)
+                float flightTime = 35.0f;
+                
+                // Vélocité horizontale
+                ballVelX = dx / flightTime;
+                
+                // Vélocité verticale avec compensation de la gravité (0.3f)
+                // Pour atteindre targetY, on calcule: vy = (dy + 0.5 * g * t^2) / t
+                float gravity = 0.3f;
+                ballVelY = (dy - 0.5f * gravity * flightTime * flightTime) / flightTime;
+                
+                ballAnimFrame = 0;
+                ballScoredBasket = 0;
+            }
+            toucheX_Relache = 0;
+        }
+    } else {
+        toucheX_Relache = 1;
+    }
+    
+    // --- BLOQUER LE MOUVEMENT SI ON DORT OU ON EST ASSIS ---
+    if (isSleeping || isSitting) {
+        // Animation de respiration pour le sommeil
+        if (isSleeping) {
+            sleepAnimTimer++;
+            // Changement de frame Zzz toutes les 45 frames (plus lent et naturel)
+            if (sleepAnimTimer % 45 == 0) {
+                sleepAnimFrame = (sleepAnimFrame + 1) % 3;
+            }
+            // L'effet de respiration est calculé directement dans DrawGame avec sleepAnimTimer
+        }
+        // Animation subtile pour l'état assis
+        if (isSitting) {
+            sitIdleTimer++;
+            // Reset pour éviter overflow
+            if (sitIdleTimer > 1000) sitIdleTimer = 0;
+        }
+        return; // On bloque les mouvements et le reste de l'update
+    }
+    
     if (state[SDL_SCANCODE_E]) {
         if (toucheE_Relache) {
             // Si le joueur est à moins de 16 pixel (une tuile)
@@ -1084,6 +1414,16 @@ int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance){
         case 109:
             targetY += 8;
             targetX += 8;
+            break;
+        case 34: // Lit (bas du lit) - centre de détection plus bas
+            targetY += 8;
+            break;
+        case 51: // Chaise du bureau
+            targetY += 4;
+            break;
+        case 79: // Ballon de basket
+            targetY += 4;
+            break;
     }
 
     // 3. Calcul de la distance avec la position CORRIGÉE
@@ -1243,6 +1583,13 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
                 DrawTuiles(x, y, type, renderer, lum); // On passe 'lum'
 
                 int type_maps = maps[currentLevel][y][x];
+                
+                // On skip le panneau de basket (78) pour le dessiner APRES le joueur
+                // Cela crée un effet de profondeur : le joueur passe SOUS le panneau
+                if (type_maps == 78) {
+                    continue; // On le dessinera plus tard
+                }
+                
                 if(IsTuileSpecial(type_maps)){
                     DrawTuiles(x, y, type_maps, renderer, lum); // On passe 'lum'
                 }
@@ -1290,11 +1637,261 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
 
     
 
-    SDL_Rect srcPlayer = { 112, 0, 16, 16 };
-    SDL_Rect destPlayer = { (int)player.x - 2, (int)player.y - 2, 16, 16 };
-    SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);  
+    // --- AFFICHAGE DU JOUEUR (avec états spéciaux) ---
+    if (isSleeping) {
+        // Joueur allongé VERTICALEMENT sur le lit
+        // Structure du lit :
+        // Ligne 1 (y=1): oreillers (36, 37) aux colonnes 3-4
+        // Ligne 2 (y=2): haut lit (32, 33) aux colonnes 3-4  
+        // Ligne 3 (y=3): bas lit (34, 35) aux colonnes 3-4
+        // Le joueur doit avoir la TÊTE vers les oreillers (en haut) et PIEDS vers le bas
+        
+        SDL_Rect srcPlayer = { 112, 0, 16, 16 };
+        
+        // Effet de respiration réaliste (poitrine qui se soulève)
+        float breathEffect = sinf(sleepAnimTimer * 0.08f) * 1.2f;
+        
+        SDL_Rect destPlayer = { 
+            (int)(3.5f * TILE_SIZE),  // Centré horizontalement entre colonnes 3 et 4
+            (int)(2.2f * TILE_SIZE) + (int)breathEffect,  // Centré verticalement sur le lit (entre ligne 2 et 3)
+            16, 16 
+        };
+        
+        // Rotation 0° = tête en haut (vers oreillers), pieds en bas - position naturelle
+        SDL_RenderCopyEx(renderer, tilesetTexture, &srcPlayer, &destPlayer, 0.0, NULL, SDL_FLIP_NONE);
+        
+        // --- EFFET "Zzz" ANIMÉ avec flottement ---
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        char zzzText[8];
+        if (sleepAnimFrame == 0) strcpy(zzzText, "z");
+        else if (sleepAnimFrame == 1) strcpy(zzzText, "zZ");
+        else strcpy(zzzText, "zZz");
+        
+        // Les Zzz flottent doucement vers le haut au-dessus de la tête
+        float zzzFloat = sinf(sleepAnimTimer * 0.15f) * 2.0f;
+        
+        SDL_Surface *sZzz = TTF_RenderText_Solid(fontMini, zzzText, cBlanc);
+        if (sZzz) {
+            SDL_Texture *tZzz = SDL_CreateTextureFromSurface(renderer, sZzz);
+            // Position au-dessus de la tête (côté oreillers)
+            int zzzX = (int)(4.2f * TILE_SIZE) + sleepAnimFrame * 2;
+            int zzzY = (int)(1.5f * TILE_SIZE) - sleepAnimFrame * 4 + (int)zzzFloat;
+            SDL_Rect rZzz = { zzzX, zzzY, sZzz->w, sZzz->h };
+            SDL_RenderCopy(renderer, tZzz, NULL, &rZzz);
+            SDL_FreeSurface(sZzz);
+            SDL_DestroyTexture(tZzz);
+        }
+        
+        // Instruction pour se lever
+        SDL_Surface *sWake = TTF_RenderText_Solid(fontMini, "[X] Se lever", cBlanc);
+        if (sWake) {
+            SDL_Texture *tWake = SDL_CreateTextureFromSurface(renderer, sWake);
+            SDL_Rect rWake = { (int)(3 * TILE_SIZE) - 5, (int)(5 * TILE_SIZE), sWake->w, sWake->h };
+            
+            // Fond semi-transparent
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150);
+            SDL_Rect rFond = { rWake.x - 2, rWake.y - 1, rWake.w + 4, rWake.h + 2 };
+            SDL_RenderFillRect(renderer, &rFond);
+            
+            SDL_RenderCopy(renderer, tWake, NULL, &rWake);
+            SDL_FreeSurface(sWake);
+            SDL_DestroyTexture(tWake);
+        }
+    }
+    else if (isSitting) {
+        // Joueur assis sur la chaise, face au bureau
+        // Structure :
+        // Ligne 12 (y=12): chaise (51) à la colonne 6
+        // Ligne 13 (y=13): bureau (46, 47, 48, 49) aux colonnes 6-9
+        // Le joueur doit être ASSIS sur la chaise (ligne 12), regardant vers le bureau (ligne 13)
+        
+        SDL_Rect srcPlayer = { 112, 0, 16, 16 };
+        
+        // Petit mouvement subtil comme si le personnage bougeait légèrement (respiration, ajustement posture)
+        float idleMoveX = sinf(sitIdleTimer * 0.05f) * 0.3f;
+        float idleMoveY = sinf(sitIdleTimer * 0.08f) * 0.2f; // Légère oscillation verticale (respiration)
+        
+        SDL_Rect destPlayer = { 
+            (int)(6 * TILE_SIZE) + 2 + (int)idleMoveX,  // Centré sur la colonne 6 (chaise)
+            (int)(12 * TILE_SIZE) + 2 + (int)idleMoveY, // Positionné SUR la chaise (ligne 12), pas au-dessus
+            16, 16 
+        };
+        
+        // Le joueur regarde vers le haut (vers le bureau ligne 13)
+        // Pas de rotation, pas de flip - posture naturelle assise
+        SDL_RenderCopyEx(renderer, tilesetTexture, &srcPlayer, &destPlayer, 0.0, NULL, SDL_FLIP_NONE);
+        
+        // Instruction pour se lever
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sStand = TTF_RenderText_Solid(fontMini, "[X] Se lever", cBlanc);
+        if (sStand) {
+            SDL_Texture *tStand = SDL_CreateTextureFromSurface(renderer, sStand);
+            SDL_Rect rStand = { (int)(5 * TILE_SIZE), (int)(14 * TILE_SIZE) - 6, sStand->w, sStand->h };
+            
+            // Fond semi-transparent
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150);
+            SDL_Rect rFond = { rStand.x - 2, rStand.y - 1, rStand.w + 4, rStand.h + 2 };
+            SDL_RenderFillRect(renderer, &rFond);
+            
+            SDL_RenderCopy(renderer, tStand, NULL, &rStand);
+            SDL_FreeSurface(sStand);
+            SDL_DestroyTexture(tStand);
+        }
+    }
+    else {
+        // Joueur normal
+        SDL_Rect srcPlayer = { 112, 0, 16, 16 };
+        SDL_Rect destPlayer = { (int)player.x - 2, (int)player.y - 2, 16, 16 };
+        SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
+    }  
 
-
+    // --- RENDU DES ÉLÉMENTS EN PREMIER PLAN (après le joueur) ---
+    // Panneau de basket : doit apparaître au-dessus du joueur pour l'effet de profondeur
+    if (tilesetTexture && currentLevel == 0) {
+        // Position du panneau : colonne 1, ligne 11 (tuile 78)
+        int panneauX = 1;
+        int panneauY = 11;
+        
+        float intensite = getLuminosite(panneauX, panneauY, rayon);
+        if (intensite > 0.0f) {
+            int lum = (int)(intensite * 255);
+            
+            // 1. Dessiner l'ombre du panneau au sol (effet réaliste)
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 80);
+            SDL_Rect shadowRect = {
+                panneauX * TILE_SIZE + 2,
+                (panneauY + 1) * TILE_SIZE - 2,
+                12, 4
+            };
+            SDL_RenderFillRect(renderer, &shadowRect);
+            
+            // 2. Dessiner le panneau de basket (78)
+            DrawTuiles(panneauX, panneauY, 78, renderer, lum);
+            
+            // 3. Effet de balancement du filet quand le joueur passe en dessous
+            float playerCenterX = player.x + player.w / 2;
+            float playerCenterY = player.y + player.h / 2;
+            float panneauCenterX = panneauX * TILE_SIZE + 8;
+            float panneauCenterY = panneauY * TILE_SIZE + 8;
+            
+            float distToPanneau = sqrtf(powf(playerCenterX - panneauCenterX, 2) + 
+                                        powf(playerCenterY - panneauCenterY, 2));
+            
+            // Si le joueur est proche du panneau, le filet bouge
+            if (distToPanneau < 24) {
+                basketNetSwing = sinf(basketAnimTimer * 0.3f) * 2.0f;
+                basketAnimTimer++;
+            } else {
+                // Le filet revient progressivement au repos
+                basketNetSwing *= 0.95f;
+                if (fabs(basketNetSwing) < 0.1f) {
+                    basketNetSwing = 0;
+                    basketAnimTimer = 0;
+                }
+            }
+            
+            // Dessiner les lignes du filet (effet visuel)
+            if (fabs(basketNetSwing) > 0.1f) {
+                SDL_SetRenderDrawColor(renderer, 200, 200, 200, 180);
+                int netX = panneauX * TILE_SIZE + 4;
+                int netY = panneauY * TILE_SIZE + 10;
+                SDL_RenderDrawLine(renderer, 
+                    netX, netY, 
+                    netX + 2 + (int)basketNetSwing, netY + 4);
+                SDL_RenderDrawLine(renderer, 
+                    netX + 4, netY, 
+                    netX + 6 + (int)basketNetSwing, netY + 4);
+            }
+        }
+    }
+    
+    // --- ANIMATION DU BALLON EN L'AIR ---
+    if (ballInAir && currentLevel == 0) {
+        // Physique simple du ballon
+        ballVelY += 0.3f; // Gravité
+        
+        // Prédire la prochaine position
+        float nextBallX = ballX + ballVelX;
+        float nextBallY = ballY + ballVelY;
+        
+        // Vérifier collision avec les murs (colonne 0 = mur gauche, colonne 19 = mur droit)
+        int ballTileX = (int)(nextBallX / TILE_SIZE);
+        int ballTileY = (int)(nextBallY / TILE_SIZE);
+        
+        // Collision avec le mur gauche (colonne 0)
+        if (ballTileX <= 0) {
+            ballVelX = -ballVelX * 0.6f; // Rebond avec perte d'énergie
+            nextBallX = TILE_SIZE + 2; // Reposition
+        }
+        // Collision avec le mur droit (colonne 19)
+        if (ballTileX >= MAP_WIDTH - 1) {
+            ballVelX = -ballVelX * 0.6f; // Rebond avec perte d'énergie
+            nextBallX = (MAP_WIDTH - 2) * TILE_SIZE - 2; // Reposition
+        }
+        // Collision avec le mur du haut
+        if (ballTileY <= 0) {
+            ballVelY = -ballVelY * 0.6f;
+            nextBallY = TILE_SIZE + 2;
+        }
+        
+        // Vérifier collision avec les murs solides (tuile 2)
+        if (ballTileX >= 0 && ballTileX < MAP_WIDTH && ballTileY >= 0 && ballTileY < MAP_HEIGHT) {
+            int tileType = maps_patern[currentLevel][ballTileY][ballTileX];
+            if (tileType == 2) {
+                // Rebond sur mur
+                ballVelX = -ballVelX * 0.6f;
+                ballVelY = -ballVelY * 0.6f;
+            }
+        }
+        
+        ballX = nextBallX;
+        ballY = nextBallY;
+        
+        // Animation rotation du ballon
+        ballAnimFrame = (ballAnimFrame + 1) % 8;
+        
+        // Dessiner le ballon (tuile 79)
+        SDL_Rect srcBall = { 79 * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
+        SDL_Rect destBall = { (int)ballX - 6, (int)ballY - 6, 12, 12 };
+        SDL_RenderCopyEx(renderer, tilesetTexture, &srcBall, &destBall, 
+                         ballAnimFrame * 45.0, NULL, SDL_FLIP_NONE);
+        
+        // Le ballon entre dans le panier ! (détection précise)
+        // Position EXACTE de l'anneau du panier
+        float basketCenterX = 1 * TILE_SIZE + 8;   // Centre horizontal
+        float basketCenterY = 11 * TILE_SIZE + 12; // L'anneau est légèrement en bas du panneau
+        
+        // Zone de l'anneau (cercle du panier) - zone plus large pour détecter
+        float basketLeft = basketCenterX - 8;
+        float basketRight = basketCenterX + 8;
+        float basketTop = basketCenterY - 4;
+        float basketBottom = basketCenterY + 6;
+        
+        // Le ballon doit entrer dans la zone du panier en descendant
+        if (!ballScoredBasket && 
+            ballX > basketLeft && ballX < basketRight && 
+            ballY > basketTop && ballY < basketBottom && 
+            ballVelY > 0) {
+            // PANIER MARQUÉ ! 
+            basketNetSwing = 8.0f; // Le filet bouge fort
+            basketAnimTimer = 0;
+            ballScoredBasket = 1;
+            
+            // Le ballon passe à travers l'anneau - on le recentre légèrement
+            ballX = basketCenterX; // Centrer le ballon dans l'anneau
+            ballVelX = 0;          // Arrêter le mouvement horizontal
+            ballVelY = 2.0f;       // Descendre doucement
+        }
+        
+        // Le ballon touche le sol - SEULEMENT LÀ on le remet
+        if (ballY > (MAP_HEIGHT - 2) * TILE_SIZE) {
+            ballInAir = 0;
+            ballScoredBasket = 0; // Réinitialiser
+            // Remettre le ballon à sa position initiale (colonne 2, ligne 12)
+            maps[0][12][2] = 79;
+        }
+    }
+    
     int caseX = (int)(fantome.x / TILE_SIZE);
     int caseY = (int)(fantome.y / TILE_SIZE);
 
@@ -1330,6 +1927,27 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         
         if (sText) DrawInteractions(renderer, sText);
     }
+    
+    // --- AFFICHAGE DES PROMPTS POUR LIT ET BUREAU ---
+    if (showInteractPromptLit == 1 && !isSleeping && !isSitting) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] Dormir", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (showInteractPromptBureau == 1 && !isSitting && !isSleeping) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] S'asseoir", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    
+    // Prompt pour le panier de basket
+    if (showInteractPromptBasket == 1 && !ballInAir) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] Lancer au panier", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    
+
     if(showInteractImpossibleObjet == 1){
         char *texteAffiche = "j'ai deja une piece";
         DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
