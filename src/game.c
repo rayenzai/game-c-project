@@ -697,21 +697,21 @@ void UpdateGame(void) {
     showInteractPrompt2 = 0;
     showInteractPrompt3 = 0;
 
-    if (IsLocationObjet(24, 0, 8, &distance)) {
+    if (IsLocationObjet(24, 0, 8, &distance, -1, -1)) {
         showInteractPrompt = 1;
     }
 
-    else if (IsLocationObjet(24, 0, 16, &distance)) {
+    else if (IsLocationObjet(24, 0, 16, &distance, -1, -1)) {
         showInteractPrompt2 = 1;
     }
 
-    else if (IsLocationObjet(24, 0, 12, &distance)) {
+    else if (IsLocationObjet(24, 0, 12, &distance, -1, -1)) {
         showInteractPrompt3 = 1;
     }
 
     float distance_tente;
     showInteractPromptTente = 0;
-    if(IsLocationObjet(24, 0, 55, &distance_tente)){
+    if(IsLocationObjet(24, 0, 55, &distance_tente, -1, -1)){
         showInteractPromptTente = 1;
     }
 
@@ -724,7 +724,7 @@ void UpdateGame(void) {
     TrouveCoordonnees(&morceauTableau1x, &morceauTableau1y, 117, 5);
 
     float distance_morceauTableau1;
-    if(IsLocationObjet(16, 5, 117, &distance_morceauTableau1)) showInteractPromptObjetTableau = 1;
+    if(IsLocationObjet(16, 5, 117, &distance_morceauTableau1, -1, -1)) showInteractPromptObjetTableau = 1;
 
     // Calcul distance entre joueur et deuxième pièce du tableau (118)
     int morceauTableau2x;
@@ -732,7 +732,7 @@ void UpdateGame(void) {
     TrouveCoordonnees(&morceauTableau2x, &morceauTableau2y, 118, 6);
 
     float distance_morceauTableau2;
-    if(IsLocationObjet(16, 6, 118, &distance_morceauTableau2)) showInteractPromptObjetTableau = 1;
+    if(IsLocationObjet(16, 6, 118, &distance_morceauTableau2, -1, -1)) showInteractPromptObjetTableau = 1;
 
     // Calcul distance entre joueur et troisième pièce du tableau (115)
     int morceauTableau3x;
@@ -740,7 +740,7 @@ void UpdateGame(void) {
     TrouveCoordonnees(&morceauTableau3x, &morceauTableau3y, 115, 7);
 
     float distance_morceauTableau3;
-    if(IsLocationObjet(16, 7, 115, &distance_morceauTableau3)) showInteractPromptObjetTableau = 1;
+    if(IsLocationObjet(16, 7, 115, &distance_morceauTableau3, -1, -1)) showInteractPromptObjetTableau = 1;
 
     // Calcul distance entre joueur et quatrième pièce du tableau (116)
     int morceauTableau4x;
@@ -748,7 +748,7 @@ void UpdateGame(void) {
     TrouveCoordonnees(&morceauTableau4x, &morceauTableau4y, 116, 8);
 
     float distance_morceauTableau4;
-    if(IsLocationObjet(16, 8, 116, &distance_morceauTableau4)) showInteractPromptObjetTableau = 1;
+    if(IsLocationObjet(16, 8, 116, &distance_morceauTableau4, -1, -1)) showInteractPromptObjetTableau = 1;
 
     // Ouverture de la salle du niveau 3
     if(cpt_piece_tableau == 4){
@@ -759,7 +759,7 @@ void UpdateGame(void) {
 
     showInteractTableau=0;
     float distance_Tableau;
-    if( (IsLocationObjet(24, 2, 113, &distance_Tableau) || IsLocationObjet(24, 2, 109, &distance_Tableau) ) && cpt_piece_tableau != 4){
+    if( (IsLocationObjet(24, 2, 113, &distance_Tableau, -1, -1) || IsLocationObjet(24, 2, 109, &distance_Tableau, -1, -1) ) && cpt_piece_tableau != 4){
         showInteractTableau = 1;
     }
 
@@ -1058,9 +1058,10 @@ void UpdateGame(void) {
     // printf("lvl: %d \n", currentLevel);
 }
 
-int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance){
-    int x = -1, y = -1;
-    TrouveCoordonnees(&x, &y, indexTuile, CurrLvl);
+int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance, int x, int y){
+    if(x == -1 || y == -1){
+        TrouveCoordonnees(&x, &y, indexTuile, CurrLvl);
+    }
 
     if (x == -1 || y == -1) {
         *distance = 9999.0f; 

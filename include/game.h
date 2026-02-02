@@ -47,7 +47,7 @@ void SpawnFantomeRandom();
 void DrawTexte(char *texteAffiche, SDL_Renderer *renderer,TTF_Font *font, int x, int y, int w, int h);
 void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText);
 void TrouveCoordonnees(int *nvx, int *nvy, int indexObjet, int CurrLvl);
-int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance);
+int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance, int x, int y);
 
 extern int currentLevel; 
 
