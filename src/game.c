@@ -304,6 +304,12 @@ int showInteractPrompt = 0;
 int showInteractPrompt2 = 0;
 int showInteractPrompt3 = 0;
 int showInteractPromptTente = 0;
+int showInteractPromptLit = 0;
+int showInteractPromptChaise = 0;
+int isSleeping = 0;
+int isSitting = 0;
+int sleepTimer = 0;
+static int toucheX_Relache = 1;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
 
 int TuilesNotSpecial[] = {0, 1, 2};
@@ -354,75 +360,217 @@ void InitGame(SDL_Renderer *renderer) {
 
 }
 
-// Fonction utilitaire collision
-int isWall(float x, float y) {
+// Vérifie si une position est dans la zone 3D d'un mur en face
+int isInWallFace3DZone(float x, float y) {
+    int caseX = x / TILE_SIZE;
+    int caseY = y / TILE_SIZE;
+    if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 0;
+    int type = maps[currentLevel][caseY][caseX];
+    int type_pattern = maps_patern[currentLevel][caseY][caseX];
+    
+    if (type == 2 || type_pattern == 2 || type == 83) {
+        // Vérifier si c'est un mur EN FACE (pas de mur en dessous)
+        int caseY_Below = caseY + 1;
+        if (caseY_Below < MAP_HEIGHT) {
+            int typeBelow = maps[currentLevel][caseY_Below][caseX];
+            int typeBelow_pattern = maps_patern[currentLevel][caseY_Below][caseX];
+            if (typeBelow != 2 && typeBelow_pattern != 2 && typeBelow != 83) {
+                // C'est un mur en face, vérifier si on est dans la zone 3D
+                int localY = (int)y % TILE_SIZE;
+                if (localY >= 4) {
+                    return 1;  // Dans la zone 3D
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+// Fonction utilitaire collision - MOUVEMENT HORIZONTAL
+// playerX, playerY = position ACTUELLE du joueur (pour savoir s'il est déjà dans un mur)
+int isWallX_withContext(float x, float y, float playerX, float playerY) {
     int caseX = x / TILE_SIZE;
     int caseY = y / TILE_SIZE;
     if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
     int type = maps[currentLevel][caseY][caseX];
     int type_pattern = maps_patern[currentLevel][caseY][caseX];
 
-    // --- TYPE 1 : MURS CLASSIQUES (Tout le bloc est solide) ---
-    // Les murs, les bords, le vide...
+    // Si le joueur est DÉJÀ dans la zone 3D d'un mur en face
+    int playerInWall3D = isInWallFace3DZone(playerX, playerY) || isInWallFace3DZone(playerX + 8, playerY) ||
+                         isInWallFace3DZone(playerX, playerY + 8) || isInWallFace3DZone(playerX + 8, playerY + 8);
 
+    // Pour les murs
     if (type == 2 || type_pattern == 2 || type == 83){
-        // VERIFICATION DU MUR "DU DESSOUS"
-        // Si la case en dessous est un autre mur (type 2), alors c'est un "mur de coté" ou un "mur plein".
-        
+        // Si le joueur est DÉJÀ dans un mur en face (zone 3D)
+        if (playerInWall3D) {
+            // Vérifier si la destination est aussi un mur en face (pas de mur en dessous)
+            int caseY_Below = caseY + 1;
+            if (caseY_Below < MAP_HEIGHT) {
+                int typeBelow = maps[currentLevel][caseY_Below][caseX];
+                int typeBelow_pattern = maps_patern[currentLevel][caseY_Below][caseX];
+                if (typeBelow != 2 && typeBelow_pattern != 2 && typeBelow != 83) {
+                    // Destination = mur en face, vérifier zone 3D
+                    int localY = (int)y % TILE_SIZE;
+                    if (localY >= 4) {
+                        return 0;  // Glissement autorisé dans la zone 3D
+                    }
+                }
+            }
+        }
+        // Sinon le mur est SOLIDE (on ne peut pas entrer par le côté)
+        return 1;
+    }
+
+    // Si le joueur est dans la zone 3D et la destination est VIDE (pas un mur)
+    // => Autoriser la sortie du mur
+    if (playerInWall3D) {
+        return 0;  // Sortie du mur autorisée
+    }
+
+    // Meubles solides pour mouvement horizontal
+    if (type == 10 || type == 11 || type == 14 || type == 15 || type == 18 || type == 19) {
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 4) return 1;
+        return 0;
+    }
+
+    if (type == 22 || type == 23) {
+        int localY = (int)y % TILE_SIZE;
+        if (localY > 2) return 1;
+        return 0;
+    }
+    
+    if (type == 20 || type == 21) return 1;
+    
+    // Collision avec le lit (32, 33 = haut, 34, 35 = bas, 36, 37 = déco) avec effet de profondeur
+    if (type == 32 || type == 33 || type == 34 || type == 35) {
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 6) return 1; // Partie basse du lit solide
+        return 0; // Partie haute traversable (effet 3D)
+    }
+    if (type == 36 || type == 37) return 1; // Déco du lit toujours solide
+    
+    // Collision avec le bureau (46, 47, 48, 49) - pas la chaise pour pouvoir s'asseoir
+    if (type == 46 || type == 47 || type == 48 || type == 49) return 1;
+    
+    // Collision avec la tente (52, 53, 54 = bas, 55, 56, 57 = haut)
+    if (type == 52 || type == 53 || type == 54 || type == 55 || type == 56 || type == 57) return 1;
+    
+    // Collision avec la commode mur gauche (42, 43) et mur droit (80, 81)
+    if (type == 42 || type == 43 || type == 80 || type == 81) return 1;
+    
+    return 0;
+}
+
+// Fonction simple pour compatibilité
+int isWallX(float x, float y) {
+    int caseX = x / TILE_SIZE;
+    int caseY = y / TILE_SIZE;
+    if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
+    int type = maps[currentLevel][caseY][caseX];
+    int type_pattern = maps_patern[currentLevel][caseY][caseX];
+
+    if (type == 2 || type_pattern == 2 || type == 83) return 1;
+    if (type == 10 || type == 11 || type == 14 || type == 15 || type == 18 || type == 19) {
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 4) return 1;
+        return 0;
+    }
+    if (type == 22 || type == 23) {
+        int localY = (int)y % TILE_SIZE;
+        if (localY > 2) return 1;
+        return 0;
+    }
+    if (type == 20 || type == 21) return 1;
+    
+    // Collision avec le lit (32, 33 = haut, 34, 35 = bas, 36, 37 = déco) avec effet de profondeur
+    if (type == 32 || type == 33 || type == 34 || type == 35) {
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 6) return 1; // Partie basse du lit solide
+        return 0; // Partie haute traversable (effet 3D)
+    }
+    if (type == 36 || type == 37) return 1; // Déco du lit toujours solide
+    
+    // Collision avec le bureau (46, 47, 48, 49) - pas la chaise pour pouvoir s'asseoir
+    if (type == 46 || type == 47 || type == 48 || type == 49) return 1;
+    
+    // Collision avec la tente (52, 53, 54 = bas, 55, 56, 57 = haut)
+    if (type == 52 || type == 53 || type == 54 || type == 55 || type == 56 || type == 57) return 1;
+    
+    // Collision avec la commode mur gauche (42, 43) et mur droit (80, 81)
+    if (type == 42 || type == 43 || type == 80 || type == 81) return 1;
+    
+    return 0;
+}
+
+// Fonction utilitaire collision - MOUVEMENT VERTICAL (effet 3D pour murs en face)
+int isWallY(float x, float y) {
+    int caseX = x / TILE_SIZE;
+    int caseY = y / TILE_SIZE;
+    if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return 1;
+    int type = maps[currentLevel][caseY][caseX];
+    int type_pattern = maps_patern[currentLevel][caseY][caseX];
+
+    // --- MURS AVEC EFFET 3D ---
+    if (type == 2 || type_pattern == 2 || type == 83){
+        // Vérifier si c'est un mur latéral (mur en dessous)
         int caseY_Below = caseY + 1;
         if (caseY_Below < MAP_HEIGHT) {
             int typeBelow = maps[currentLevel][caseY_Below][caseX];
             int typeBelow_pattern = maps_patern[currentLevel][caseY_Below][caseX];
             if (typeBelow_pattern == 2 || typeBelow == 83) {
-                return 1;
+                return 1;  // Mur latéral - complètement solide
             }
         } else {
-             return 1;
-        }
-
-        int localY = (int)y % TILE_SIZE; 
-
-        if (localY < 4) {
             return 1;
-        } else {
-            return 0;
         }
+
+        // Mur en face - EFFET 3D uniforme sur TOUTE la longueur
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 4) {
+            return 1; // Bas du mur solide
+        }
+        return 0; // Haut traversable (effet 3D)
     }
 
-
-    // --- TYPE 2 : MEUBLES AVEC PROFONDEUR (Placard 8 et 9) ---
-    // On veut que le haut du meuble soit traversable (effet de perspective)
-    // et que seul le bas bloque les pieds du joueur.
+    // Meubles avec profondeur
     if (type == 10 || type == 11 || type == 14 || type == 15 || type == 18 || type == 19) {
-        int localY = (int)y % TILE_SIZE; // Position de 0 à 15 dans la case
-
-        // Hitbox : Seulement les 8 pixels du bas sont solides
-        if (localY < 4) {
-            return 1;
-        } else {
-            return 0; // Le haut est traversable (on passe "derrière")
-        }
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 4) return 1;
+        return 0;
     }
 
-    if (type == 22 || type == 23)
-    {
-         int localY = (int)y % TILE_SIZE; // Position de 0 à 15 dans la case
-
-        // Hitbox : Seulement les 8 pixels du bas sont solides
-        if (localY > 2) {
-            return 1;
-        } else {
-            return 0; // Le haut est traversable (on passe "derrière")
-        }
+    if (type == 22 || type == 23) {
+        int localY = (int)y % TILE_SIZE;
+        if (localY > 2) return 1;
+        return 0;
     }
-    if (type == 20)
-    {
-        return 1;
+    
+    if (type == 20 || type == 21) return 1;
+    
+    // Collision avec le lit (32, 33 = haut, 34, 35 = bas, 36, 37 = déco) avec effet de profondeur
+    if (type == 32 || type == 33 || type == 34 || type == 35) {
+        int localY = (int)y % TILE_SIZE;
+        if (localY < 6) return 1; // Partie basse du lit solide
+        return 0; // Partie haute traversable (effet 3D)
     }
-    if (type == 21){
-        return 1;
-    }
+    if (type == 36 || type == 37) return 1; // Déco du lit toujours solide
+    
+    // Collision avec le bureau (46, 47, 48, 49) - pas la chaise pour pouvoir s'asseoir
+    if (type == 46 || type == 47 || type == 48 || type == 49) return 1;
+    
+    // Collision avec la tente (52, 53, 54 = bas, 55, 56, 57 = haut)
+    if (type == 52 || type == 53 || type == 54 || type == 55 || type == 56 || type == 57) return 1;
+    
+    // Collision avec la commode mur gauche (42, 43) et mur droit (80, 81)
+    if (type == 42 || type == 43 || type == 80 || type == 81) return 1;
+    
     return 0;
+}
+
+// Fonction de compatibilité (pour les autres usages)
+int isWall(float x, float y) {
+    return isWallX(x, y) || isWallY(x, y);
 }
 
 // -- Fonctions pour vérification de directions et d'emplacements
@@ -519,6 +667,62 @@ void UpdateGame(void) {
         return;
     }
 
+    // Gestion du sommeil - décrémenter le timer
+    if (isSleeping) {
+        if (sleepTimer > 0) {
+            sleepTimer--;
+            if (sleepTimer <= 0) {
+                isSleeping = 0;
+            }
+        }
+        // Permettre de se réveiller avec X même pendant le sommeil
+        if (state[SDL_SCANCODE_X]) {
+            if (toucheX_Relache) {
+                isSleeping = 0;
+                sleepTimer = 0;
+                // Le joueur sort du lit - se téléporte à côté
+                player.x = 2 * TILE_SIZE; // À gauche du lit
+                player.y = 3 * TILE_SIZE; // À la hauteur du lit
+                toucheX_Relache = 0;
+            }
+        } else {
+            toucheX_Relache = 1;
+        }
+        // Si sleepTimer == -1, sommeil infini jusqu'à ce qu'on appuie sur X
+        // Reset les prompts d'interaction pendant le sommeil
+        showInteractPrompt = 0;
+        showInteractPrompt2 = 0;
+        showInteractPrompt3 = 0;
+        showInteractPromptTente = 0;
+        showInteractPromptLit = 0;
+        showInteractPromptChaise = 0;
+        return; // Le joueur ne peut pas bouger pendant qu'il dort
+    }
+
+    // Gestion quand le joueur est assis sur la chaise
+    if (isSitting) {
+        // Permettre de se lever avec X
+        if (state[SDL_SCANCODE_X]) {
+            if (toucheX_Relache) {
+                isSitting = 0;
+                // Le joueur se lève - se téléporte à côté de la chaise
+                player.x = 5 * TILE_SIZE; // À gauche de la chaise
+                player.y = 12 * TILE_SIZE; // À la hauteur de la chaise
+                toucheX_Relache = 0;
+            }
+        } else {
+            toucheX_Relache = 1;
+        }
+        // Reset les prompts d'interaction pendant qu'on est assis
+        showInteractPrompt = 0;
+        showInteractPrompt2 = 0;
+        showInteractPrompt3 = 0;
+        showInteractPromptTente = 0;
+        showInteractPromptLit = 0;
+        showInteractPromptChaise = 0;
+        return; // Le joueur ne peut pas bouger pendant qu'il est assis
+    }
+
     float dirX = 0;
     float dirY = 0;
 
@@ -537,22 +741,22 @@ void UpdateGame(void) {
     // 3. On applique la VITESSE
     float nextX = player.x + (dirX * PLAYER_SPEED);
     float nextY = player.y + (dirY * PLAYER_SPEED);
-    // Collision X
+    // Collision X - utilise isWallX_withContext pour permettre le glissement sur les murs en face
     int touchWallX = 0;
-    if (isWall(nextX, player.y)) touchWallX = 1;
-    if (isWall(nextX + player.w, player.y)) touchWallX = 1;
-    if (isWall(nextX, player.y + player.h)) touchWallX = 1;
-    if (isWall(nextX + player.w, player.y + player.h)) touchWallX = 1;
+    if (isWallX_withContext(nextX, player.y, player.x, player.y)) touchWallX = 1;
+    if (isWallX_withContext(nextX + player.w, player.y, player.x, player.y)) touchWallX = 1;
+    if (isWallX_withContext(nextX, player.y + player.h, player.x, player.y)) touchWallX = 1;
+    if (isWallX_withContext(nextX + player.w, player.y + player.h, player.x, player.y)) touchWallX = 1;
 
     if (!touchWallX) player.x = nextX;
 
     
-    // Collision Y
+    // Collision Y - utilise isWallY (effet 3D pour murs en face)
     int touchWallY = 0;
-    if (isWall(player.x, nextY)) touchWallY = 1;
-    if (isWall(player.x + player.w, nextY)) touchWallY = 1;
-    if (isWall(player.x, nextY + player.h)) touchWallY = 1;
-    if (isWall(player.x + player.w, nextY + player.h)) touchWallY = 1;
+    if (isWallY(player.x, nextY)) touchWallY = 1;
+    if (isWallY(player.x + player.w, nextY)) touchWallY = 1;
+    if (isWallY(player.x, nextY + player.h)) touchWallY = 1;
+    if (isWallY(player.x + player.w, nextY + player.h)) touchWallY = 1;
 
     if (!touchWallY) player.y = nextY;
 
@@ -597,6 +801,36 @@ void UpdateGame(void) {
     }
     else{
         showInteractPromptTente = 0;
+    }
+
+    // Calcul de la distance entre le joueur et le lit (lit en position 3,4 colonnes, lignes 2-3)
+    float litX = 3 * TILE_SIZE + TILE_SIZE; // Centre du lit (entre colonnes 3 et 4)
+    float litY = 3 * TILE_SIZE + 8; // Centre du lit (entre lignes 2 et 3)
+
+    float dx_lit = (player.x + player.w / 2) - litX;
+    float dy_lit = (player.y + player.h / 2) - litY;
+    float distance_lit = sqrt(dx_lit*dx_lit + dy_lit*dy_lit);
+
+    if(distance_lit <= 28 && currentLevel == 0 && !isSleeping){
+        showInteractPromptLit = 1;
+    }
+    else{
+        showInteractPromptLit = 0;
+    }
+
+    // Calcul de la distance entre le joueur et la chaise (chaise en position colonne 6, ligne 12)
+    float chaiseX = 6 * TILE_SIZE + 8; // Centre de la chaise
+    float chaiseY = 12 * TILE_SIZE + 8; // Centre de la chaise
+
+    float dx_chaise = (player.x + player.w / 2) - chaiseX;
+    float dy_chaise = (player.y + player.h / 2) - chaiseY;
+    float distance_chaise = sqrt(dx_chaise*dx_chaise + dy_chaise*dy_chaise);
+
+    if(distance_chaise <= 24 && currentLevel == 0 && !isSitting){
+        showInteractPromptChaise = 1;
+    }
+    else{
+        showInteractPromptChaise = 0;
     }
 
     if(IsLocationLeft(6, 10, 9, 6*TILE_SIZE-8)){
@@ -672,6 +906,47 @@ void UpdateGame(void) {
     else{
             toucheEnter_Relache = 1;
     }
+
+    // Gestion de la touche X pour dormir/se réveiller sur le lit OU s'asseoir/se lever de la chaise
+    if (state[SDL_SCANCODE_X]) {
+        if (toucheX_Relache) {
+            // Si le joueur dort déjà, il se réveille et sort du lit
+            if (isSleeping) {
+                isSleeping = 0;
+                sleepTimer = 0;
+                // Le joueur sort du lit - se téléporte à côté
+                player.x = 2 * TILE_SIZE; // À gauche du lit
+                player.y = 3 * TILE_SIZE; // À la hauteur du lit
+            }
+            // Si le joueur est assis sur la chaise, il se lève
+            else if (isSitting) {
+                isSitting = 0;
+                // Le joueur se lève - se téléporte à côté de la chaise
+                player.x = 5 * TILE_SIZE; // À gauche de la chaise
+                player.y = 12 * TILE_SIZE; // À la hauteur de la chaise
+            }
+            // Sinon, s'il est près du lit, il s'allonge pour dormir
+            else if (distance_lit <= 28 && currentLevel == 0) {
+                isSleeping = 1;
+                sleepTimer = -1; // Durée infinie jusqu'à ce qu'on appuie à nouveau sur X
+                // Le joueur s'allonge sur le lit
+                player.x = 3 * TILE_SIZE + 4; // Position X sur le lit
+                player.y = 2 * TILE_SIZE + 8; // Position Y sur le lit
+            }
+            // Sinon, s'il est près de la chaise, il s'assoit
+            else if (distance_chaise <= 24 && currentLevel == 0) {
+                isSitting = 1;
+                // Le joueur s'assoit sur la chaise
+                player.x = 6 * TILE_SIZE + 2; // Position X sur la chaise
+                player.y = 12 * TILE_SIZE + 4; // Position Y sur la chaise
+            }
+            toucheX_Relache = 0;
+        }
+    } else {
+        toucheX_Relache = 1;
+    }
+
+
     
 
     // 1. Quitter la CHAMBRE (Niveau 0) par le HAUT
@@ -860,7 +1135,7 @@ float getLuminosite(int gridX, int gridY, int rayonPx) {
     // --- 2. Lumière des LAMPES (Calcul en cases) ---
     for (int ly = 0; ly < MAP_HEIGHT; ly++) {
         for (int lx = 0; lx < MAP_WIDTH; lx++) {
-             if (maps[currentLevel][ly][lx] == 21 || (maps[currentLevel][ly][lx] >= 75 && maps[currentLevel][ly][lx] <= 76) || maps[currentLevel][ly][lx] == 85 || maps[currentLevel][ly][lx] == 86 ) { // Si c'est une lampe
+             if (maps[currentLevel][ly][lx] == 21 || (maps[currentLevel][ly][lx] >= 75 && maps[currentLevel][ly][lx] <= 76) || maps[currentLevel][ly][lx] >= 85 || maps[currentLevel][ly][lx] >= 86 ) { // Si c'est une lampe
                  float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
                  float rayonLampe = 2.5f; // Rayon d'une lampe (2.5 cases)
                  
@@ -1013,6 +1288,22 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     SDL_Rect destPlayer = { (int)player.x - 2, (int)player.y - 2, 16, 16 };
     SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);  
 
+    // Dessiner les éléments qui doivent passer DEVANT le joueur (panneau de basket, etc.)
+    if (tilesetTexture && currentLevel == 0) {
+        for (int y = 0; y < MAP_HEIGHT; y++) {
+            for (int x = 0; x < MAP_WIDTH; x++) {
+                int type_maps = maps[currentLevel][y][x];
+                // Panneau de basket (78, 79) - doit être dessiné par-dessus le joueur
+                if (type_maps == 78 || type_maps == 79) {
+                    float intensite = getLuminosite(x, y, rayon);
+                    if (intensite > 0.0f) {
+                        int lum = (int)(intensite * 255);
+                        DrawTuiles(x, y, type_maps, renderer, lum);
+                    }
+                }
+            }
+        }
+    }
 
     int caseX = (int)(fantome.x / TILE_SIZE);
     int caseY = (int)(fantome.y / TILE_SIZE);
@@ -1048,6 +1339,41 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Entrer", cBlanc);
         
         if (sText) DrawInteractions(renderer, sText);
+    }
+    if (showInteractPromptLit == 1)            
+    {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] Dormir", cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (showInteractPromptChaise == 1)            
+    {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] S'asseoir", cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
+    }
+
+
+    // Effet de sommeil (petit "Zzz" près du joueur)
+    if (isSleeping) {
+        // Fond semi-transparent noir léger
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 100);
+        SDL_Rect overlay = {0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT};
+        SDL_RenderFillRect(renderer, &overlay);
+
+        // Afficher "Zzz" en petit près du joueur
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sZzz = TTF_RenderText_Solid(fontMini, "Zzz...", cBlanc);
+        if (sZzz) {
+            SDL_Texture *tZzz = SDL_CreateTextureFromSurface(renderer, sZzz);
+            SDL_Rect rZzz = { (int)player.x + 10, (int)player.y - 10, sZzz->w, sZzz->h };
+            SDL_RenderCopy(renderer, tZzz, NULL, &rZzz);
+            SDL_FreeSurface(sZzz);
+            SDL_DestroyTexture(tZzz);
+        }
     }
 }
 
