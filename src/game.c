@@ -325,12 +325,16 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
 int dialogueStep = 0; 
 int dialogueStep_sortie1 = 0;
 int dialogue_hasDoudou = 0;
+int dialogue_statue_haut = 0;
+int dialogue_statue_bas = 0;
 int toucheRelache = 0;
 int hasDoudou = 0;
 int showInteractPrompt = 0;
 int showInteractPrompt2 = 0;
 int showInteractPrompt3 = 0;
 int showInteractPromptTente = 0;
+int show_interact_prompt_statue_haut = 0;
+int show_interact_prompt_statue_bas = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
     
 int showInteractPromptObjetTableau = 0;
@@ -615,6 +619,38 @@ void UpdateGame(void) {
         }
         return;
     }
+    if (dialogue_statue_haut> 0) {
+        if (state[SDL_SCANCODE_RETURN]) {
+            if (toucheRelache) {
+                dialogue_statue_haut ++; // On ferme le dialogue
+                if (dialogue_statue_haut > 2)
+                {
+                    dialogue_statue_haut = 0;
+                }
+                
+                toucheRelache = 0;
+            }
+        } else {
+            toucheRelache = 1;
+        }
+        return;
+    }
+    if (dialogue_statue_bas > 0) {
+        if (state[SDL_SCANCODE_RETURN]) {
+            if (toucheRelache) {
+                dialogue_statue_bas ++; // On ferme le dialogue
+                if (dialogue_statue_bas > 2)
+                {
+                    dialogue_statue_bas = 0;
+                }
+                
+                toucheRelache = 0;
+            }
+        } else {
+            toucheRelache = 1;
+        }
+        return;
+    }
     if (dialogue_hasDoudou > 0) {
         if (state[SDL_SCANCODE_RETURN]) {
             if (toucheRelache) {
@@ -714,6 +750,23 @@ void UpdateGame(void) {
     if(IsLocationObjet(24, 0, 55, &distance_tente, -1, -1)){
         showInteractPromptTente = 1;
     }
+    show_interact_prompt_statue_haut = 0;
+    show_interact_prompt_statue_bas = 0;
+    // --- GESTION PROMPT STATUES (NIVEAU 2) ---
+    float distStatueHaut = 9999.0f;
+    float distStatueBas = 9999.0f;
+
+    if (IsLocationObjet(24, 2, 84, &distStatueHaut, 17, 6))
+    {
+        show_interact_prompt_statue_haut = 1;
+    }
+    if (IsLocationObjet(24, 2, 84, &distStatueBas, 17, 10))
+    {
+        show_interact_prompt_statue_bas = 1;
+    }
+    
+
+    
 
     // --- Calcul pour les pièces du tableau dans le labyrinthe ---
     showInteractPromptObjetTableau=0;
@@ -800,6 +853,16 @@ void UpdateGame(void) {
                     maps[0][1][16] = 14; 
                     maps[0][1][17] = 15; 
                 }
+            }
+
+            if (currentLevel == 2 && distStatueHaut < 24) {
+                 dialogue_statue_haut = 1;
+                 toucheE_Relache = 0;
+            }
+
+            if (currentLevel == 2 && distStatueBas < 24) {
+                 dialogue_statue_bas = 1;
+                 toucheE_Relache = 0;
             }
 
             else if(distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55){
@@ -1288,6 +1351,22 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         if (dialogue_hasDoudou == 3) texteAffiche = "De la lumiere !";
         DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
     }
+    if (dialogue_statue_haut > 0) {
+        show_interact_prompt_statue_haut = 0;
+        char *texteAffiche = "";
+        if (dialogue_statue_haut == 1) texteAffiche = "Cette statue tient une coupe vide,";
+        if (dialogue_statue_haut == 2) texteAffiche = "elle doit avoir soif...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_statue_bas > 0) {
+        show_interact_prompt_statue_bas = 0;
+        char *texteAffiche = "";
+        if (dialogue_statue_bas == 1) texteAffiche = "Son visage est tordu par la haine.";
+        if (dialogue_statue_bas == 2) texteAffiche = "Un sourir ne ferait pas de mal...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
 
     
 
@@ -1312,7 +1391,7 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         if (sText) DrawInteractions(renderer, sText);
     }
 
-     if (showInteractPrompt2 == 1) {
+    if (showInteractPrompt2 == 1) {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[ENTER] Interagir", cBlanc);
         
@@ -1348,6 +1427,16 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, Prompt, cBlanc);
         
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (show_interact_prompt_statue_haut == 1) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Interagir", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (show_interact_prompt_statue_bas == 1) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Interagir", cBlanc);
         if (sText) DrawInteractions(renderer, sText);
     }
 }
