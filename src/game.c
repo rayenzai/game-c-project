@@ -336,8 +336,10 @@ int showInteractPrompt3 = 0;
 int showInteractPromptTente = 0;
 int show_interact_prompt_statue_haut = 0;
 int show_interact_prompt_statue_bas = 0;
-int has_water = 0;
-int has_drawing = 0;
+int has_water = 1;
+int has_drawing = 1;
+int statue_has_water = 0;
+int statue_has_drawing = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
     
 int showInteractPromptObjetTableau = 0;
@@ -431,7 +433,6 @@ int isWall(float x, float y) {
                 downIs82 = 1;
             }
         }
-
         if (upIs82 && downIs82) {
             
             // On regarde si les pieds sont physiquement plus bas que le mur
@@ -875,10 +876,21 @@ void UpdateGame(void) {
                  dialogue_statue_haut = 1;
                  toucheE_Relache = 0;
             }
+            else if (currentLevel == 2 && distStatueHaut < 24 && has_water == 1)
+            {
+                maps[2][5][17] = 86;
+                statue_has_water = 1;
+            }
+            
 
             if (currentLevel == 2 && distStatueBas < 24 && has_drawing == 0) {
                  dialogue_statue_bas = 1;
                  toucheE_Relache = 0;
+            }
+            else if (currentLevel == 2 && distStatueBas < 24 && has_drawing == 1)
+            {
+                maps[2][9][17] = 86;
+                statue_has_drawing = 1;
             }
 
             else if(distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55){
@@ -1033,12 +1045,12 @@ void UpdateGame(void) {
 
 
     // 1. Entrée dans le labyrinthe (Niveau 2 -> 5)
-    if(IsLocationRight(6, 10, 2, 20) && has_drawing == 1 && has_water == 1){
+    if(IsLocationRight(6, 10, 2, 20) && (statue_has_drawing == 1 && statue_has_water == 1)){
         currentLevel = 5;
         player.x = 5;
         SpawnFantomeRandom(); // <--- NOUVEAU
     }
-    if(IsLocationRight(6, 10, 2, 20) && (has_drawing == 0 || has_water == 0)){
+    if(IsLocationRight(6, 10, 2, 20) && (statue_has_drawing == 0 || statue_has_water == 0)){
 
         dialogue_entree_labyrinthe = 1;
 
@@ -1462,7 +1474,7 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Interagir", cBlanc);
         if (sText) DrawInteractions(renderer, sText);
     }
-    if (show_interact_prompt_statue_haut == 1 && has_water == 1){
+    if (show_interact_prompt_statue_haut == 1 && has_water == 1 && statue_has_water == 0){
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Donner", cBlanc);
         if (sText) DrawInteractions(renderer, sText);
@@ -1472,7 +1484,7 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Interagir", cBlanc);
         if (sText) DrawInteractions(renderer, sText);
     }
-    if (show_interact_prompt_statue_bas == 1 && has_drawing == 1) {
+    if (show_interact_prompt_statue_bas == 1 && has_drawing == 1 && statue_has_drawing == 0) {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Donner", cBlanc);
         if (sText) DrawInteractions(renderer, sText);
