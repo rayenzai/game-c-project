@@ -357,17 +357,18 @@ float savedPlayerX = 0;       // Position sauvegardée du joueur
 float savedPlayerY = 0;
 static int toucheX_Relache = 1;
 
-// --- VARIABLES POUR LE PANNEAU DE BASKET ---
-int showInteractPromptBasket = 0; // Affiche "[X] Lancer le ballon"
-int basketAnimTimer = 0;          // Timer pour animation du filet
-float basketNetSwing = 0;         // Angle de balancement du filet
-int ballInAir = 0;                // 1 = le ballon est en l'air
-float ballX = 0, ballY = 0;       // Position du ballon
-float ballVelX = 0, ballVelY = 0; // Vélocité du ballon
-int ballAnimFrame = 0;            // Frame d'animation du ballon
-int ballScoredBasket = 0;         // 1 = le ballon a marqué un panier
-
-
+// --- VARIABLES POUR LE DUNK ---
+int isDunking = 0;             // 1 = le joueur est en train de dunker
+int dunkState = 0;             // État du dunk : 0=repos, 1=saut, 2=accroché, 3=dunk, 4=descente, 5=retour
+int dunkTimer = 0;             // Timer pour l'animation
+float dunkPlayerX = 0;         // Position X du joueur pendant le dunk
+float dunkPlayerY = 0;         // Position Y du joueur pendant le dunk
+float dunkBallX = 0;           // Position X du ballon pendant le dunk
+float dunkBallY = 0;           // Position Y du ballon pendant le dunk
+int showDunkPrompt = 0;        // Afficher le prompt pour dunker
+float dunkBallVelY = 0;
+int dunkBallBounced = 0;
+int ballFallen = 0;
 
 int TuilesNotSpecial[] = {0, 1, 2};
 int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
@@ -938,15 +939,13 @@ void UpdateGame(void) {
     if (IsLocationObjet(24, 0, 51, &distance_bureau) && !isSitting && !isSleeping) {
         showInteractPromptBureau = 1;
     }
-    
-    // --- DÉTECTION PROXIMITÉ PANNEAU BASKET (tuile 79 = ballon) ---
-    float distance_basket;
-    showInteractPromptBasket = 0;
-    if (IsLocationObjet(28, 0, 79, &distance_basket) && !isSitting && !isSleeping && !ballInAir) {
-        showInteractPromptBasket = 1;
-    }
-    
 
+    // --- DÉTECTION PROXIMITÉ POUR LE DUNK (ballon tuile 79) ---
+    float distance_ballon;
+    showDunkPrompt = 0;
+    if (IsLocationObjet(28, 0, 79, &distance_ballon) && !isSitting && !isSleeping && !isDunking) {
+        showDunkPrompt = 1;
+    }
 
     // --- Calcul pour les pièces du tableau dans le labyrinthe ---
     showInteractPromptObjetTableau=0;
@@ -1040,38 +1039,25 @@ void UpdateGame(void) {
                 player.x = savedPlayerX;
                 player.y = savedPlayerY;
             }
-            // --- LANCER LE BALLON AU PANIER ---
-            else if (showInteractPromptBasket && !ballInAir && currentLevel == 0) {
-                // Le ballon décolle !
-                ballInAir = 1;
-                maps[0][12][2] = 1; // Retirer le ballon du sol
+            // --- DÉMARRER LE DUNK ---
+            else if (showDunkPrompt && !isDunking && currentLevel == 0 && !ballFallen) {
+                // Sauvegarder la position de départ
+                savedPlayerX = player.x;
+                savedPlayerY = player.y;
                 
-                // Position de départ : position du ballon sur le sol
-                ballX = 2 * TILE_SIZE + 8;  // Centre du ballon au sol
-                ballY = 12 * TILE_SIZE + 8;
+                // Initialiser le dunk
+                isDunking = 1;
+                dunkState = 1; // État : saut
+                dunkTimer = 0;
                 
-                // Position EXACTE du centre du panier (anneau)
-                // Panneau à (1, 11), l'anneau est légèrement en bas du panneau
-                float targetX = 1 * TILE_SIZE + 8;   // Centre horizontal du panneau
-                float targetY = 11 * TILE_SIZE + 12; // Un peu en bas du panneau (l'anneau)
+                // Position initiale du joueur et du ballon
+                dunkPlayerX = player.x;
+                dunkPlayerY = player.y;
+                dunkBallX = 2 * TILE_SIZE + 8;  // Position du ballon au sol
+                dunkBallY = 12 * TILE_SIZE + 8;
                 
-                // Calculer la trajectoire parabolique parfaite
-                float dx = targetX - ballX;
-                float dy = targetY - ballY;
-                
-                // Temps de vol estimé (ajusté pour que le ballon arrive pile)
-                float flightTime = 35.0f;
-                
-                // Vélocité horizontale
-                ballVelX = dx / flightTime;
-                
-                // Vélocité verticale avec compensation de la gravité (0.3f)
-                // Pour atteindre targetY, on calcule: vy = (dy + 0.5 * g * t^2) / t
-                float gravity = 0.3f;
-                ballVelY = (dy - 0.5f * gravity * flightTime * flightTime) / flightTime;
-                
-                ballAnimFrame = 0;
-                ballScoredBasket = 0;
+                // Retirer le ballon de la carte
+                maps[0][12][2] = 1;
             }
             toucheX_Relache = 0;
         }
@@ -1079,8 +1065,8 @@ void UpdateGame(void) {
         toucheX_Relache = 1;
     }
     
-    // --- BLOQUER LE MOUVEMENT SI ON DORT OU ON EST ASSIS ---
-    if (isSleeping || isSitting) {
+    // --- BLOQUER LE MOUVEMENT SI ON DORT, ON EST ASSIS OU EN TRAIN DE DUNKER ---
+    if (isSleeping || isSitting || isDunking) {
         // Animation de respiration pour le sommeil
         if (isSleeping) {
             sleepAnimTimer++;
@@ -1096,6 +1082,111 @@ void UpdateGame(void) {
             // Reset pour éviter overflow
             if (sitIdleTimer > 1000) sitIdleTimer = 0;
         }
+        
+        // --- ANIMATION DU DUNK ---
+        if (isDunking) {
+            dunkTimer++;
+            
+            // Position du panier (cercle)
+            float basketX = 1 * TILE_SIZE + 8;
+            float basketY = 11 * TILE_SIZE + 10;
+            float solY = 12 * TILE_SIZE + 8;
+            
+            if (dunkState == 1) {
+                float progress = dunkTimer / 30.0f;
+                if (progress > 1.0f) progress = 1.0f;
+                
+                dunkPlayerX = savedPlayerX + (basketX - savedPlayerX) * progress;
+                dunkPlayerY = savedPlayerY + (basketY - 20 - savedPlayerY) * progress;
+                
+                dunkBallX = dunkPlayerX;
+                dunkBallY = dunkPlayerY + 10;
+                
+                if (dunkTimer >= 30) {
+                    dunkState = 2;
+                    dunkTimer = 0;
+                }
+            }
+            else if (dunkState == 2) {
+                dunkPlayerX = basketX;
+                dunkPlayerY = basketY - 15;
+                
+                dunkBallX = dunkPlayerX;
+                dunkBallY = dunkPlayerY + 8;
+                
+                if (dunkTimer >= 20) {
+                    dunkState = 3;
+                    dunkTimer = 0;
+                }
+            }
+            else if (dunkState == 3) {
+                dunkPlayerX = basketX;
+                dunkPlayerY = basketY - 15;
+                
+                float ballProgress = dunkTimer / 15.0f;
+                if (ballProgress > 1.0f) ballProgress = 1.0f;
+                
+                dunkBallX = basketX;
+                dunkBallY = (basketY - 10) + (solY - (basketY - 10)) * ballProgress;
+                
+                if (dunkTimer >= 15) {
+                    dunkState = 4;
+                    dunkTimer = 0;
+                    dunkBallVelY = -3.0f;
+                    dunkBallBounced = 0;
+                }
+            }
+            else if (dunkState == 4) {
+                float progress = dunkTimer / 35.0f;
+                if (progress > 1.0f) progress = 1.0f;
+                
+                dunkPlayerX = basketX;
+                dunkPlayerY = (basketY - 15) + (savedPlayerY - (basketY - 15)) * progress;
+                
+                if (!dunkBallBounced) {
+                    dunkBallVelY += 0.4f;
+                    dunkBallY += dunkBallVelY;
+                    
+                    if (dunkBallY >= solY) {
+                        dunkBallY = solY;
+                        dunkBallVelY = -2.0f;
+                        dunkBallBounced = 1;
+                    }
+                } else {
+                    dunkBallVelY += 0.4f;
+                    dunkBallY += dunkBallVelY;
+                    if (dunkBallY >= solY) {
+                        dunkBallY = solY;
+                        dunkBallVelY = 0;
+                    }
+                }
+                
+                if (dunkTimer >= 35) {
+                    dunkState = 5;
+                    dunkTimer = 0;
+                }
+            }
+            else if (dunkState == 5) {
+                float progress = dunkTimer / 30.0f;
+                if (progress > 1.0f) progress = 1.0f;
+                
+                dunkPlayerX = basketX + (savedPlayerX - basketX) * progress;
+                dunkPlayerY = savedPlayerY;
+                
+                if (dunkTimer >= 30) {
+                    isDunking = 0;
+                    dunkState = 0;
+                    dunkTimer = 0;
+                    player.x = savedPlayerX;
+                    player.y = savedPlayerY;
+                    ballFallen = 1;
+                }
+            }
+            
+            player.x = dunkPlayerX;
+            player.y = dunkPlayerY;
+        }
+        
         return; // On bloque les mouvements et le reste de l'update
     }
     
@@ -1584,7 +1675,7 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
 
                 int type_maps = maps[currentLevel][y][x];
                 
-                // On skip le panneau de basket (78) pour le dessiner APRES le joueur
+                // Skip le panneau de basket (78) pour le dessiner APRES le joueur
                 // Cela crée un effet de profondeur : le joueur passe SOUS le panneau
                 if (type_maps == 78) {
                     continue; // On le dessinera plus tard
@@ -1745,8 +1836,8 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
     }  
 
-    // --- RENDU DES ÉLÉMENTS EN PREMIER PLAN (après le joueur) ---
-    // Panneau de basket : doit apparaître au-dessus du joueur pour l'effet de profondeur
+    // --- RENDU DU PANNEAU DE BASKET EN PREMIER PLAN (effet 3D) ---
+    // Le panneau est dessiné après le joueur pour créer un effet de profondeur
     if (tilesetTexture && currentLevel == 0) {
         // Position du panneau : colonne 1, ligne 11 (tuile 78)
         int panneauX = 1;
@@ -1755,143 +1846,23 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         float intensite = getLuminosite(panneauX, panneauY, rayon);
         if (intensite > 0.0f) {
             int lum = (int)(intensite * 255);
-            
-            // 1. Dessiner l'ombre du panneau au sol (effet réaliste)
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 80);
-            SDL_Rect shadowRect = {
-                panneauX * TILE_SIZE + 2,
-                (panneauY + 1) * TILE_SIZE - 2,
-                12, 4
-            };
-            SDL_RenderFillRect(renderer, &shadowRect);
-            
-            // 2. Dessiner le panneau de basket (78)
+            // Dessiner le panneau de basket (78)
             DrawTuiles(panneauX, panneauY, 78, renderer, lum);
-            
-            // 3. Effet de balancement du filet quand le joueur passe en dessous
-            float playerCenterX = player.x + player.w / 2;
-            float playerCenterY = player.y + player.h / 2;
-            float panneauCenterX = panneauX * TILE_SIZE + 8;
-            float panneauCenterY = panneauY * TILE_SIZE + 8;
-            
-            float distToPanneau = sqrtf(powf(playerCenterX - panneauCenterX, 2) + 
-                                        powf(playerCenterY - panneauCenterY, 2));
-            
-            // Si le joueur est proche du panneau, le filet bouge
-            if (distToPanneau < 24) {
-                basketNetSwing = sinf(basketAnimTimer * 0.3f) * 2.0f;
-                basketAnimTimer++;
-            } else {
-                // Le filet revient progressivement au repos
-                basketNetSwing *= 0.95f;
-                if (fabs(basketNetSwing) < 0.1f) {
-                    basketNetSwing = 0;
-                    basketAnimTimer = 0;
-                }
-            }
-            
-            // Dessiner les lignes du filet (effet visuel)
-            if (fabs(basketNetSwing) > 0.1f) {
-                SDL_SetRenderDrawColor(renderer, 200, 200, 200, 180);
-                int netX = panneauX * TILE_SIZE + 4;
-                int netY = panneauY * TILE_SIZE + 10;
-                SDL_RenderDrawLine(renderer, 
-                    netX, netY, 
-                    netX + 2 + (int)basketNetSwing, netY + 4);
-                SDL_RenderDrawLine(renderer, 
-                    netX + 4, netY, 
-                    netX + 6 + (int)basketNetSwing, netY + 4);
-            }
         }
     }
     
-    // --- ANIMATION DU BALLON EN L'AIR ---
-    if (ballInAir && currentLevel == 0) {
-        // Physique simple du ballon
-        ballVelY += 0.3f; // Gravité
-        
-        // Prédire la prochaine position
-        float nextBallX = ballX + ballVelX;
-        float nextBallY = ballY + ballVelY;
-        
-        // Vérifier collision avec les murs (colonne 0 = mur gauche, colonne 19 = mur droit)
-        int ballTileX = (int)(nextBallX / TILE_SIZE);
-        int ballTileY = (int)(nextBallY / TILE_SIZE);
-        
-        // Collision avec le mur gauche (colonne 0)
-        if (ballTileX <= 0) {
-            ballVelX = -ballVelX * 0.6f; // Rebond avec perte d'énergie
-            nextBallX = TILE_SIZE + 2; // Reposition
-        }
-        // Collision avec le mur droit (colonne 19)
-        if (ballTileX >= MAP_WIDTH - 1) {
-            ballVelX = -ballVelX * 0.6f; // Rebond avec perte d'énergie
-            nextBallX = (MAP_WIDTH - 2) * TILE_SIZE - 2; // Reposition
-        }
-        // Collision avec le mur du haut
-        if (ballTileY <= 0) {
-            ballVelY = -ballVelY * 0.6f;
-            nextBallY = TILE_SIZE + 2;
-        }
-        
-        // Vérifier collision avec les murs solides (tuile 2)
-        if (ballTileX >= 0 && ballTileX < MAP_WIDTH && ballTileY >= 0 && ballTileY < MAP_HEIGHT) {
-            int tileType = maps_patern[currentLevel][ballTileY][ballTileX];
-            if (tileType == 2) {
-                // Rebond sur mur
-                ballVelX = -ballVelX * 0.6f;
-                ballVelY = -ballVelY * 0.6f;
-            }
-        }
-        
-        ballX = nextBallX;
-        ballY = nextBallY;
-        
-        // Animation rotation du ballon
-        ballAnimFrame = (ballAnimFrame + 1) % 8;
-        
-        // Dessiner le ballon (tuile 79)
-        SDL_Rect srcBall = { 79 * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
-        SDL_Rect destBall = { (int)ballX - 6, (int)ballY - 6, 12, 12 };
-        SDL_RenderCopyEx(renderer, tilesetTexture, &srcBall, &destBall, 
-                         ballAnimFrame * 45.0, NULL, SDL_FLIP_NONE);
-        
-        // Le ballon entre dans le panier ! (détection précise)
-        // Position EXACTE de l'anneau du panier
-        float basketCenterX = 1 * TILE_SIZE + 8;   // Centre horizontal
-        float basketCenterY = 11 * TILE_SIZE + 12; // L'anneau est légèrement en bas du panneau
-        
-        // Zone de l'anneau (cercle du panier) - zone plus large pour détecter
-        float basketLeft = basketCenterX - 8;
-        float basketRight = basketCenterX + 8;
-        float basketTop = basketCenterY - 4;
-        float basketBottom = basketCenterY + 6;
-        
-        // Le ballon doit entrer dans la zone du panier en descendant
-        if (!ballScoredBasket && 
-            ballX > basketLeft && ballX < basketRight && 
-            ballY > basketTop && ballY < basketBottom && 
-            ballVelY > 0) {
-            // PANIER MARQUÉ ! 
-            basketNetSwing = 8.0f; // Le filet bouge fort
-            basketAnimTimer = 0;
-            ballScoredBasket = 1;
-            
-            // Le ballon passe à travers l'anneau - on le recentre légèrement
-            ballX = basketCenterX; // Centrer le ballon dans l'anneau
-            ballVelX = 0;          // Arrêter le mouvement horizontal
-            ballVelY = 2.0f;       // Descendre doucement
-        }
-        
-        // Le ballon touche le sol - SEULEMENT LÀ on le remet
-        if (ballY > (MAP_HEIGHT - 2) * TILE_SIZE) {
-            ballInAir = 0;
-            ballScoredBasket = 0; // Réinitialiser
-            // Remettre le ballon à sa position initiale (colonne 2, ligne 12)
-            maps[0][12][2] = 79;
+    if ((isDunking || ballFallen) && currentLevel == 0) {
+        float ballLum = getLuminosite((int)(dunkBallX / TILE_SIZE), (int)(dunkBallY / TILE_SIZE), rayon);
+        if (ballLum > 0.0f) {
+            int lumBall = (int)(ballLum * 255);
+            SDL_SetTextureColorMod(tilesetTexture, lumBall, lumBall, lumBall);
+            SDL_Rect srcBall = { 79 * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
+            SDL_Rect destBall = { (int)dunkBallX - 6, (int)dunkBallY - 6, 12, 12 };
+            SDL_RenderCopy(renderer, tilesetTexture, &srcBall, &destBall);
+            SDL_SetTextureColorMod(tilesetTexture, 255, 255, 255);
         }
     }
-    
+
     int caseX = (int)(fantome.x / TILE_SIZE);
     int caseY = (int)(fantome.y / TILE_SIZE);
 
@@ -1940,13 +1911,12 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         if (sText) DrawInteractions(renderer, sText);
     }
     
-    // Prompt pour le panier de basket
-    if (showInteractPromptBasket == 1 && !ballInAir) {
+    // Prompt pour dunker
+    if (showDunkPrompt == 1 && !isDunking) {
         SDL_Color cBlanc = {255, 255, 255, 255};
-        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] Lancer au panier", cBlanc);
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] Dunker", cBlanc);
         if (sText) DrawInteractions(renderer, sText);
     }
-    
 
     if(showInteractImpossibleObjet == 1){
         char *texteAffiche = "j'ai deja une piece";
