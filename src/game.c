@@ -326,19 +326,12 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
 int dialogueStep = 0; 
 int dialogueStep_sortie1 = 0;
 int dialogue_hasDoudou = 0;
-int dialogue_statue_haut = 0;
-int dialogue_statue_bas = 0;
-int dialogue_entree_labyrinthe = 0;
 int toucheRelache = 0;
 int hasDoudou = 0;
 int showInteractPrompt = 0;
 int showInteractPrompt2 = 0;
 int showInteractPrompt3 = 0;
 int showInteractPromptTente = 0;
-int show_interact_prompt_statue_haut = 0;
-int show_interact_prompt_statue_bas = 0;
-int has_water = 0;
-int has_drawing = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
     
 int showInteractPromptObjetTableau = 0;
@@ -353,7 +346,11 @@ int isSleeping = 0;           // 1 = le joueur dort sur le lit
 int isSitting = 0;            // 1 = le joueur est assis sur la chaise
 int sleepAnimFrame = 0;       // Frame d'animation pour le sommeil
 int sleepAnimTimer = 0;       // Timer pour animer le "Zzz"
+float sleepBreathOffset = 0;  // Offset pour l'effet de respiration
+float sitIdleOffset = 0;      // Offset pour mouvement subtil assis
 int sitIdleTimer = 0;         // Timer pour animation assis
+int transitionFrame = 0;      // Frame de transition (coucher/lever)
+int isInTransition = 0;       // 1 = en train de se coucher/lever
 int showInteractPromptLit = 0;    // Affiche "[X] Dormir"
 int showInteractPromptBureau = 0; // Affiche "[X] S'asseoir"
 float savedPlayerX = 0;       // Position sauvegardée du joueur
@@ -805,43 +802,10 @@ void UpdateGame(void) {
         }
         return;
     }
-    dialogueStep_sortie1 = 0;
     if (dialogueStep_sortie1 > 0) {
         if (state[SDL_SCANCODE_RETURN]) {
             if (toucheRelache) {
                 dialogueStep_sortie1 = 0; // On ferme le dialogue
-                toucheRelache = 0;
-            }
-        } else {
-            toucheRelache = 1;
-        }
-        return;
-    }
-    if (dialogue_statue_haut> 0) {
-        if (state[SDL_SCANCODE_RETURN]) {
-            if (toucheRelache) {
-                dialogue_statue_haut ++; // On ferme le dialogue
-                if (dialogue_statue_haut > 2)
-                {
-                    dialogue_statue_haut = 0;
-                }
-                
-                toucheRelache = 0;
-            }
-        } else {
-            toucheRelache = 1;
-        }
-        return;
-    }
-    if (dialogue_statue_bas > 0) {
-        if (state[SDL_SCANCODE_RETURN]) {
-            if (toucheRelache) {
-                dialogue_statue_bas ++; // On ferme le dialogue
-                if (dialogue_statue_bas > 2)
-                {
-                    dialogue_statue_bas = 0;
-                }
-                
                 toucheRelache = 0;
             }
         } else {
@@ -858,18 +822,6 @@ void UpdateGame(void) {
                     dialogue_hasDoudou = 0;
                 }
                 
-                toucheRelache = 0;
-            }
-        } else {
-            toucheRelache = 1;
-        }
-        return;
-    }
-    dialogue_entree_labyrinthe = 0;
-    if (dialogue_entree_labyrinthe > 0) {
-        if (state[SDL_SCANCODE_RETURN]) {
-            if (toucheRelache) {
-                dialogue_entree_labyrinthe = 0; // On ferme le dialogue
                 toucheRelache = 0;
             }
         } else {
@@ -943,55 +895,37 @@ void UpdateGame(void) {
     showInteractPrompt2 = 0;
     showInteractPrompt3 = 0;
 
-    if (IsLocationObjet(24, 0, 8, &distance, -1, -1)) {
+    if (IsLocationObjet(24, 0, 8, &distance)) {
         showInteractPrompt = 1;
     }
 
-    else if (IsLocationObjet(24, 0, 16, &distance, -1, -1)) {
+    else if (IsLocationObjet(24, 0, 16, &distance)) {
         showInteractPrompt2 = 1;
     }
 
-    else if (IsLocationObjet(24, 0, 12, &distance, -1, -1)) {
+    else if (IsLocationObjet(24, 0, 12, &distance)) {
         showInteractPrompt3 = 1;
     }
 
     float distance_tente;
     showInteractPromptTente = 0;
-    if(IsLocationObjet(24, 0, 55, &distance_tente, -1, -1)){
+    if(IsLocationObjet(24, 0, 55, &distance_tente)){
         showInteractPromptTente = 1;
     }
 
     // --- DÉTECTION PROXIMITÉ LIT (tuile 34 = bas du lit) ---
     float distance_lit;
     showInteractPromptLit = 0;
-    if (IsLocationObjet(28, 0, 34, &distance_lit, -1, -1) && !isSleeping && !isSitting) {
+    if (IsLocationObjet(28, 0, 34, &distance_lit) && !isSleeping && !isSitting) {
         showInteractPromptLit = 1;
     }
 
     // --- DÉTECTION PROXIMITÉ BUREAU/CHAISE (tuile 51 = chaise) ---
     float distance_bureau;
     showInteractPromptBureau = 0;
-    if (IsLocationObjet(24, 0, 51, &distance_bureau, -1, -1) && !isSitting && !isSleeping) {
+    if (IsLocationObjet(24, 0, 51, &distance_bureau) && !isSitting && !isSleeping) {
         showInteractPromptBureau = 1;
     }
-
-    show_interact_prompt_statue_haut = 0;
-    show_interact_prompt_statue_bas = 0;
-    // --- GESTION PROMPT STATUES (NIVEAU 2) ---
-    float distStatueHaut = 9999.0f;
-    float distStatueBas = 9999.0f;
-
-    if (IsLocationObjet(24, 2, 84, &distStatueHaut, 17, 6))
-    {
-        show_interact_prompt_statue_haut = 1;
-    }
-    if (IsLocationObjet(24, 2, 84, &distStatueBas, 17, 10))
-    {
-        show_interact_prompt_statue_bas = 1;
-    }
-    
-
-    
 
     // --- Calcul pour les pièces du tableau dans le labyrinthe ---
     showInteractPromptObjetTableau=0;
@@ -1002,7 +936,7 @@ void UpdateGame(void) {
     TrouveCoordonnees(&morceauTableau1x, &morceauTableau1y, 117, 5);
 
     float distance_morceauTableau1;
-    if(IsLocationObjet(16, 5, 117, &distance_morceauTableau1, -1, -1)) showInteractPromptObjetTableau = 1;
+    if(IsLocationObjet(16, 5, 117, &distance_morceauTableau1)) showInteractPromptObjetTableau = 1;
 
     // Calcul distance entre joueur et deuxième pièce du tableau (118)
     int morceauTableau2x;
@@ -1010,7 +944,7 @@ void UpdateGame(void) {
     TrouveCoordonnees(&morceauTableau2x, &morceauTableau2y, 118, 6);
 
     float distance_morceauTableau2;
-    if(IsLocationObjet(16, 6, 118, &distance_morceauTableau2, -1, -1)) showInteractPromptObjetTableau = 1;
+    if(IsLocationObjet(16, 6, 118, &distance_morceauTableau2)) showInteractPromptObjetTableau = 1;
 
     // Calcul distance entre joueur et troisième pièce du tableau (115)
     int morceauTableau3x;
@@ -1018,7 +952,7 @@ void UpdateGame(void) {
     TrouveCoordonnees(&morceauTableau3x, &morceauTableau3y, 115, 7);
 
     float distance_morceauTableau3;
-    if(IsLocationObjet(16, 7, 115, &distance_morceauTableau3, -1, -1)) showInteractPromptObjetTableau = 1;
+    if(IsLocationObjet(16, 7, 115, &distance_morceauTableau3)) showInteractPromptObjetTableau = 1;
 
     // Calcul distance entre joueur et quatrième pièce du tableau (116)
     int morceauTableau4x;
@@ -1026,7 +960,7 @@ void UpdateGame(void) {
     TrouveCoordonnees(&morceauTableau4x, &morceauTableau4y, 116, 8);
 
     float distance_morceauTableau4;
-    if(IsLocationObjet(16, 8, 116, &distance_morceauTableau4, -1, -1)) showInteractPromptObjetTableau = 1;
+    if(IsLocationObjet(16, 8, 116, &distance_morceauTableau4)) showInteractPromptObjetTableau = 1;
 
     // Ouverture de la salle du niveau 3
     if(cpt_piece_tableau == 4){
@@ -1037,7 +971,7 @@ void UpdateGame(void) {
 
     showInteractTableau=0;
     float distance_Tableau;
-    if( (IsLocationObjet(24, 2, 113, &distance_Tableau, -1, -1) || IsLocationObjet(24, 2, 109, &distance_Tableau, -1, -1) ) && cpt_piece_tableau != 4){
+    if( (IsLocationObjet(24, 2, 113, &distance_Tableau) || IsLocationObjet(24, 2, 109, &distance_Tableau) ) && cpt_piece_tableau != 4){
         showInteractTableau = 1;
     }
 
@@ -1058,6 +992,7 @@ void UpdateGame(void) {
                 isSleeping = 1;
                 sleepAnimFrame = 0;
                 sleepAnimTimer = 0;
+                sleepBreathOffset = 0;
                 // Positionner le joueur précisément sur le lit (centré entre colonnes 3-4, lignes 2-3)
                 player.x = 3.5f * TILE_SIZE;
                 player.y = 2.2f * TILE_SIZE;
@@ -1099,6 +1034,7 @@ void UpdateGame(void) {
             if (sleepAnimTimer % 45 == 0) {
                 sleepAnimFrame = (sleepAnimFrame + 1) % 3;
             }
+            // L'effet de respiration est calculé directement dans DrawGame avec sleepAnimTimer
         }
         // Animation subtile pour l'état assis
         if (isSitting) {
@@ -1109,7 +1045,7 @@ void UpdateGame(void) {
         
         return; // On bloque les mouvements et le reste de l'update
     }
-
+    
     if (state[SDL_SCANCODE_E]) {
         if (toucheE_Relache) {
             // Si le joueur est à moins de 16 pixel (une tuile)
@@ -1141,16 +1077,6 @@ void UpdateGame(void) {
                     maps[0][1][16] = 14; 
                     maps[0][1][17] = 15; 
                 }
-            }
-
-            if (currentLevel == 2 && distStatueHaut < 24 && has_water == 0) {
-                 dialogue_statue_haut = 1;
-                 toucheE_Relache = 0;
-            }
-
-            if (currentLevel == 2 && distStatueBas < 24 && has_drawing == 0) {
-                 dialogue_statue_bas = 1;
-                 toucheE_Relache = 0;
             }
 
             else if(distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55){
@@ -1251,14 +1177,13 @@ void UpdateGame(void) {
         if (hasDoudou == 1) {
             currentLevel = 1; 
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
+            
+
         }
         else{
-            player.y = 5;
+            player.y = 10;
+            dialogueStep_sortie1 = 1;
         }
-    }
-    if (IsLocationUp(8, 13, 0, 10) && hasDoudou == 0){
-        dialogueStep_sortie1 = 1;
-
     }
 
     // 2. Quitter le COULOIR (Niveau 1) par le BAS
@@ -1305,15 +1230,10 @@ void UpdateGame(void) {
 
 
     // 1. Entrée dans le labyrinthe (Niveau 2 -> 5)
-    if(IsLocationRight(6, 10, 2, 20) && has_drawing == 1 && has_water == 1){
+    if(IsLocationRight(6, 10, 2, 20)){
         currentLevel = 5;
         player.x = 5;
         SpawnFantomeRandom(); // <--- NOUVEAU
-    }
-    if(IsLocationRight(6, 10, 2, 20) && (has_drawing == 0 || has_water == 0)){
-
-        dialogue_entree_labyrinthe = 1;
-
     }
 
     // 2. Retour couloir (5 -> 2)
@@ -1415,10 +1335,9 @@ void UpdateGame(void) {
     // printf("lvl: %d \n", currentLevel);
 }
 
-int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance, int x, int y){
-    if(x == -1 || y == -1){
-        TrouveCoordonnees(&x, &y, indexTuile, CurrLvl);
-    }
+int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance){
+    int x = -1, y = -1;
+    TrouveCoordonnees(&x, &y, indexTuile, CurrLvl);
 
     if (x == -1 || y == -1) {
         *distance = 9999.0f; 
@@ -1509,7 +1428,7 @@ float getLuminosite(int gridX, int gridY, int rayonPx) {
     // --- 2. Lumière des LAMPES (Calcul en cases) ---
     for (int ly = 0; ly < MAP_HEIGHT; ly++) {
         for (int lx = 0; lx < MAP_WIDTH; lx++) {
-             if (maps[currentLevel][ly][lx] == 21 || (maps[currentLevel][ly][lx] >= 75 && maps[currentLevel][ly][lx] <= 76) || maps[currentLevel][ly][lx] == 85 || maps[currentLevel][ly][lx] == 86 || maps[currentLevel][ly][lx] == 148) { // Si c'est une lampe
+             if (maps[currentLevel][ly][lx] == 21 || (maps[currentLevel][ly][lx] >= 75 && maps[currentLevel][ly][lx] <= 76) || maps[currentLevel][ly][lx] == 85 || maps[currentLevel][ly][lx] == 86 ) { // Si c'est une lampe
                  float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
                  float rayonLampe = 2.5f; // Rayon d'une lampe (2.5 cases)
                  
@@ -1662,28 +1581,6 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         if (dialogue_hasDoudou == 3) texteAffiche = "De la lumiere !";
         DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
     }
-    if (dialogue_statue_haut > 0) {
-        show_interact_prompt_statue_haut = 0;
-        char *texteAffiche = "";
-        if (dialogue_statue_haut == 1) texteAffiche = "Cette statue tient une coupe vide,";
-        if (dialogue_statue_haut == 2) texteAffiche = "elle doit avoir soif...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_statue_bas > 0) {
-        show_interact_prompt_statue_bas = 0;
-        char *texteAffiche = "";
-        if (dialogue_statue_bas == 1) texteAffiche = "Son visage est tordu par la haine.";
-        if (dialogue_statue_bas == 2) texteAffiche = "Un sourir ne ferait pas de mal...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_entree_labyrinthe > 0) {
-        char *texteAffiche = "";
-        if (dialogue_entree_labyrinthe == 1) texteAffiche = "Les statues bloquent le passage...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
 
     
 
@@ -1793,7 +1690,7 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         SDL_Rect srcPlayer = { 112, 0, 16, 16 };
         SDL_Rect destPlayer = { (int)player.x - 2, (int)player.y - 2, 16, 16 };
         SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
-    }
+    }  
 
     // --- RENDU DU PANNEAU DE BASKET EN PREMIER PLAN (effet 3D) ---
     // Le panneau est dessiné après le joueur pour créer un effet de profondeur
@@ -1826,7 +1723,7 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         if (sText) DrawInteractions(renderer, sText);
     }
 
-    if (showInteractPrompt2 == 1) {
+     if (showInteractPrompt2 == 1) {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[ENTER] Interagir", cBlanc);
         
@@ -1845,6 +1742,19 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         
         if (sText) DrawInteractions(renderer, sText);
     }
+    
+    // --- AFFICHAGE DES PROMPTS POUR LIT ET BUREAU ---
+    if (showInteractPromptLit == 1 && !isSleeping && !isSitting) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] Dormir", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (showInteractPromptBureau == 1 && !isSitting && !isSleeping) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] S'asseoir", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+
     if(showInteractImpossibleObjet == 1){
         char *texteAffiche = "j'ai deja une piece";
         DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
@@ -1864,39 +1774,6 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         
         if (sText) DrawInteractions(renderer, sText);
     }
-    if (show_interact_prompt_statue_haut == 1 && has_water == 0) {
-        SDL_Color cBlanc = {255, 255, 255, 255};
-        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Interagir", cBlanc);
-        if (sText) DrawInteractions(renderer, sText);
-    }
-    if (show_interact_prompt_statue_haut == 1 && has_water == 1){
-        SDL_Color cBlanc = {255, 255, 255, 255};
-        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Donner", cBlanc);
-        if (sText) DrawInteractions(renderer, sText);
-    }
-    if (show_interact_prompt_statue_bas == 1 && has_drawing == 0) {
-        SDL_Color cBlanc = {255, 255, 255, 255};
-        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Interagir", cBlanc);
-        if (sText) DrawInteractions(renderer, sText);
-    }
-    if (show_interact_prompt_statue_bas == 1 && has_drawing == 1) {
-        SDL_Color cBlanc = {255, 255, 255, 255};
-        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Donner", cBlanc);
-        if (sText) DrawInteractions(renderer, sText);
-    }
-    
-    // --- AFFICHAGE DES PROMPTS POUR LIT ET BUREAU ---
-    if (showInteractPromptLit == 1 && !isSleeping && !isSitting) {
-        SDL_Color cBlanc = {255, 255, 255, 255};
-        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] Dormir", cBlanc);
-        if (sText) DrawInteractions(renderer, sText);
-    }
-    if (showInteractPromptBureau == 1 && !isSitting && !isSleeping) {
-        SDL_Color cBlanc = {255, 255, 255, 255};
-        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] S'asseoir", cBlanc);
-        if (sText) DrawInteractions(renderer, sText);
-    }
-    
 }
 
 void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText){
