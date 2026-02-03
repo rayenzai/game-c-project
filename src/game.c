@@ -96,6 +96,7 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 149 = cookie 
 150 = mur tente 
 151,152 = leds rouge
+174 = dessin theo
 ........................
 62 = monstre vu de gauche
 63 = monstre de face
@@ -106,11 +107,14 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 65, 66 = haut tapis 
 67, 68 = tapis 
 69, 70 = bas mur 
-71 72 = table
+71 72 = table avec broc d'eau 
+71, 172 = table avec broc sans eau
+71, 173 = table sans broc
 73 = vase
 74, 75 = lampe murale gauche
 76, 77 = lampe murale droite
 ...........................
+-haul d'entrée-
 84(bas), 85(tete rouge) = statue mur gauche 
 86 = tete statue yeux verts 
 107, 108 = bas tableau 
@@ -131,6 +135,14 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 145,146 = fleur du pot de fleurs
 153(bas),154 = fenetre 
 ...........................
+-cuisine-
+155 = sol
+156(g),157(d) = bas bouche
+158(g),159(d) = haut bouche 
+160-166 = grande table 
+167,168 = lavabo 
+169,170 = plaque cuisson 
+171 = bloc seul
 
 */
 
@@ -166,7 +178,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 2, 2, 2, 2, 2, 74, 75, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2,  2, 72, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2,  2,172, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2, 71, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68, 76, 77,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2, 74, 75, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
@@ -194,21 +206,21 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
     },  
     // CARTE 4 (Niveau 3) index 3
     {       
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 8, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2}, // Bas fermé
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+        {2, 2, 2,  2,  2,   2,  2,  2,  0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
+        {2, 2, 2,  2,  2,   2,  2,  2,  0, 0, 0, 0, 2, 2, 2, 2, 2, 8, 2, 2},
+        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},  
+        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {2, 2, 0,  0,  0,   0,166,165,163, 0, 0, 0,158,159, 0, 0, 0, 0, 0, 0},
+        {2, 2, 0,  0,  0,   0,166,164,162, 0, 0, 0,156,157, 0, 0, 0, 0, 0, 0},
+        {2, 2, 0,  0,  0,   0,163,166,161, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2}, // Bas fermé
+        {2, 2, 0,171,169, 170,167,168,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 2,  2,  2,   2,  2,  2,  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
     },
     // CARTE 5 (Niveau 4 - dernière du bloc précédent) index 4
     {    
@@ -313,7 +325,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {50, 50, 50, 50, 50,150, 44,   0,   1,   0,  1,   0, 147, 150, 50, 50, 50, 50, 50, 50},
         {50, 50, 50, 50, 50,  0,  1,   0,   1,   0,  1,   0,   1, 150, 50, 50, 50, 50, 50, 50}, 
         {50, 50, 50, 50, 50,  0,  1,   0, 148,  59, 60,   0,   1, 150, 50, 50, 50, 50, 50, 50}, 
-        {50, 50, 50, 50, 50,  0,  1,   0,   1,   0,149,  45,   1, 150, 50, 50, 50, 50, 50, 50}, 
+        {50, 50, 50, 50, 50,  0,  1,   0,   1,   0,149,  45, 174, 150, 50, 50, 50, 50, 50, 50}, 
         {50, 50, 50, 50, 50,150, 58,   0,   1,   0,  1,  40,   1, 150, 50, 50, 50, 50, 50, 50},
         {50, 50, 50, 50, 50,150,  1,   0,   1,   0,  1,   0,   1, 150, 50, 50, 50, 50, 50, 50},
         {50, 50, 50, 50, 50,150,150, 150, 150, 150,150, 150, 150, 150, 50, 50, 50, 50, 50, 50}, // Fin Rectangle
@@ -326,14 +338,33 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
 int dialogueStep = 0; 
 int dialogueStep_sortie1 = 0;
 int dialogue_hasDoudou = 0;
+int dialogue_statue_haut = 0;
+int dialogue_statue_bas = 0;
+int dialogue_entree_labyrinthe = 0;
+int dialogue_max_objet = 0;
 int toucheRelache = 0;
 int hasDoudou = 0;
 int showInteractPrompt = 0;
 int showInteractPrompt2 = 0;
 int showInteractPrompt3 = 0;
 int showInteractPromptTente = 0;
+int show_interact_prompt_statue_haut = 0;
+int show_interact_prompt_statue_bas = 0;
+int show_interact_prompt_eau = 0;
+int show_interact_prompt_dessin = 0;
+int interact_statue_haut = 0;
+int interact_statue_bas = 0;
+int has_water = 0;
+int has_drawing = 0;
+int statue_has_water = 0;
+int statue_has_drawing = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
     
+int carafeX = -1;
+int carafeY = -1;
+int dessinX = -1;
+int dessinY = -1;
+
 int showInteractPromptObjetTableau = 0;
 int showInteractTableau = 0;
 int showInteractImpossibleObjet = 0;
@@ -347,8 +378,6 @@ int isSitting = 0;            // 1 = le joueur est assis sur la chaise
 int sleepAnimFrame = 0;       // Frame d'animation pour le sommeil
 int sleepAnimTimer = 0;       // Timer pour animer le "Zzz"
 float sleepBreathOffset = 0;  // Offset pour l'effet de respiration
-float sitIdleOffset = 0;      // Offset pour mouvement subtil assis
-int sitIdleTimer = 0;         // Timer pour animation assis
 int transitionFrame = 0;      // Frame de transition (coucher/lever)
 int isInTransition = 0;       // 1 = en train de se coucher/lever
 int showInteractPromptLit = 0;    // Affiche "[X] Dormir"
@@ -357,11 +386,10 @@ float savedPlayerX = 0;       // Position sauvegardée du joueur
 float savedPlayerY = 0;
 static int toucheX_Relache = 1;
 
-// --- VARIABLES POUR LES STATUES ---
-int show_interact_prompt_statue_haut = 0;
-int show_interact_prompt_statue_bas = 0;
-int has_water = 0;
-int has_drawing = 0;
+// --- VARIABLES POUR L'ANIMATION DU FILET DE BASKET ---
+int basketNetAnimTimer = 0;   // Timer pour l'animation du filet
+float basketNetSwing = 0.0f;  // Oscillation du filet
+int playerNearBasket = 0;     // Le joueur est proche du panier
 
 int TuilesNotSpecial[] = {0, 1, 2};
 int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
@@ -447,7 +475,6 @@ int isWall(float x, float y) {
                 downIs82 = 1;
             }
         }
-
         if (upIs82 && downIs82) {
             
             // On regarde si les pieds sont physiquement plus bas que le mur
@@ -553,159 +580,138 @@ int isWall(float x, float y) {
         return 0;
     }
 
-    // --- COLLISION 3D RÉALISTE : LAMPE ET TABLE DE NUIT (tuiles 20, 21) ---
+    // --- COLLISION LAMPE ET TABLE DE NUIT (tuiles 20, 21) AVEC EFFET 3D ---
     if (type == 20) {
-        // Partie haute (lampe elle-même)
         int localY = (int)y % TILE_SIZE;
-        if (localY < 6) {
-            return 1; // Collision sur le "toit" de la lampe
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 3) {
+            if (localX >= 6 && localX <= 10) return 1;
+        } else if (localY < 10) {
+            if (localX >= 4 && localX <= 12) return 1;
         }
-        // Si la tuile en dessous est la table de nuit, collision solide
-        if (caseY + 1 < MAP_HEIGHT) {
-            int typeBelow = maps[currentLevel][caseY + 1][caseX];
-            if (typeBelow == 21 || typeBelow == 20) {
-                return 1;
-            }
-        }
-        // On peut passer devant si on est au niveau des pieds
+        
+        // EFFET 3D
         float lampePixelBottom = (caseY + 1) * TILE_SIZE;
         if ((player.y + player.h) >= lampePixelBottom) {
             return 0;
         }
         return 1;
     }
+    
     if (type == 21) {
-        // Table de nuit (partie basse) : effet 3D - on peut passer devant
         int localY = (int)y % TILE_SIZE;
-        if (localY < 4) {
-            return 1; // Collision sur le haut de cette tuile
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 3) {
+            if (localX >= 2 && localX <= 14) return 1;
+        } else if (localY < 10) {
+            if (localX >= 3 && localX <= 13) return 1;
         }
-        // Si on est assez bas (pieds du joueur sous le bas de la tuile), on passe devant
+        
+        // EFFET 3D
         float lampePixelBottom = (caseY + 1) * TILE_SIZE;
-        if ((player.y + player.h) >= lampePixelBottom - 2) {
+        if ((player.y + player.h) >= lampePixelBottom) {
             return 0;
         }
         return 1;
     }
 
-    // --- COLLISION 3D RÉALISTE : LIT (tuiles 32, 33, 34, 35, 36, 37) ---
-    // Le lit occupe les colonnes 3-4, lignes 1-3 dans la chambre
+    // --- COLLISION LIT (tuiles 32, 33, 34, 35, 36, 37) AVEC EFFET 3D MARQUÉ ---
     if (type == 32 || type == 33 || type == 36 || type == 37) {
-        // Partie haute du lit : collision totale sauf si on est devant (en bas)
+        // Partie haute du lit
         int localY = (int)y % TILE_SIZE;
-        if (localY < 6) {
-            return 1; // Collision sur le "toit" du lit
-        }
-        // Si la tuile en dessous fait partie du lit aussi, collision solide
-        if (caseY + 1 < MAP_HEIGHT) {
-            int typeBelow = maps[currentLevel][caseY + 1][caseX];
-            if (typeBelow == 34 || typeBelow == 35 || typeBelow == 32 || typeBelow == 33) {
-                return 1;
-            }
-        }
-        // On peut passer devant si on est au niveau des pieds
-        float litPixelBottom = (caseY + 1) * TILE_SIZE;
-        if ((player.y + player.h) >= litPixelBottom) {
-            return 0;
-        }
-        return 1;
-    }
-    if (type == 34 || type == 35) {
-        // Partie basse du lit : effet 3D - on peut passer devant
-        int localY = (int)y % TILE_SIZE;
+        int localX = (int)x % TILE_SIZE;
+        
         if (localY < 4) {
-            return 1; // Collision sur le haut de cette tuile
+            if (localX >= 2 && localX <= 14) return 1;
+        } else if (localY < 12) {
+            if (localX >= 1 && localX <= 15) return 1;
         }
-        // Si on est assez bas (pieds du joueur sous le bas de la tuile), on passe devant
+        
+        // EFFET 3D MARQUÉ : marge plus petite pour être plus proche
         float litPixelBottom = (caseY + 1) * TILE_SIZE;
         if ((player.y + player.h) >= litPixelBottom - 2) {
-            return 0;
+            return 0; // On passe devant plus facilement
+        }
+        return 1;
+    }
+    
+    if (type == 34 || type == 35) {
+        // Partie basse du lit
+        int localY = (int)y % TILE_SIZE;
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 3) {
+            if (localX >= 1 && localX <= 15) return 1;
+        } else if (localY < 10) {
+            if (localX >= 2 && localX <= 14) return 1;
+        }
+        
+        // EFFET 3D MARQUÉ
+        float litPixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= litPixelBottom - 2) {
+            return 0; // On passe devant plus facilement
         }
         return 1;
     }
 
-    // --- COLLISION 3D RÉALISTE : TENTE (tuiles 52-57) ---
-    // La tente occupe les colonnes 16-18, lignes 6-8 dans la chambre
-    if (type == 55 || type == 56 || type == 57) {
-        // Partie haute de la tente : collision comme un mur avec perspective
-        int localY = (int)y % TILE_SIZE;
-        if (localY < 6) {
-            return 1;
-        }
-        // Si la tuile en dessous est aussi la tente, collision solide
-        if (caseY + 1 < MAP_HEIGHT) {
-            int typeBelow = maps[currentLevel][caseY + 1][caseX];
-            if (typeBelow == 52 || typeBelow == 53 || typeBelow == 54 || 
-                typeBelow == 55 || typeBelow == 56 || typeBelow == 57) {
-                return 1;
-            }
-        }
-        float tentePixelBottom = (caseY + 1) * TILE_SIZE;
-        if ((player.y + player.h) >= tentePixelBottom) {
-            return 0;
-        }
-        return 1;
-    }
-    if (type == 52 || type == 53 || type == 54) {
-        // Partie basse de la tente
-        int localY = (int)y % TILE_SIZE;
-        if (localY < 4) {
-            return 1;
-        }
-        float tentePixelBottom = (caseY + 1) * TILE_SIZE;
-        if ((player.y + player.h) >= tentePixelBottom - 2) {
-            return 0;
-        }
-        return 1;
+    // TENTE (tuiles 52-57) : AUCUNE COLLISION
+    if (type == 52 || type == 53 || type == 54 || type == 55 || type == 56 || type == 57) {
+        return 0;
     }
 
-    // --- COLLISION 3D RÉALISTE : BUREAU (tuiles 46, 47, 48, 49, 51) ---
-    // Le bureau occupe les colonnes 6-9, lignes 12-13 avec la chaise (51) au-dessus
+    // --- COLLISION BUREAU ET CHAISE (tuiles 46-49, 51) AVEC EFFET 3D ---
     if (type == 51) {
-        // Chaise : collision avec effet 3D
+        // Chaise
         int localY = (int)y % TILE_SIZE;
-        if (localY < 6) {
-            return 1;
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 3) {
+            if (localX >= 5 && localX <= 11) return 1;
+        } else if (localY < 12) {
+            if (localX >= 3 && localX <= 13) return 1;
         }
-        if (caseY + 1 < MAP_HEIGHT) {
-            int typeBelow = maps[currentLevel][caseY + 1][caseX];
-            if (typeBelow == 46 || typeBelow == 47 || typeBelow == 48 || typeBelow == 49) {
-                return 1;
-            }
-        }
+        
+        // EFFET 3D
         float chaisePixelBottom = (caseY + 1) * TILE_SIZE;
         if ((player.y + player.h) >= chaisePixelBottom) {
             return 0;
         }
         return 1;
     }
+    
     if (type == 46 || type == 47 || type == 48 || type == 49) {
-        // Bureau : collision avec effet 3D perspective
+        // Bureau
         int localY = (int)y % TILE_SIZE;
-        if (localY < 4) {
-            return 1;
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 3) {
+            if (localX >= 1 && localX <= 15) return 1;
+        } else if (localY < 10) {
+            if (localX >= 2 && localX <= 14) return 1;
         }
+        
+        // EFFET 3D
         float bureauPixelBottom = (caseY + 1) * TILE_SIZE;
-        if ((player.y + player.h) >= bureauPixelBottom - 2) {
+        if ((player.y + player.h) >= bureauPixelBottom) {
             return 0;
         }
         return 1;
     }
 
     // --- COLLISION 3D RÉALISTE : PETITE ARMOIRE À GAUCHE (tuiles 42, 43) ---
-    // L'armoire occupe la colonne 1, lignes 6-7 dans la chambre
     if (type == 42) {
-        // Partie haute de l'armoire
         int localY = (int)y % TILE_SIZE;
-        if (localY < 6) {
-            return 1;
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 2) {
+            if (localX >= 3 && localX <= 13) return 1;
+        } else if (localY < 12) {
+            if (localX >= 2 && localX <= 14) return 1;
         }
-        if (caseY + 1 < MAP_HEIGHT) {
-            int typeBelow = maps[currentLevel][caseY + 1][caseX];
-            if (typeBelow == 43 || typeBelow == 42) {
-                return 1;
-            }
-        }
+        
+        // EFFET 3D
         float armoirePixelBottom = (caseY + 1) * TILE_SIZE;
         if ((player.y + player.h) >= armoirePixelBottom) {
             return 0;
@@ -713,26 +719,218 @@ int isWall(float x, float y) {
         return 1;
     }
     if (type == 43) {
-        // Partie basse de l'armoire
         int localY = (int)y % TILE_SIZE;
-        if (localY < 4) {
-            return 1;
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 10) {
+            if (localX >= 2 && localX <= 14) return 1;
         }
+        
+        // EFFET 3D
         float armoirePixelBottom = (caseY + 1) * TILE_SIZE;
-        if ((player.y + player.h) >= armoirePixelBottom - 2) {
+        if ((player.y + player.h) >= armoirePixelBottom) {
             return 0;
         }
         return 1;
     }
 
-    // --- COLLISION 3D : GRANDE ARMOIRE DROITE (tuiles 80, 81) ---
-    if (type == 80 || type == 81) {
+    // --- COLLISION 3D RÉALISTE : GRANDE ARMOIRE (tuiles 80, 81) ---
+    if (type == 80) {
         int localY = (int)y % TILE_SIZE;
-        if (localY < 4) {
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 2) {
+            if (localX >= 3 && localX <= 13) return 1;
+        } else if (localY < 12) {
+            if (localX >= 2 && localX <= 14) return 1;
+        }
+        
+        // EFFET 3D
+        float armoirePixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= armoirePixelBottom) {
+            return 0;
+        }
+        return 1;
+    }
+    
+    if (type == 43) {
+        int localY = (int)y % TILE_SIZE;
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 10) {
+            if (localX >= 2 && localX <= 14) return 1;
+        }
+        
+        // EFFET 3D
+        float armoirePixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= armoirePixelBottom) {
+            return 0;
+        }
+        return 1;
+    }
+
+    // --- COLLISION 3D RÉALISTE : GRANDE ARMOIRE (tuiles 80, 81) ---
+    if (type == 80) {
+        int localY = (int)y % TILE_SIZE;
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 2) {
+            if (localX >= 3 && localX <= 13) return 1;
+        } else if (localY < 12) {
+            if (localX >= 2 && localX <= 14) return 1;
+        }
+        
+        // EFFET 3D
+        float armoirePixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= armoirePixelBottom) {
+            return 0;
+        }
+        return 1;
+    }
+    
+    if (type == 81) {
+        int localY = (int)y % TILE_SIZE;
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 10) {
+            if (localX >= 2 && localX <= 14) return 1;
+        }
+        
+        // EFFET 3D
+        float armoirePixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= armoirePixelBottom) {
+            return 0;
+        }
+        return 1;
+    }
+
+    // --- COLLISION PRÉCISE : JOUETS ET OBJETS AU SOL ---
+    
+    // CUBES (tuiles 3, 4, 44, 45, 50) AVEC EFFET 3D
+    if (type == 3 || type == 4 || type == 44 || type == 45 || type == 50) {
+        int localY = (int)y % TILE_SIZE;
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 10 && localX >= 3 && localX <= 13) {
             return 1;
         }
-        float armoirePixelBottom = (caseY + 1) * TILE_SIZE;
-        if ((player.y + player.h) >= armoirePixelBottom - 2) {
+        
+        // EFFET 3D
+        float cubePixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= cubePixelBottom) {
+            return 0;
+        }
+        return 1;
+    }
+
+    // TRAIN (tuiles 38, 39) AVEC EFFET 3D
+    if (type == 38 || type == 39) {
+        int localY = (int)y % TILE_SIZE;
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 2) {
+            if (localX >= 5 && localX <= 11) return 1;
+        } else if (localY < 5) {
+            if (localX >= 3 && localX <= 13) return 1;
+        } else if (localY < 10) {
+            if (localX >= 2 && localX <= 14) return 1;
+        }
+        
+        // EFFET 3D
+        float trainPixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= trainPixelBottom) {
+            return 0;
+        }
+        return 1;
+    }
+
+    // AVION (tuile 40) AVEC EFFET 3D
+    if (type == 40) {
+        int localY = (int)y % TILE_SIZE;
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 2) {
+            if (localX >= 7 && localX <= 9) return 1;
+        } else if (localY < 4) {
+            if (localX >= 6 && localX <= 10) return 1;
+        } else if (localY < 6) {
+            if (localX >= 1 && localX <= 15) return 1;
+        } else if (localY < 10) {
+            if (localX >= 5 && localX <= 11) return 1;
+        }
+        
+        // EFFET 3D
+        float avionPixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= avionPixelBottom) {
+            return 0;
+        }
+        return 1;
+    }
+
+    // DINOSAURE (tuile 41) AVEC EFFET 3D
+    if (type == 41) {
+        int localY = (int)y % TILE_SIZE;
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 2) {
+            if (localX >= 6 && localX <= 10) return 1;
+        } else if (localY < 4) {
+            if (localX >= 5 && localX <= 11) return 1;
+        } else if (localY < 10) {
+            if (localX >= 2 && localX <= 14) return 1;
+        }
+        
+        // EFFET 3D
+        float dinoPixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= dinoPixelBottom) {
+            return 0;
+        }
+        return 1;
+    }
+
+    // DOUDOU (tuiles 6, 147) AVEC EFFET 3D
+    if (type == 6 || type == 147) {
+        int localY = (int)y % TILE_SIZE;
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localY < 8 && localX >= 4 && localX <= 12) {
+            return 1;
+        }
+        
+        // EFFET 3D
+        float doudouPixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= doudouPixelBottom) {
+            return 0;
+        }
+        return 1;
+    }
+
+    // TAPIS (tuiles 24-31, 87-106)
+    if ((type >= 24 && type <= 31) || (type >= 87 && type <= 106)) {
+        // Tapis = pas de collision (on marche dessus)
+        return 0;
+    }
+
+    // VASE (tuile 73)
+    if (type == 73) {
+        int localY = (int)y % TILE_SIZE;
+        int localX = (int)x % TILE_SIZE;
+        
+        // Forme du vase (conique)
+        if (localY < 3) {
+            // Haut du vase (plus étroit)
+            if (localX >= 6 && localX <= 10) {
+                return 1;
+            }
+        } else if (localY < 7) {
+            // Bas du vase (plus large)
+            if (localX >= 4 && localX <= 12) {
+                return 1;
+            }
+        }
+        
+        float vasePixelBottom = (caseY + 1) * TILE_SIZE;
+        if ((player.y + player.h) >= vasePixelBottom) {
             return 0;
         }
         return 1;
@@ -808,10 +1006,45 @@ void UpdateGame(void) {
         }
         return;
     }
+    dialogueStep_sortie1 = 0;
     if (dialogueStep_sortie1 > 0) {
         if (state[SDL_SCANCODE_RETURN]) {
             if (toucheRelache) {
                 dialogueStep_sortie1 = 0; // On ferme le dialogue
+                toucheRelache = 0;
+            }
+        } else {
+            toucheRelache = 1;
+        }
+        return;
+    }
+    if (dialogue_statue_haut> 0) {
+        if (state[SDL_SCANCODE_RETURN]) {
+            if (toucheRelache) {
+                dialogue_statue_haut ++; // On ferme le dialogue
+                interact_statue_haut = 1;
+                if (dialogue_statue_haut > 2)
+                {
+                    dialogue_statue_haut = 0;
+                }
+                
+                toucheRelache = 0;
+            }
+        } else {
+            toucheRelache = 1;
+        }
+        return;
+    }
+    if (dialogue_statue_bas > 0) {
+        if (state[SDL_SCANCODE_RETURN]) {
+            if (toucheRelache) {
+                dialogue_statue_bas ++; // On ferme le dialogue
+                interact_statue_bas = 1;
+                if (dialogue_statue_bas > 2)
+                {
+                    dialogue_statue_bas = 0;
+                }
+                
                 toucheRelache = 0;
             }
         } else {
@@ -835,6 +1068,18 @@ void UpdateGame(void) {
         }
         return;
     }
+    dialogue_entree_labyrinthe = 0;
+    if (dialogue_entree_labyrinthe > 0) {
+        if (state[SDL_SCANCODE_RETURN]) {
+            if (toucheRelache) {
+                dialogue_entree_labyrinthe = 0; // On ferme le dialogue
+                toucheRelache = 0;
+            }
+        } else {
+            toucheRelache = 1;
+        }
+        return;
+    }
     if(showInteractImpossibleObjet >0){
         if(state[SDL_SCANCODE_RETURN]){
             if(toucheRelache){
@@ -844,6 +1089,18 @@ void UpdateGame(void) {
         }else{toucheRelache=1;}
         return;
     }   
+    if (dialogue_max_objet > 0) {
+        if (state[SDL_SCANCODE_RETURN]) {
+            if (toucheRelache) {
+                dialogue_max_objet = 0;
+                toucheRelache = 0;
+            }
+        } else {
+            toucheRelache = 1;
+        }
+        return;
+    }
+    
 
     float dirX = 0;
     float dirY = 0;
@@ -869,24 +1126,34 @@ void UpdateGame(void) {
     // 3. On applique la VITESSE
     float nextX = player.x + (dirX * PLAYER_SPEED);
     float nextY = player.y + (dirY * PLAYER_SPEED);
-    // Collision X
-    int touchWallX = 0;
-    if (isWall(nextX, player.y)) touchWallX = 1;
-    if (isWall(nextX + player.w, player.y)) touchWallX = 1;
-    if (isWall(nextX, player.y + player.h)) touchWallX = 1;
-    if (isWall(nextX + player.w, player.y + player.h)) touchWallX = 1;
-
-    if (!touchWallX) player.x = nextX;
-
     
-    // Collision Y
-    int touchWallY = 0;
-    if (isWall(player.x, nextY)) touchWallY = 1;
-    if (isWall(player.x + player.w, nextY)) touchWallY = 1;
-    if (isWall(player.x, nextY + player.h)) touchWallY = 1;
-    if (isWall(player.x + player.w, nextY + player.h)) touchWallY = 1;
+    // === COLLISIONS SIMPLES ===
+    int touchWallX = 0;
+    
+    // Test collision X
+    for (int i = 0; i <= player.h; i += 2) {
+        if (isWall(nextX, player.y + i) || isWall(nextX + player.w, player.y + i)) {
+            touchWallX = 1;
+            break;
+        }
+    }
 
-    if (!touchWallY) player.y = nextY;
+    if (!touchWallX) {
+        player.x = nextX;
+    }
+
+    // Test collision Y
+    int touchWallY = 0;
+    for (int i = 0; i <= player.w; i += 2) {
+        if (isWall(player.x + i, nextY) || isWall(player.x + i, nextY + player.h)) {
+            touchWallY = 1;
+            break;
+        }
+    }
+
+    if (!touchWallY) {
+        player.y = nextY;
+    }
 
     // if (dirX != 0 || dirY != 0) {
     //     Mix_Volume(2, 64); // On met le son si on bouge
@@ -901,36 +1168,79 @@ void UpdateGame(void) {
     showInteractPrompt2 = 0;
     showInteractPrompt3 = 0;
 
-    if (IsLocationObjet(24, 0, 8, &distance)) {
+    if (IsLocationObjet(24, 0, 8, &distance, -1, -1)) {
         showInteractPrompt = 1;
     }
 
-    else if (IsLocationObjet(24, 0, 16, &distance)) {
+    else if (IsLocationObjet(24, 0, 16, &distance, -1, -1)) {
         showInteractPrompt2 = 1;
     }
 
-    else if (IsLocationObjet(24, 0, 12, &distance)) {
+    else if (IsLocationObjet(24, 0, 12, &distance, -1, -1)) {
         showInteractPrompt3 = 1;
     }
 
     float distance_tente;
     showInteractPromptTente = 0;
-    if(IsLocationObjet(24, 0, 55, &distance_tente)){
+    if(IsLocationObjet(24, 0, 55, &distance_tente, -1, -1)){
         showInteractPromptTente = 1;
     }
+    show_interact_prompt_statue_haut = 0;
+    show_interact_prompt_statue_bas = 0;
+    // --- GESTION PROMPT STATUES (NIVEAU 2) ---
+    float distStatueHaut = 9999.0f;
+    float distStatueBas = 9999.0f;
+
+    if (IsLocationObjet(24, 2, 84, &distStatueHaut, 17, 6))
+    {
+        show_interact_prompt_statue_haut = 1;
+    }
+    if (IsLocationObjet(24, 2, 84, &distStatueBas, 17, 10))
+    {
+        show_interact_prompt_statue_bas = 1;
+    }
+    show_interact_prompt_eau = 0;
+    show_interact_prompt_dessin = 0;
+    float distance_carafe = 9999.0f;
+    float distance_dessin = 9999.0f;
+
+
+    if(carafeX == -1 && carafeY == -1)TrouveCoordonnees(&carafeX, &carafeY, 172, 1);
+    else{TrouveCoordonnees(&carafeX, &carafeY, 72, 1);}
+    
+    if (IsLocationObjet(14, 1, 72, &distance_carafe , -1, -1) && interact_statue_haut == 1)
+    {
+        show_interact_prompt_eau = 1;
+    }
+
+    TrouveCoordonnees(&dessinX, &dessinY, 174, 9);
+    if (IsLocationObjet(14, 9, 174, &distance_dessin , -1, -1) && interact_statue_bas == 1)
+    {
+        show_interact_prompt_dessin = 1;
+    }
+    
+
+    
 
     // --- DÉTECTION PROXIMITÉ LIT (tuile 34 = bas du lit) ---
     float distance_lit;
     showInteractPromptLit = 0;
-    if (IsLocationObjet(28, 0, 34, &distance_lit) && !isSleeping && !isSitting) {
+    if (IsLocationObjet(28, 0, 34, &distance_lit, -1, -1) && !isSleeping && !isSitting) {
         showInteractPromptLit = 1;
     }
 
     // --- DÉTECTION PROXIMITÉ BUREAU/CHAISE (tuile 51 = chaise) ---
     float distance_bureau;
     showInteractPromptBureau = 0;
-    if (IsLocationObjet(24, 0, 51, &distance_bureau) && !isSitting && !isSleeping) {
+    if (IsLocationObjet(24, 0, 51, &distance_bureau, -1, -1) && !isSitting && !isSleeping) {
         showInteractPromptBureau = 1;
+    }
+
+    // --- DÉTECTION PROXIMITÉ DU PANIER DE BASKET POUR ANIMATION DU FILET ---
+    float distance_basket;
+    playerNearBasket = 0;
+    if (IsLocationObjet(32, 0, 78, &distance_basket, 1, 11) && currentLevel == 0) {
+        playerNearBasket = 1;
     }
 
     // --- Calcul pour les pièces du tableau dans le labyrinthe ---
@@ -942,7 +1252,7 @@ void UpdateGame(void) {
     TrouveCoordonnees(&morceauTableau1x, &morceauTableau1y, 117, 5);
 
     float distance_morceauTableau1;
-    if(IsLocationObjet(16, 5, 117, &distance_morceauTableau1)) showInteractPromptObjetTableau = 1;
+    if(IsLocationObjet(16, 5, 117, &distance_morceauTableau1, -1, -1)) showInteractPromptObjetTableau = 1;
 
     // Calcul distance entre joueur et deuxième pièce du tableau (118)
     int morceauTableau2x;
@@ -950,7 +1260,7 @@ void UpdateGame(void) {
     TrouveCoordonnees(&morceauTableau2x, &morceauTableau2y, 118, 6);
 
     float distance_morceauTableau2;
-    if(IsLocationObjet(16, 6, 118, &distance_morceauTableau2)) showInteractPromptObjetTableau = 1;
+    if(IsLocationObjet(16, 6, 118, &distance_morceauTableau2, -1, -1)) showInteractPromptObjetTableau = 1;
 
     // Calcul distance entre joueur et troisième pièce du tableau (115)
     int morceauTableau3x;
@@ -958,7 +1268,7 @@ void UpdateGame(void) {
     TrouveCoordonnees(&morceauTableau3x, &morceauTableau3y, 115, 7);
 
     float distance_morceauTableau3;
-    if(IsLocationObjet(16, 7, 115, &distance_morceauTableau3)) showInteractPromptObjetTableau = 1;
+    if(IsLocationObjet(16, 7, 115, &distance_morceauTableau3, -1, -1)) showInteractPromptObjetTableau = 1;
 
     // Calcul distance entre joueur et quatrième pièce du tableau (116)
     int morceauTableau4x;
@@ -966,7 +1276,7 @@ void UpdateGame(void) {
     TrouveCoordonnees(&morceauTableau4x, &morceauTableau4y, 116, 8);
 
     float distance_morceauTableau4;
-    if(IsLocationObjet(16, 8, 116, &distance_morceauTableau4)) showInteractPromptObjetTableau = 1;
+    if(IsLocationObjet(16, 8, 116, &distance_morceauTableau4, -1, -1)) showInteractPromptObjetTableau = 1;
 
     // Ouverture de la salle du niveau 3
     if(cpt_piece_tableau == 4){
@@ -977,7 +1287,7 @@ void UpdateGame(void) {
 
     showInteractTableau=0;
     float distance_Tableau;
-    if( (IsLocationObjet(24, 2, 113, &distance_Tableau) || IsLocationObjet(24, 2, 109, &distance_Tableau) ) && cpt_piece_tableau != 4){
+    if( (IsLocationObjet(24, 2, 113, &distance_Tableau, -1, -1) || IsLocationObjet(24, 2, 109, &distance_Tableau, -1, -1) ) && cpt_piece_tableau != 4){
         showInteractTableau = 1;
     }
 
@@ -986,6 +1296,11 @@ void UpdateGame(void) {
         player.x = 15 * TILE_SIZE;
         currentLevel = 0;
     }
+    if (interact_statue_haut == 1 && maps[1][carafeY][carafeX] == 172)
+    {
+        maps[1][carafeY][carafeX] = 72;
+    }
+    
 
     // --- GESTION INTERACTION TOUCHE X POUR LIT ET BUREAU ---
     if (state[SDL_SCANCODE_X]) {
@@ -1014,7 +1329,6 @@ void UpdateGame(void) {
                 savedPlayerX = player.x;
                 savedPlayerY = player.y;
                 isSitting = 1;
-                sitIdleTimer = 0;
                 // Positionner le joueur précisément sur la chaise (colonne 6, ligne 12)
                 player.x = 6 * TILE_SIZE + 2;
                 player.y = 12 * TILE_SIZE + 2;
@@ -1031,6 +1345,21 @@ void UpdateGame(void) {
         toucheX_Relache = 1;
     }
     
+    // --- ANIMATION DU FILET DE BASKET ---
+    if (playerNearBasket) {
+        basketNetAnimTimer++;
+        // Oscillation du filet (effet de balancement)
+        basketNetSwing = sinf(basketNetAnimTimer * 0.15f) * 2.0f;
+    } else {
+        // Ralentir progressivement l'animation quand le joueur s'éloigne
+        if (basketNetAnimTimer > 0) {
+            basketNetAnimTimer--;
+            basketNetSwing = sinf(basketNetAnimTimer * 0.15f) * 2.0f;
+        } else {
+            basketNetSwing = 0.0f;
+        }
+    }
+
     // --- BLOQUER LE MOUVEMENT SI ON DORT OU ON EST ASSIS ---
     if (isSleeping || isSitting) {
         // Animation de respiration pour le sommeil
@@ -1041,12 +1370,6 @@ void UpdateGame(void) {
                 sleepAnimFrame = (sleepAnimFrame + 1) % 3;
             }
             // L'effet de respiration est calculé directement dans DrawGame avec sleepAnimTimer
-        }
-        // Animation subtile pour l'état assis
-        if (isSitting) {
-            sitIdleTimer++;
-            // Reset pour éviter overflow
-            if (sitIdleTimer > 1000) sitIdleTimer = 0;
         }
         
         return; // On bloque les mouvements et le reste de l'update
@@ -1083,6 +1406,43 @@ void UpdateGame(void) {
                     maps[0][1][16] = 14; 
                     maps[0][1][17] = 15; 
                 }
+            }
+
+            if (currentLevel == 1 && distance_carafe < 14 && has_drawing == 0) {
+                maps[1][carafeY][carafeX] = 173;
+                has_water = 1;
+            }
+
+            if (currentLevel == 2 && distStatueHaut < 24 && has_water == 0) {
+                dialogue_statue_haut = 1;   
+            }
+            else if (currentLevel == 2 && distStatueHaut < 24 && has_water == 1)
+            {
+                maps[2][5][17] = 86;
+                statue_has_water = 1;
+                has_water = 0;
+            }
+            
+
+            if (currentLevel == 2 && distStatueBas < 24 && has_drawing == 0) {
+                 dialogue_statue_bas = 1;
+                 toucheE_Relache = 0;
+            }
+            if (currentLevel == 9 && distance_dessin < 16 && has_drawing == 0 && has_water == 0 && interact_statue_bas == 1) {
+                maps[9][dessinY][dessinX] = 1;
+                has_drawing = 1;
+            }
+            if (currentLevel == 9 && distance_dessin < 16 && has_drawing == 0 && has_water == 1) {
+                dialogue_max_objet = 1;
+            }
+            if (currentLevel == 1 && distance_carafe < 14 && has_drawing == 1 && has_water == 0) {
+                dialogue_max_objet = 1;
+            }
+            else if (currentLevel == 2 && distStatueBas < 24 && has_drawing == 1)
+            {
+                maps[2][9][17] = 86;
+                statue_has_drawing = 1;
+                has_drawing = 0;
             }
 
             else if(distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55){
@@ -1183,13 +1543,14 @@ void UpdateGame(void) {
         if (hasDoudou == 1) {
             currentLevel = 1; 
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
-            
-
         }
         else{
-            player.y = 10;
-            dialogueStep_sortie1 = 1;
+            player.y = 5;
         }
+    }
+    if (IsLocationUp(8, 13, 0, 10) && hasDoudou == 0){
+        dialogueStep_sortie1 = 1;
+
     }
 
     // 2. Quitter le COULOIR (Niveau 1) par le BAS
@@ -1236,10 +1597,15 @@ void UpdateGame(void) {
 
 
     // 1. Entrée dans le labyrinthe (Niveau 2 -> 5)
-    if(IsLocationRight(6, 10, 2, 20)){
+    if(IsLocationRight(6, 10, 2, 20) && (statue_has_drawing == 1 && statue_has_water == 1)){
         currentLevel = 5;
         player.x = 5;
         SpawnFantomeRandom(); // <--- NOUVEAU
+    }
+    if(IsLocationRight(6, 10, 2, 20) && (statue_has_drawing == 0 || statue_has_water == 0)){
+
+        dialogue_entree_labyrinthe = 1;
+
     }
 
     // 2. Retour couloir (5 -> 2)
@@ -1341,9 +1707,10 @@ void UpdateGame(void) {
     // printf("lvl: %d \n", currentLevel);
 }
 
-int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance){
-    int x = -1, y = -1;
-    TrouveCoordonnees(&x, &y, indexTuile, CurrLvl);
+int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance, int x, int y){
+    if(x == -1 || y == -1){
+        TrouveCoordonnees(&x, &y, indexTuile, CurrLvl);
+    }
 
     if (x == -1 || y == -1) {
         *distance = 9999.0f; 
@@ -1434,7 +1801,7 @@ float getLuminosite(int gridX, int gridY, int rayonPx) {
     // --- 2. Lumière des LAMPES (Calcul en cases) ---
     for (int ly = 0; ly < MAP_HEIGHT; ly++) {
         for (int lx = 0; lx < MAP_WIDTH; lx++) {
-             if (maps[currentLevel][ly][lx] == 21 || (maps[currentLevel][ly][lx] >= 75 && maps[currentLevel][ly][lx] <= 76) || maps[currentLevel][ly][lx] == 85 || maps[currentLevel][ly][lx] == 86 ) { // Si c'est une lampe
+             if (maps[currentLevel][ly][lx] == 21 || (maps[currentLevel][ly][lx] >= 75 && maps[currentLevel][ly][lx] <= 76) || maps[currentLevel][ly][lx] == 85 || maps[currentLevel][ly][lx] == 86 || maps[currentLevel][ly][lx] == 148) { // Si c'est une lampe
                  float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
                  float rayonLampe = 2.5f; // Rayon d'une lampe (2.5 cases)
                  
@@ -1587,6 +1954,36 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         if (dialogue_hasDoudou == 3) texteAffiche = "De la lumiere !";
         DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
     }
+    if (dialogue_statue_haut > 0) {
+        show_interact_prompt_statue_haut = 0;
+        char *texteAffiche = "";
+        if (dialogue_statue_haut == 1) texteAffiche = "Cette statue tient une coupe vide,";
+        if (dialogue_statue_haut == 2) texteAffiche = "elle doit avoir soif...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_statue_bas > 0) {
+        show_interact_prompt_statue_bas = 0;
+        char *texteAffiche = "";
+        if (dialogue_statue_bas == 1) texteAffiche = "Son visage est tordu par la haine.";
+        if (dialogue_statue_bas == 2) texteAffiche = "Un sourir ne ferait pas de mal...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_entree_labyrinthe > 0) {
+        char *texteAffiche = "";
+        if (dialogue_entree_labyrinthe == 1) texteAffiche = "Les statues bloquent le passage...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_max_objet > 0) {
+        show_interact_prompt_dessin = 0;
+        show_interact_prompt_eau = 0;
+        char *texteAffiche = "";
+        if (dialogue_max_objet == 1) texteAffiche = "Je n'ai que deux mains...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
 
     
 
@@ -1653,17 +2050,13 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     }
     else if (isSitting) {
         // Joueur assis sur la chaise, face au bureau
-        // Structure :
-        // Ligne 12 (y=12): chaise (51) à la colonne 6
-        // Ligne 13 (y=13): bureau (46, 47, 48, 49) aux colonnes 6-9
-        // Le joueur doit être ASSIS sur la chaise (ligne 12), regardant vers le bureau (ligne 13)
-        
         SDL_Rect srcPlayer = { 112, 0, 16, 16 };
         
         SDL_Rect destPlayer = { 
             (int)(6 * TILE_SIZE) + 2,  // Centré sur la colonne 6 (chaise)
-            (int)(12 * TILE_SIZE) + 2, // Positionné SUR la chaise (ligne 12), pas au-dessus
-            16, 16 
+            (int)(12 * TILE_SIZE) + 2, // Assis sur la ligne 12 (chaise)
+            16, 
+            16 
         };
         
         // Le joueur regarde vers le haut (vers le bureau ligne 13)
@@ -1704,8 +2097,39 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         float intensite = getLuminosite(panneauX, panneauY, rayon);
         if (intensite > 0.0f) {
             int lum = (int)(intensite * 255);
-            // Dessiner le panneau de basket (78)
-            DrawTuiles(panneauX, panneauY, 78, renderer, lum);
+            SDL_SetTextureColorMod(tilesetTexture, lum, lum, lum);
+            
+            // Dessiner le panneau de basket fixe (structure)
+            SDL_Rect srcPanneau = { 78 * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
+            SDL_Rect destPanneau = { 
+                panneauX * TILE_SIZE, 
+                panneauY * TILE_SIZE,
+                TILE_SIZE, 
+                TILE_SIZE 
+            };
+            SDL_RenderCopy(renderer, tilesetTexture, &srcPanneau, &destPanneau);
+            
+            // Animation du filet uniquement (partie basse du panneau)
+            // Toujours animer le filet même faiblement pour le rendre visible
+            if (basketNetSwing != 0.0f || playerNearBasket) {
+                // Augmenter l'amplitude pour rendre l'animation plus visible
+                float swingAmplitude = basketNetSwing * 0.8f; // Augmenté de 0.3f à 0.8f
+                
+                // Dessiner le filet avec mouvement oscillant
+                SDL_Rect srcFilet = { 78 * TILE_SIZE, 11, TILE_SIZE, 5 }; // Partie filet (bas de la tuile)
+                SDL_Rect destFilet = { 
+                    panneauX * TILE_SIZE + (int)swingAmplitude, // Mouvement horizontal visible
+                    panneauY * TILE_SIZE + 11 + (int)(basketNetSwing * 0.5f), // Mouvement vertical plus visible
+                    TILE_SIZE, 
+                    5 
+                };
+                // Dessiner le filet avec un effet visuel
+                SDL_SetTextureAlphaMod(tilesetTexture, 220);
+                SDL_RenderCopy(renderer, tilesetTexture, &srcFilet, &destFilet);
+                SDL_SetTextureAlphaMod(tilesetTexture, 255);
+            }
+            
+            SDL_SetTextureColorMod(tilesetTexture, 255, 255, 255);
         }
     }
 
@@ -1725,7 +2149,7 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         if (sText) DrawInteractions(renderer, sText);
     }
 
-     if (showInteractPrompt2 == 1) {
+    if (showInteractPrompt2 == 1) {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[ENTER] Interagir", cBlanc);
         
@@ -1745,6 +2169,18 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         if (sText) DrawInteractions(renderer, sText);
     }
     
+    // --- AFFICHAGE DES PROMPTS POUR LIT ET BUREAU ---
+    if (showInteractPromptLit == 1 && !isSleeping && !isSitting) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] Dormir", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (showInteractPromptBureau == 1 && !isSitting && !isSleeping) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] S'asseoir", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+
     // --- AFFICHAGE DES PROMPTS POUR STATUES ---
     if (show_interact_prompt_statue_haut == 1 && has_water == 0) {
         SDL_Color cBlanc = {255, 255, 255, 255};
@@ -1766,18 +2202,6 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Donner", cBlanc);
         if (sText) DrawInteractions(renderer, sText);
     }
-    
-    // --- AFFICHAGE DES PROMPTS POUR LIT ET BUREAU ---
-    if (showInteractPromptLit == 1 && !isSleeping && !isSitting) {
-        SDL_Color cBlanc = {255, 255, 255, 255};
-        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] Dormir", cBlanc);
-        if (sText) DrawInteractions(renderer, sText);
-    }
-    if (showInteractPromptBureau == 1 && !isSitting && !isSleeping) {
-        SDL_Color cBlanc = {255, 255, 255, 255};
-        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] S'asseoir", cBlanc);
-        if (sText) DrawInteractions(renderer, sText);
-    }
 
     if(showInteractImpossibleObjet == 1){
         char *texteAffiche = "j'ai deja une piece";
@@ -1790,11 +2214,50 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         
         if (sText) DrawInteractions(renderer, sText);
     }
+    
     if(showInteractTableau == 1){
         char Prompt[100] = "";
-        sprintf(Prompt, "[E] Ajouter la %d e piece", cpt_piece_tableau+1);
+        if(cpt_piece_tableau == 0){
+            sprintf(Prompt, "[E] Ajouter la %d ere piece", cpt_piece_tableau+1);
+        }
+        else{
+            sprintf(Prompt, "[E] Ajouter la %d eme piece", cpt_piece_tableau+1);
+        }
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, Prompt, cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (show_interact_prompt_statue_haut == 1 && has_water == 0 && statue_has_water == 0) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Interagir", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (show_interact_prompt_statue_haut == 1 && has_water == 1 && statue_has_water == 0){
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Donner", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (show_interact_prompt_statue_bas == 1 && has_drawing == 0 && statue_has_drawing == 0) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Interagir", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (show_interact_prompt_statue_bas == 1 && has_drawing == 1 && statue_has_drawing == 0) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Donner", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+     if (show_interact_prompt_eau == 1)            
+    {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if(show_interact_prompt_dessin == 1){
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
         
         if (sText) DrawInteractions(renderer, sText);
     }
