@@ -347,12 +347,18 @@ int showInteractPrompt3 = 0;
 int showInteractPromptTente = 0;
 int show_interact_prompt_statue_haut = 0;
 int show_interact_prompt_statue_bas = 0;
-int has_water = 1;
-int has_drawing = 1;
+int show_interact_prompt_eau = 0;
+int intercat_statue_haut = 0;
+int interact_statue_bas = 0;
+int has_water = 0;
+int has_drawing = 0;
 int statue_has_water = 0;
 int statue_has_drawing = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
     
+int carafeX = -1;
+int carafeY = -1;
+
 int showInteractPromptObjetTableau = 0;
 int showInteractTableau = 0;
 int showInteractImpossibleObjet = 0;
@@ -639,6 +645,7 @@ void UpdateGame(void) {
         if (state[SDL_SCANCODE_RETURN]) {
             if (toucheRelache) {
                 dialogue_statue_haut ++; // On ferme le dialogue
+                intercat_statue_haut = 1;
                 if (dialogue_statue_haut > 2)
                 {
                     dialogue_statue_haut = 0;
@@ -655,6 +662,7 @@ void UpdateGame(void) {
         if (state[SDL_SCANCODE_RETURN]) {
             if (toucheRelache) {
                 dialogue_statue_bas ++; // On ferme le dialogue
+                interact_statue_bas = 1;
                 if (dialogue_statue_bas > 2)
                 {
                     dialogue_statue_bas = 0;
@@ -792,6 +800,16 @@ void UpdateGame(void) {
     {
         show_interact_prompt_statue_bas = 1;
     }
+    show_interact_prompt_eau = 0;
+    float distance_carafe = 9999.0f;
+
+    if(carafeX == -1 && carafeY == -1)TrouveCoordonnees(&carafeX, &carafeY, 172, 1);
+    else{TrouveCoordonnees(&carafeX, &carafeY, 72, 1);}
+    
+    if (IsLocationObjet(14, 1, 72, &distance_carafe , -1, -1) && intercat_statue_haut == 1)
+    {
+        show_interact_prompt_eau = 1;
+    }
     
 
     
@@ -849,6 +867,11 @@ void UpdateGame(void) {
         player.x = 15 * TILE_SIZE;
         currentLevel = 0;
     }
+    if (intercat_statue_haut == 1 && maps[1][carafeY][carafeX] == 172)
+    {
+        maps[1][carafeY][carafeX] = 72;
+    }
+    
 
     if (state[SDL_SCANCODE_E]) {
         if (toucheE_Relache) {
@@ -883,9 +906,13 @@ void UpdateGame(void) {
                 }
             }
 
+            if (currentLevel == 1 && distance_carafe < 14) {
+                maps[1][carafeY][carafeX] = 173;
+                has_water = 1;
+            }
+
             if (currentLevel == 2 && distStatueHaut < 24 && has_water == 0) {
-                 dialogue_statue_haut = 1;
-                 toucheE_Relache = 0;
+                dialogue_statue_haut = 1;   
             }
             else if (currentLevel == 2 && distStatueHaut < 24 && has_water == 1)
             {
@@ -1474,7 +1501,12 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     }
     if(showInteractTableau == 1){
         char Prompt[100] = "";
-        sprintf(Prompt, "[E] Ajouter la %d e piece", cpt_piece_tableau+1);
+        if(cpt_piece_tableau == 0){
+            sprintf(Prompt, "[E] Ajouter la %d ere piece", cpt_piece_tableau+1);
+        }
+        else{
+            sprintf(Prompt, "[E] Ajouter la %d eme piece", cpt_piece_tableau+1);
+        }
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, Prompt, cBlanc);
         
@@ -1498,6 +1530,13 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     if (show_interact_prompt_statue_bas == 1 && has_drawing == 1 && statue_has_drawing == 0) {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Donner", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+     if (show_interact_prompt_eau == 1)            
+    {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
+        
         if (sText) DrawInteractions(renderer, sText);
     }
     
