@@ -341,34 +341,15 @@ int whichTableauPiece = 0;
 
 int cpt_piece_tableau = 0;
 
-// --- VARIABLES POUR LES INTERACTIONS LIT ET BUREAU ---
-int isSleeping = 0;           // 1 = le joueur dort sur le lit
-int isSitting = 0;            // 1 = le joueur est assis sur la chaise
-int sleepAnimFrame = 0;       // Frame d'animation pour le sommeil
-int sleepAnimTimer = 0;       // Timer pour animer le "Zzz"
-float sleepBreathOffset = 0;  // Offset pour l'effet de respiration
-float sitIdleOffset = 0;      // Offset pour mouvement subtil assis
-int sitIdleTimer = 0;         // Timer pour animation assis
-int transitionFrame = 0;      // Frame de transition (coucher/lever)
-int isInTransition = 0;       // 1 = en train de se coucher/lever
-int showInteractPromptLit = 0;    // Affiche "[X] Dormir"
-int showInteractPromptBureau = 0; // Affiche "[X] S'asseoir"
-float savedPlayerX = 0;       // Position sauvegardée du joueur
+int isSleeping = 0;
+int isSitting = 0;
+int sleepAnimFrame = 0;
+int sleepAnimTimer = 0;
+int showInteractPromptLit = 0;
+int showInteractPromptBureau = 0;
+float savedPlayerX = 0;
 float savedPlayerY = 0;
 static int toucheX_Relache = 1;
-
-// --- VARIABLES POUR LE DUNK ---
-int isDunking = 0;             // 1 = le joueur est en train de dunker
-int dunkState = 0;             // État du dunk : 0=repos, 1=saut, 2=accroché, 3=dunk, 4=descente, 5=retour
-int dunkTimer = 0;             // Timer pour l'animation
-float dunkPlayerX = 0;         // Position X du joueur pendant le dunk
-float dunkPlayerY = 0;         // Position Y du joueur pendant le dunk
-float dunkBallX = 0;           // Position X du ballon pendant le dunk
-float dunkBallY = 0;           // Position Y du ballon pendant le dunk
-int showDunkPrompt = 0;        // Afficher le prompt pour dunker
-float dunkBallVelY = 0;
-int dunkBallBounced = 0;
-int ballFallen = 0;
 
 int TuilesNotSpecial[] = {0, 1, 2};
 int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
@@ -940,13 +921,6 @@ void UpdateGame(void) {
         showInteractPromptBureau = 1;
     }
 
-    // --- DÉTECTION PROXIMITÉ POUR LE DUNK (ballon tuile 79) ---
-    float distance_ballon;
-    showDunkPrompt = 0;
-    if (IsLocationObjet(28, 0, 79, &distance_ballon) && !isSitting && !isSleeping && !isDunking) {
-        showDunkPrompt = 1;
-    }
-
     // --- Calcul pour les pièces du tableau dans le labyrinthe ---
     showInteractPromptObjetTableau=0;
 
@@ -1012,7 +986,6 @@ void UpdateGame(void) {
                 isSleeping = 1;
                 sleepAnimFrame = 0;
                 sleepAnimTimer = 0;
-                sleepBreathOffset = 0;
                 // Positionner le joueur précisément sur le lit (centré entre colonnes 3-4, lignes 2-3)
                 player.x = 3.5f * TILE_SIZE;
                 player.y = 2.2f * TILE_SIZE;
@@ -1028,7 +1001,6 @@ void UpdateGame(void) {
                 savedPlayerX = player.x;
                 savedPlayerY = player.y;
                 isSitting = 1;
-                sitIdleTimer = 0;
                 // Positionner le joueur précisément sur la chaise (colonne 6, ligne 12)
                 player.x = 6 * TILE_SIZE + 2;
                 player.y = 12 * TILE_SIZE + 2;
@@ -1039,155 +1011,20 @@ void UpdateGame(void) {
                 player.x = savedPlayerX;
                 player.y = savedPlayerY;
             }
-            // --- DÉMARRER LE DUNK ---
-            else if (showDunkPrompt && !isDunking && currentLevel == 0 && !ballFallen) {
-                // Sauvegarder la position de départ
-                savedPlayerX = player.x;
-                savedPlayerY = player.y;
-                
-                // Initialiser le dunk
-                isDunking = 1;
-                dunkState = 1; // État : saut
-                dunkTimer = 0;
-                
-                // Position initiale du joueur et du ballon
-                dunkPlayerX = player.x;
-                dunkPlayerY = player.y;
-                dunkBallX = 2 * TILE_SIZE + 8;  // Position du ballon au sol
-                dunkBallY = 12 * TILE_SIZE + 8;
-                
-                // Retirer le ballon de la carte
-                maps[0][12][2] = 1;
-            }
             toucheX_Relache = 0;
         }
     } else {
         toucheX_Relache = 1;
     }
     
-    // --- BLOQUER LE MOUVEMENT SI ON DORT, ON EST ASSIS OU EN TRAIN DE DUNKER ---
-    if (isSleeping || isSitting || isDunking) {
-        // Animation de respiration pour le sommeil
+    if (isSleeping || isSitting) {
         if (isSleeping) {
             sleepAnimTimer++;
-            // Changement de frame Zzz toutes les 45 frames (plus lent et naturel)
             if (sleepAnimTimer % 45 == 0) {
                 sleepAnimFrame = (sleepAnimFrame + 1) % 3;
             }
-            // L'effet de respiration est calculé directement dans DrawGame avec sleepAnimTimer
         }
-        // Animation subtile pour l'état assis
-        if (isSitting) {
-            sitIdleTimer++;
-            // Reset pour éviter overflow
-            if (sitIdleTimer > 1000) sitIdleTimer = 0;
-        }
-        
-        // --- ANIMATION DU DUNK ---
-        if (isDunking) {
-            dunkTimer++;
-            
-            // Position du panier (cercle)
-            float basketX = 1 * TILE_SIZE + 8;
-            float basketY = 11 * TILE_SIZE + 10;
-            float solY = 12 * TILE_SIZE + 8;
-            
-            if (dunkState == 1) {
-                float progress = dunkTimer / 30.0f;
-                if (progress > 1.0f) progress = 1.0f;
-                
-                dunkPlayerX = savedPlayerX + (basketX - savedPlayerX) * progress;
-                dunkPlayerY = savedPlayerY + (basketY - 20 - savedPlayerY) * progress;
-                
-                dunkBallX = dunkPlayerX;
-                dunkBallY = dunkPlayerY + 10;
-                
-                if (dunkTimer >= 30) {
-                    dunkState = 2;
-                    dunkTimer = 0;
-                }
-            }
-            else if (dunkState == 2) {
-                dunkPlayerX = basketX;
-                dunkPlayerY = basketY - 15;
-                
-                dunkBallX = dunkPlayerX;
-                dunkBallY = dunkPlayerY + 8;
-                
-                if (dunkTimer >= 20) {
-                    dunkState = 3;
-                    dunkTimer = 0;
-                }
-            }
-            else if (dunkState == 3) {
-                dunkPlayerX = basketX;
-                dunkPlayerY = basketY - 15;
-                
-                float ballProgress = dunkTimer / 15.0f;
-                if (ballProgress > 1.0f) ballProgress = 1.0f;
-                
-                dunkBallX = basketX;
-                dunkBallY = (basketY - 10) + (solY - (basketY - 10)) * ballProgress;
-                
-                if (dunkTimer >= 15) {
-                    dunkState = 4;
-                    dunkTimer = 0;
-                    dunkBallVelY = -3.0f;
-                    dunkBallBounced = 0;
-                }
-            }
-            else if (dunkState == 4) {
-                float progress = dunkTimer / 35.0f;
-                if (progress > 1.0f) progress = 1.0f;
-                
-                dunkPlayerX = basketX;
-                dunkPlayerY = (basketY - 15) + (savedPlayerY - (basketY - 15)) * progress;
-                
-                if (!dunkBallBounced) {
-                    dunkBallVelY += 0.4f;
-                    dunkBallY += dunkBallVelY;
-                    
-                    if (dunkBallY >= solY) {
-                        dunkBallY = solY;
-                        dunkBallVelY = -2.0f;
-                        dunkBallBounced = 1;
-                    }
-                } else {
-                    dunkBallVelY += 0.4f;
-                    dunkBallY += dunkBallVelY;
-                    if (dunkBallY >= solY) {
-                        dunkBallY = solY;
-                        dunkBallVelY = 0;
-                    }
-                }
-                
-                if (dunkTimer >= 35) {
-                    dunkState = 5;
-                    dunkTimer = 0;
-                }
-            }
-            else if (dunkState == 5) {
-                float progress = dunkTimer / 30.0f;
-                if (progress > 1.0f) progress = 1.0f;
-                
-                dunkPlayerX = basketX + (savedPlayerX - basketX) * progress;
-                dunkPlayerY = savedPlayerY;
-                
-                if (dunkTimer >= 30) {
-                    isDunking = 0;
-                    dunkState = 0;
-                    dunkTimer = 0;
-                    player.x = savedPlayerX;
-                    player.y = savedPlayerY;
-                    ballFallen = 1;
-                }
-            }
-            
-            player.x = dunkPlayerX;
-            player.y = dunkPlayerY;
-        }
-        
-        return; // On bloque les mouvements et le reste de l'update
+        return;
     }
     
     if (state[SDL_SCANCODE_E]) {
@@ -1730,35 +1567,24 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
 
     // --- AFFICHAGE DU JOUEUR (avec états spéciaux) ---
     if (isSleeping) {
-        // Joueur allongé VERTICALEMENT sur le lit
-        // Structure du lit :
-        // Ligne 1 (y=1): oreillers (36, 37) aux colonnes 3-4
-        // Ligne 2 (y=2): haut lit (32, 33) aux colonnes 3-4  
-        // Ligne 3 (y=3): bas lit (34, 35) aux colonnes 3-4
-        // Le joueur doit avoir la TÊTE vers les oreillers (en haut) et PIEDS vers le bas
-        
         SDL_Rect srcPlayer = { 112, 0, 16, 16 };
-        
-        // Effet de respiration réaliste (poitrine qui se soulève)
-        float breathEffect = sinf(sleepAnimTimer * 0.08f) * 1.2f;
+        float breathEffect = sinf(sleepAnimTimer * 0.08f) * 1.0f;
         
         SDL_Rect destPlayer = { 
-            (int)(3.5f * TILE_SIZE),  // Centré horizontalement entre colonnes 3 et 4
-            (int)(2.2f * TILE_SIZE) + (int)breathEffect,  // Centré verticalement sur le lit (entre ligne 2 et 3)
+            (int)(3.5f * TILE_SIZE),
+            (int)(2.2f * TILE_SIZE + breathEffect),
             16, 16 
         };
         
-        // Rotation 0° = tête en haut (vers oreillers), pieds en bas - position naturelle
         SDL_RenderCopyEx(renderer, tilesetTexture, &srcPlayer, &destPlayer, 0.0, NULL, SDL_FLIP_NONE);
         
-        // --- EFFET "Zzz" ANIMÉ avec flottement ---
+        // Effet "Zzz"
         SDL_Color cBlanc = {255, 255, 255, 255};
         char zzzText[8];
         if (sleepAnimFrame == 0) strcpy(zzzText, "z");
         else if (sleepAnimFrame == 1) strcpy(zzzText, "zZ");
         else strcpy(zzzText, "zZz");
         
-        // Les Zzz flottent doucement vers le haut au-dessus de la tête
         float zzzFloat = sinf(sleepAnimTimer * 0.15f) * 2.0f;
         
         SDL_Surface *sZzz = TTF_RenderText_Solid(fontMini, zzzText, cBlanc);
@@ -1790,29 +1616,15 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         }
     }
     else if (isSitting) {
-        // Joueur assis sur la chaise, face au bureau
-        // Structure :
-        // Ligne 12 (y=12): chaise (51) à la colonne 6
-        // Ligne 13 (y=13): bureau (46, 47, 48, 49) aux colonnes 6-9
-        // Le joueur doit être ASSIS sur la chaise (ligne 12), regardant vers le bureau (ligne 13)
-        
         SDL_Rect srcPlayer = { 112, 0, 16, 16 };
-        
-        // Petit mouvement subtil comme si le personnage bougeait légèrement (respiration, ajustement posture)
-        float idleMoveX = sinf(sitIdleTimer * 0.05f) * 0.3f;
-        float idleMoveY = sinf(sitIdleTimer * 0.08f) * 0.2f; // Légère oscillation verticale (respiration)
-        
         SDL_Rect destPlayer = { 
-            (int)(6 * TILE_SIZE) + 2 + (int)idleMoveX,  // Centré sur la colonne 6 (chaise)
-            (int)(12 * TILE_SIZE) + 2 + (int)idleMoveY, // Positionné SUR la chaise (ligne 12), pas au-dessus
+            (int)(6 * TILE_SIZE + 2),
+            (int)(12 * TILE_SIZE + 2),
             16, 16 
         };
         
-        // Le joueur regarde vers le haut (vers le bureau ligne 13)
-        // Pas de rotation, pas de flip - posture naturelle assise
         SDL_RenderCopyEx(renderer, tilesetTexture, &srcPlayer, &destPlayer, 0.0, NULL, SDL_FLIP_NONE);
         
-        // Instruction pour se lever
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sStand = TTF_RenderText_Solid(fontMini, "[X] Se lever", cBlanc);
         if (sStand) {
@@ -1836,30 +1648,14 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
     }  
 
-    // --- RENDU DU PANNEAU DE BASKET EN PREMIER PLAN (effet 3D) ---
-    // Le panneau est dessiné après le joueur pour créer un effet de profondeur
+    // Panneau de basket (dessiné après le joueur pour effet de profondeur)
     if (tilesetTexture && currentLevel == 0) {
-        // Position du panneau : colonne 1, ligne 11 (tuile 78)
         int panneauX = 1;
         int panneauY = 11;
-        
         float intensite = getLuminosite(panneauX, panneauY, rayon);
         if (intensite > 0.0f) {
             int lum = (int)(intensite * 255);
-            // Dessiner le panneau de basket (78)
             DrawTuiles(panneauX, panneauY, 78, renderer, lum);
-        }
-    }
-    
-    if ((isDunking || ballFallen) && currentLevel == 0) {
-        float ballLum = getLuminosite((int)(dunkBallX / TILE_SIZE), (int)(dunkBallY / TILE_SIZE), rayon);
-        if (ballLum > 0.0f) {
-            int lumBall = (int)(ballLum * 255);
-            SDL_SetTextureColorMod(tilesetTexture, lumBall, lumBall, lumBall);
-            SDL_Rect srcBall = { 79 * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
-            SDL_Rect destBall = { (int)dunkBallX - 6, (int)dunkBallY - 6, 12, 12 };
-            SDL_RenderCopy(renderer, tilesetTexture, &srcBall, &destBall);
-            SDL_SetTextureColorMod(tilesetTexture, 255, 255, 255);
         }
     }
 
@@ -1908,13 +1704,6 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     if (showInteractPromptBureau == 1 && !isSitting && !isSleeping) {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] S'asseoir", cBlanc);
-        if (sText) DrawInteractions(renderer, sText);
-    }
-    
-    // Prompt pour dunker
-    if (showDunkPrompt == 1 && !isDunking) {
-        SDL_Color cBlanc = {255, 255, 255, 255};
-        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[X] Dunker", cBlanc);
         if (sText) DrawInteractions(renderer, sText);
     }
 
