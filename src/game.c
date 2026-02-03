@@ -1654,13 +1654,9 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         
         SDL_Rect srcPlayer = { 112, 0, 16, 16 };
         
-        // Petit mouvement subtil comme si le personnage bougeait légèrement (respiration, ajustement posture)
-        float idleMoveX = sinf(sitIdleTimer * 0.05f) * 0.3f;
-        float idleMoveY = sinf(sitIdleTimer * 0.08f) * 0.2f; // Légère oscillation verticale (respiration)
-        
         SDL_Rect destPlayer = { 
-            (int)(6 * TILE_SIZE) + 2 + (int)idleMoveX,  // Centré sur la colonne 6 (chaise)
-            (int)(12 * TILE_SIZE) + 2 + (int)idleMoveY, // Positionné SUR la chaise (ligne 12), pas au-dessus
+            (int)(6 * TILE_SIZE) + 2,  // Centré sur la colonne 6 (chaise)
+            (int)(12 * TILE_SIZE) + 2, // Positionné SUR la chaise (ligne 12), pas au-dessus
             16, 16 
         };
         
