@@ -357,6 +357,12 @@ float savedPlayerX = 0;       // Position sauvegardée du joueur
 float savedPlayerY = 0;
 static int toucheX_Relache = 1;
 
+// --- VARIABLES POUR LES STATUES ---
+int show_interact_prompt_statue_haut = 0;
+int show_interact_prompt_statue_bas = 0;
+int has_water = 0;
+int has_drawing = 0;
+
 int TuilesNotSpecial[] = {0, 1, 2};
 int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
 
@@ -1736,6 +1742,28 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Entrer", cBlanc);
         
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    
+    // --- AFFICHAGE DES PROMPTS POUR STATUES ---
+    if (show_interact_prompt_statue_haut == 1 && has_water == 0) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Interagir", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (show_interact_prompt_statue_haut == 1 && has_water == 1){
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Donner", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (show_interact_prompt_statue_bas == 1 && has_drawing == 0) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Interagir", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (show_interact_prompt_statue_bas == 1 && has_drawing == 1) {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Donner", cBlanc);
         if (sText) DrawInteractions(renderer, sText);
     }
     
