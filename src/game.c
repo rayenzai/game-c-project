@@ -369,7 +369,7 @@ int showInteractTableau = 0;
 int showInteractImpossibleObjet = 0;
 int whichTableauPiece = 0;
 
-int cpt_piece_tableau = 0;
+int cpt_piece_tableau = 4;
 
 int TuilesNotSpecial[] = {0, 1, 2};
 int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
@@ -875,10 +875,21 @@ void UpdateGame(void) {
     float distance_morceauTableau4;
     if(IsLocationObjet(16, 8, 116, &distance_morceauTableau4, -1, -1)) showInteractPromptObjetTableau = 1;
 
-    // Ouverture de la salle du niveau 3
+    // Ouverture de la salle du niveau 3 (cuisine) - ouvrir le passage à gauche du hall
     if(cpt_piece_tableau == 4){
+        // Ouvrir toutes les cases du passage (lignes 5-8, colonnes 0-1)
+        maps_patern[2][5][0] = 138;
+        maps_patern[2][5][1] = 138;
+        maps_patern[2][6][0] = 138;
+        maps_patern[2][6][1] = 138;
         maps_patern[2][7][0] = 138;
-        maps_patern[2][8][0] = 138; 
+        maps_patern[2][8][0] = 138;
+        
+        // Modifier maps aussi (pour les collisions basées sur les tiles visuels)
+        maps[2][5][0] = 0;
+        maps[2][6][0] = 0;
+        maps[2][7][0] = 0;
+        maps[2][8][0] = 0;
     }
     // Calcul distance entre joueur et le tableau
 
