@@ -150,6 +150,12 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 181 = tirroir mur gauche 
 182,183 = bouteille renversée 
 184 = toile d'araignée
+.........................
+-chambre parents-
+185 = commode avec télécommande (bas)
+186 = suite commode (haut)
+187,188,189 = lit bas 
+190,191,192 = lit haut avec monstre qui dort
 */
 
 
