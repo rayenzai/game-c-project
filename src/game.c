@@ -1223,7 +1223,7 @@ void UpdateGame(void) {
     if (currentLevel >= 5) {
         ActionFantome(200); 
     }
-    currentLevel = 10;
+    // currentLevel = 10;
     // --- GESTION COLLISION JOUEUR / FANTOME (GAME OVER / RESET) ---
     if (currentLevel >= 5 && currentLevel <=8) {
         
@@ -1275,7 +1275,7 @@ void UpdateGame(void) {
         player.y = 10;
     }
     hasDoudou = 1;
-    GestionPapa();
+    // if(currentLevel == 10)GestionPapa();
 
 
 
