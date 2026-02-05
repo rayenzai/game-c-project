@@ -334,8 +334,8 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
     },
     // Chambre des parents (index 10)
     {    
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 8, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
@@ -391,6 +391,8 @@ int cpt_piece_tableau = 0;
 
 int TuilesNotSpecial[] = {0, 1, 2};
 int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
+
+int papaReveil = 0;
 
 // --- INITIALISATION ---
 void InitGame(SDL_Renderer *renderer) {
@@ -782,7 +784,6 @@ void UpdateGame(void) {
 
     if (!touchWallX) player.x = nextX;
 
-    
     // Collision Y
     int touchWallY = 0;
     if (isWall(player.x, nextY)) touchWallY = 1;
@@ -798,7 +799,11 @@ void UpdateGame(void) {
     //     Mix_Volume(2, 0);  // On coupe le son si on arrête
     // }
 
-
+    if( (dirX != 0 || dirY != 0) && papaReveil==1 && currentLevel == 10){
+        player.y = (MAP_HEIGHT * TILE_SIZE)-60;
+        player.x = 10 * TILE_SIZE;
+    }
+    
     float distance;
 
     showInteractPrompt = 0;
@@ -1078,6 +1083,7 @@ void UpdateGame(void) {
             toucheEnter_Relache = 1;
     }
     
+
     
 
     // 1. Quitter la CHAMBRE (Niveau 0) par le HAUT
@@ -1204,7 +1210,7 @@ void UpdateGame(void) {
     if (currentLevel >= 5) {
         ActionFantome(200); 
     }
-
+    currentLevel = 10;
     // --- GESTION COLLISION JOUEUR / FANTOME (GAME OVER / RESET) ---
     if (currentLevel >= 5 && currentLevel <=8) {
         
@@ -1256,8 +1262,29 @@ void UpdateGame(void) {
         player.y = 10;
     }
     hasDoudou = 1;
+    GestionPapa();
+
+
 
     // printf("lvl: %d \n", currentLevel);
+}
+
+void GestionPapa() {
+    static Uint32 dernierTemps = 0; 
+    Uint32 tempsActuel = SDL_GetTicks();
+
+    if (papaReveil == 0) {
+        if (tempsActuel - dernierTemps > 5000) {
+            papaReveil = 1;          
+            dernierTemps = tempsActuel; 
+        }
+    } 
+    else {
+        if (tempsActuel - dernierTemps > 2000) {
+            papaReveil = 0;          
+            dernierTemps = tempsActuel; 
+        }
+    }
 }
 
 int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance, int x, int y){
@@ -1470,6 +1497,54 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
             
         }
     }
+
+    // --- EFFET SOMMEIL / REVEIL PARENTS ---
+    // Uniquement dans la chambre des parents (Index 10)
+    if (currentLevel == 10) { 
+        
+        // Coordonnées approximatives du lit des parents (à ajuster selon ta map)
+        // Disons que le lit est vers le milieu de la pièce
+        int litX = 15 * TILE_SIZE; 
+        int litY = 3 * TILE_SIZE;  
+
+        // Calcul de distance pour savoir si on réveille les parents
+        float dx = player.x - litX;
+        float dy = player.y - litY;
+        float distParents = sqrt(dx*dx + dy*dy);
+
+        // Si le joueur est proche (< 50 pixels) -> REVEIL (!)
+        if (distParents < 50 && estEclaire(15, 3, rayon) && papaReveil) {
+            SDL_Color cRouge = {255, 0, 0, 255};
+            // On utilise la grande police pour un gros "!"
+            SDL_Surface *sBang = TTF_RenderText_Solid(font, "!", cRouge); 
+            if (sBang) {
+                SDL_Texture *tBang = SDL_CreateTextureFromSurface(renderer, sBang);
+                // Le "!" s'affiche juste au-dessus du lit
+                SDL_Rect rBang = { litX, litY - 20, sBang->w, sBang->h }; 
+                SDL_RenderCopy(renderer, tBang, NULL, &rBang);
+                SDL_FreeSurface(sBang);
+                SDL_DestroyTexture(tBang);
+            }
+        } 
+        // Sinon -> DORT (Zzz...)
+        else if(estEclaire(15, 3, rayon) && !papaReveil) {
+            // Animation : Le texte monte de 0 à 10 pixels en boucle
+            // (SDL_GetTicks() / 200) ralentit le temps, % 10 crée la boucle
+            int offsetAnim = (SDL_GetTicks() / 200) % 10; 
+
+            SDL_Color cBlanc = {200, 200, 255, 255}; // Bleu très clair
+            SDL_Surface *sZzz = TTF_RenderText_Solid(fontMini, "Zzz...", cBlanc);
+            if (sZzz) {
+                SDL_Texture *tZzz = SDL_CreateTextureFromSurface(renderer, sZzz);
+                // On dessine le texte qui flotte (Y - offsetAnim)
+                SDL_Rect rZzz = { litX, litY - 10 - offsetAnim, sZzz->w, sZzz->h }; 
+                SDL_RenderCopy(renderer, tZzz, NULL, &rZzz);
+                SDL_FreeSurface(sZzz);
+                SDL_DestroyTexture(tZzz);
+            }
+        }
+    }
+
     //dialogues
     if (dialogueStep > 0) {
         char *texteAffiche = "";
