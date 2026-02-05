@@ -130,6 +130,7 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 145,146 = fleur du pot de fleurs
 153(bas),154 = fenetre 
 ...........................
+-cuisine-
 
 */
 
@@ -596,6 +597,7 @@ void ManageMusic() {
 void UpdateGame(void) {
     const Uint8 *state = SDL_GetKeyboardState(NULL);
     // --- MODE DIALOGUE (Joueur Bloqué) ---
+    cpt_piece_tableau=4;
     if (dialogueStep > 0) {
 
         if (state[SDL_SCANCODE_RETURN]) {
