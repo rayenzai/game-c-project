@@ -12,7 +12,7 @@
 #define LOGICAL_HEIGHT 240
 #define MAP_WIDTH 20        
 #define MAP_HEIGHT 15  
-#define NB_LEVELS 10 
+#define NB_LEVELS 11 
 #define PLAYER_SPEED 2.0f 
 
 
@@ -48,6 +48,7 @@ void DrawTexte(char *texteAffiche, SDL_Renderer *renderer,TTF_Font *font, int x,
 void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText);
 void TrouveCoordonnees(int *nvx, int *nvy, int indexObjet, int CurrLvl);
 int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance, int x, int y);
+void GestionPapa();
 
 extern int currentLevel; 
 
