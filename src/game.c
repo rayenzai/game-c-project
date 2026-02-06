@@ -18,6 +18,15 @@
 static Mix_Chunk *sonPickUp = NULL;
 static Mix_Chunk *sonOpenDoor = NULL;
 static Mix_Chunk *sonCloseDoor = NULL;
+static Mix_Chunk *sonProjectileHit = NULL;
+
+// Variables pour l'effet de flash lors d'une collision
+static int hitFlashTimer = 0;
+static int hitFlashDuration = 20;  // Durée du flash en frames
+static int knockbackTimer = 0;
+static float knockbackVX = 0.0f;
+static float knockbackVY = 0.0f;
+static int hitCount = 0;  // Compteur de coups (3 coups = reset)
 
 // Musiques D'ambiance
 static Mix_Music *MusicInterior = NULL;
@@ -142,6 +151,16 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 167,168 = lavabo 
 169,170 = plaque cuisson 
 171 = bloc seul
+...........................
+-salle à manger (Cauchemar)-
+175 = sol salle à manger
+176,177 = gargouille gauche (haut, bas)
+178,179 = gargouille droite (haut, bas)
+180 = assiette (projectile)
+181 = couteau (projectile)
+182,183 = vaisselle cassée gauche
+184,185 = vaisselle cassée droite
+186 = table longue
 
 */
 
@@ -332,6 +351,46 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {50, 50, 50, 50, 50, 50, 50,  50,  50,  50, 50,  50,  50, 50, 50, 50, 50, 50, 50, 50}, 
         {50, 50, 50, 50, 50, 50, 50,  50,  50,  50, 50,  50,  50, 50, 50, 50, 50, 50, 50, 50}
     },
+    
+    // SALLE À MANGER - CAUCHEMAR (index 10)
+    // Longue salle de banquet - couloir central avec murs décorés sur les côtés
+    {
+        {2,   2,   2,   2,   2,   2,   2,   2, 155, 155, 155, 155,   2,   2,   2,   2,   2,   2,   2,   2},  // Sortie en haut (ouverte)
+        {2,   2,   2,   2,   2,   2,   2, 156, 155, 155, 155, 155, 157,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2, 158, 155, 155, 155, 155, 159,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2, 156, 155, 155, 155, 155, 157,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2, 158, 155, 155, 155, 155, 159,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2, 156, 155, 155, 155, 155, 157,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2, 158, 155, 160, 161, 155, 159,   2,   2,   2,   2,   2,   2,   2},  // Table au centre
+        {2,   2,   2,   2,   2,   2,   2, 156, 155, 162, 163, 155, 157,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2, 158, 155, 164, 165, 155, 159,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2, 156, 155, 155, 155, 155, 157,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2, 158, 155, 155, 155, 155, 159,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2, 156, 155, 155, 155, 155, 157,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2, 158, 155, 155, 155, 155, 159,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2,   2, 155, 155, 155, 155,   2,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2,   2, 155, 155, 155, 155,   2,   2,   2,   2,   2,   2,   2,   2}   // Entrée en bas
+    },
+    
+    // CHAMBRE DES PARENTS (index 11)
+    // Après la salle à manger : Chambre avec vaisselle cassée éparpillée sur le sol
+    {
+        {2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   0,   0,  32,  33,   0,   0, 156, 157,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},  // Lit des parents + vaisselle
+        {2,   2,   0,   0,  34,  35,   0,   0, 158, 159,   0,   0, 156, 157,   0,   0,   0,   0,   2,   2},  // Vaisselle éparpillée
+        {2,   2,   0,   0,  36,  37,   0,   0,   0,   0,   0,   0, 158, 159,   0,   0,   0,   0,   2,   2},
+        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  42,  43,   0,   2,   2},  // Commode
+        {2,   2, 156, 157,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},  // Vaisselle au sol
+        {2,   2, 158, 159,   0,   0,   0,   0,  30,  31,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},  // Tapis rond
+        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 156, 157,   0,   0,   0,   0,   2,   2},  // Vaisselle
+        {2,   2,   0,   0, 156, 157,   0,   0,   0,   0,   0,   0, 158, 159,   0,   0,   0,   0,   2,   2},  // Vaisselle éparpillée
+        {2,   2,   0,   0, 158, 159,   0,   0,   0,   0,   0,   0,   0,   0,   0, 156, 157,   0,   2,   2},  // Encore de la vaisselle
+        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 158, 159,   0,   2,   2},
+        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2,   2, 155, 155, 155, 155,   2,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2,   2, 155, 155, 155, 155,   2,   2,   2,   2,   2,   2,   2,   2}   // Entrée en bas
+    }
 };
  
 int dialogueStep = 0; 
@@ -341,6 +400,8 @@ int dialogue_statue_haut = 0;
 int dialogue_statue_bas = 0;
 int dialogue_entree_labyrinthe = 0;
 int dialogue_max_objet = 0;
+int dialogue_salle_manger = 0;
+int dialogue_chambre_parents = 0;
 int toucheRelache = 0;
 int hasDoudou = 0;
 int showInteractPrompt = 0;
@@ -371,6 +432,12 @@ int whichTableauPiece = 0;
 
 int cpt_piece_tableau = 4;
 
+// --- VARIABLES PROJECTILES ---
+Projectile projectiles[MAX_PROJECTILES];
+int projectileSpawnTimer = 0;
+#define PROJECTILE_SPAWN_RATE 60  // Génère un projectile toutes les 60 frames (1 seconde à 60 FPS)
+#define PROJECTILE_SPEED 2.5f
+
 int TuilesNotSpecial[] = {0, 1, 2};
 int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
 
@@ -380,10 +447,12 @@ void InitGame(SDL_Renderer *renderer) {
     player.y = 50; 
     player.w = 12; 
     player.h = 12;
-    dialogueStep = 1;
+    dialogueStep = 1;  // Remettre les dialogues du début
     toucheRelache = 0;
     hasDoudou = 0;
 
+    // Initialisation des projectiles
+    InitProjectiles();
 
     // Test pour le fantome
     fantome.x = 8 * TILE_SIZE; 
@@ -398,12 +467,14 @@ void InitGame(SDL_Renderer *renderer) {
     sonPickUp = chargement_son_item_pick_up();
     sonOpenDoor = chargement_son_door_open();
     sonCloseDoor = chargement_son_door_close();
+    sonProjectileHit = chargement_son_transition();  // Son de collision avec projectiles
     MusicInterior = chargement_son_ambiance();
     MusicExterior = chargement_son_exterieur();
     
-    // currentLevel = 5;
-    // player.x = 20; 
-    // player.y = 12*TILE_SIZE ;
+    // Le jeu commence dans la chambre (niveau 0)
+    // currentLevel = 10;  // Test salle à manger désactivé
+    // player.x = 160; 
+    // player.y = 200;
     // hasDoudou = 1;
 
     // Chargement du Tileset
@@ -754,22 +825,26 @@ void UpdateGame(void) {
     // 3. On applique la VITESSE
     float nextX = player.x + (dirX * PLAYER_SPEED);
     float nextY = player.y + (dirY * PLAYER_SPEED);
-    // Collision X
+    
+    // Marge de sécurité pour éviter les bugs de collision (1 pixel)
+    float margin = 1.0f;
+    
+    // Collision X avec marge de sécurité
     int touchWallX = 0;
-    if (isWall(nextX, player.y)) touchWallX = 1;
-    if (isWall(nextX + player.w, player.y)) touchWallX = 1;
-    if (isWall(nextX, player.y + player.h)) touchWallX = 1;
-    if (isWall(nextX + player.w, player.y + player.h)) touchWallX = 1;
+    if (isWall(nextX + margin, player.y + margin)) touchWallX = 1;
+    if (isWall(nextX + player.w - margin, player.y + margin)) touchWallX = 1;
+    if (isWall(nextX + margin, player.y + player.h - margin)) touchWallX = 1;
+    if (isWall(nextX + player.w - margin, player.y + player.h - margin)) touchWallX = 1;
 
     if (!touchWallX) player.x = nextX;
 
     
-    // Collision Y
+    // Collision Y avec marge de sécurité
     int touchWallY = 0;
-    if (isWall(player.x, nextY)) touchWallY = 1;
-    if (isWall(player.x + player.w, nextY)) touchWallY = 1;
-    if (isWall(player.x, nextY + player.h)) touchWallY = 1;
-    if (isWall(player.x + player.w, nextY + player.h)) touchWallY = 1;
+    if (isWall(player.x + margin, nextY + margin)) touchWallY = 1;
+    if (isWall(player.x + player.w - margin, nextY + margin)) touchWallY = 1;
+    if (isWall(player.x + margin, nextY + player.h - margin)) touchWallY = 1;
+    if (isWall(player.x + player.w - margin, nextY + player.h - margin)) touchWallY = 1;
 
     if (!touchWallY) player.y = nextY;
 
@@ -1117,7 +1192,41 @@ void UpdateGame(void) {
         player.x = 5;     
         
     }
+    
+    // === TRANSITION CUISINE -> SALLE À MANGER (CAUCHEMAR) ===
     if (IsLocationUp(8, 13, 3, 5)) {
+        currentLevel = 10;  // Salle à manger cauchemar
+        player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
+        InitProjectiles();  // Réinitialise les projectiles
+        dialogue_salle_manger = 1;  // Déclenche le dialogue d'encouragement
+    }
+    
+    // === TRANSITION SALLE À MANGER CAUCHEMAR -> CHAMBRE DES PARENTS (AU RÉVEIL) ===
+    // Le joueur atteint le haut de la salle (a traversé tout le couloir)
+    else if (IsLocationUp(8, 13, 10, 5)) {
+        currentLevel = 11;  // Chambre des parents
+        player.x = 155;  // Position centrale
+        player.y = (MAP_HEIGHT * TILE_SIZE) - 25;
+        dialogue_chambre_parents = 1;  // Déclenche le dialogue
+    }
+    
+    // === RETOURS ===
+    // Retour de la salle à manger réalité vers la salle à manger cauchemar
+    else if (IsLocationDown(8, 13, 11, 20)) {
+        currentLevel = 10;
+        player.x = 155;
+        player.y = 10;
+        InitProjectiles();
+    }
+    
+    // Retour du cauchemar vers la cuisine (si le joueur recule)
+    else if (IsLocationDown(8, 13, 10, 20)) {
+        currentLevel = 3;
+        player.y = 10;
+        InitProjectiles();  // Nettoie les projectiles
+    }
+    
+    if (IsLocationUp(8, 13, 4, 5)) {
             currentLevel = 4; 
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
     }
@@ -1192,6 +1301,73 @@ void UpdateGame(void) {
 
     // Changement de son d'ambiance
     ManageMusic();
+
+    // === MISE À JOUR DES PROJECTILES (SALLE À MANGER) ===
+    UpdateProjectiles();
+    
+    // Mise à jour du timer de flash
+    if (hitFlashTimer > 0) {
+        hitFlashTimer--;
+    }
+    
+    // Mise à jour du recul (knockback)
+    if (knockbackTimer > 0) {
+        knockbackTimer--;
+        // Applique le recul
+        float nextKnockX = player.x + knockbackVX;
+        float nextKnockY = player.y + knockbackVY;
+        
+        // Vérifie les collisions avec les murs pendant le recul
+        if (!isWall(nextKnockX, player.y) && !isWall(nextKnockX + player.w, player.y) &&
+            !isWall(nextKnockX, player.y + player.h) && !isWall(nextKnockX + player.w, player.y + player.h)) {
+            player.x = nextKnockX;
+        }
+        
+        if (!isWall(player.x, nextKnockY) && !isWall(player.x + player.w, nextKnockY) &&
+            !isWall(player.x, nextKnockY + player.h) && !isWall(player.x + player.w, nextKnockY + player.h)) {
+            player.y = nextKnockY;
+        }
+        
+        // Réduction progressive du recul
+        knockbackVX *= 0.85f;
+        knockbackVY *= 0.85f;
+    }
+    
+    // Vérification de collision avec les projectiles (seulement si pas déjà en recul)
+    if (knockbackTimer <= 0 && CheckProjectileCollision(player.x, player.y, player.w, player.h)) {
+        printf("TOUCHÉ PAR UN PROJECTILE ! (%d/3)\n", hitCount + 1);
+        
+        // Jouer le son de collision
+        if (sonProjectileHit) {
+            Mix_PlayChannel(-1, sonProjectileHit, 0);
+        }
+        
+        // Déclencher l'effet de flash rouge
+        hitFlashTimer = hitFlashDuration;
+        
+        // Incrémenter le compteur de coups
+        hitCount++;
+        
+        // Calculer la direction du recul (opposée au projectile)
+        // Recule vers le bas (vers la sortie)
+        knockbackVX = 0.0f;
+        knockbackVY = 4.0f;  // Recul vers le bas
+        knockbackTimer = 15;  // Durée du recul
+        
+        // Si 3 coups, reset vers la cuisine
+        if (hitCount >= 3) {
+            currentLevel = 3;
+            player.x = 160;
+            player.y = 50;
+            InitProjectiles();
+            hitCount = 0;  // Reset du compteur
+        }
+    }
+    
+    // Reset du compteur si on quitte le niveau 10
+    if (currentLevel != 10) {
+        hitCount = 0;
+    }
 
     if (currentLevel >= 5) {
         ActionFantome(200); 
@@ -1452,6 +1628,20 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
             
         }
     }
+    
+    // === DESSINER LES PROJECTILES (SALLE À MANGER) ===
+    DrawProjectiles(renderer);
+    
+    // === EFFET DE FLASH ROUGE LORS D'UNE COLLISION ===
+    if (hitFlashTimer > 0) {
+        // Intensité du flash qui diminue progressivement
+        int alpha = (int)(200 * ((float)hitFlashTimer / hitFlashDuration));
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(renderer, 255, 50, 50, alpha);
+        SDL_Rect flashRect = {0, 0, MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE};
+        SDL_RenderFillRect(renderer, &flashRect);
+    }
+    
     //dialogues
     if (dialogueStep > 0) {
         char *texteAffiche = "";
@@ -1660,4 +1850,231 @@ void DrawTexte(char *texteAffiche, SDL_Renderer *renderer,TTF_Font *font, int x,
             SDL_FreeSurface(surfaceTexte);
             SDL_DestroyTexture(textureTexte);
         }
+}
+
+
+// SYS DE PROJECTILE POUR SALLE a manger 
+
+
+void InitProjectiles(void) {
+    for (int i = 0; i < MAX_PROJECTILES; i++) {
+        projectiles[i].active = 0;
+    }
+    projectileSpawnTimer = 0;
+}
+
+void SpawnProjectile(void) {
+    // Ne géneere des projectiles que dans le niveau cauchemar (index 10)
+    if (currentLevel != 10) return;
+    
+    // Cherche un slot libre
+    for (int i = 0; i < MAX_PROJECTILES; i++) {
+        if (!projectiles[i].active) {
+            projectiles[i].active = 1;
+            
+            // Position Y aléatoire dans le couloir (lignes 2 à 12)
+            int spawnRow = 2 + rand() % 10;
+            projectiles[i].y = spawnRow * TILE_SIZE + (rand() % 8);
+            
+            // VITESSE PROGRESSIVE 
+            // Plus le joueur avance vers le haut (y diminue), plus c'est difficile
+            // Zone de départ (bas) : vitesse lente
+            // Zone d'arrivée (haut) : vitesse rapide
+            float playerProgress = 1.0f - (player.y / (float)(MAP_HEIGHT * TILE_SIZE));
+            // playerProgress va de 0 (en bas) à 1 (en haut)
+            
+            // Vitesse de base : 1.2, vitesse max : 3.5
+            float baseSpeed = 1.2f;
+            float maxSpeed = 3.5f;
+            float currentSpeed = baseSpeed + (maxSpeed - baseSpeed) * playerProgress;
+            
+            // Légère variation aléatoire (+/- 20%)
+            float variation = 0.8f + ((rand() % 40) / 100.0f);
+            currentSpeed *= variation;
+            
+            // Alterne aléatoirement entre gauche et droite
+            int fromLeft = rand() % 2;
+            
+            if (fromLeft) {
+                // Projectile venant du mur gauche INTÉRIEUR (colonne 8)
+                projectiles[i].x = 8 * TILE_SIZE;
+                projectiles[i].vx = currentSpeed;
+            } else {
+                // Projectile venant du mur droit INTÉRIEUR (colonne 11)
+                projectiles[i].x = 11 * TILE_SIZE;
+                projectiles[i].vx = -currentSpeed;
+            }
+            
+            // Type aléatoire (0 = assiette, 1 = couteau)
+            projectiles[i].type = rand() % 2;
+            
+            break; // On ne génère qu'un projectile à la fois
+        }
+    }
+}
+
+void UpdateProjectiles(void) {
+    // Ne met à jour les projectiles que dans le niveau cauchemar
+    if (currentLevel != 10) return;
+    
+    // Génération de nouveaux projectiles
+    projectileSpawnTimer++;
+    if (projectileSpawnTimer >= PROJECTILE_SPAWN_RATE) {
+        SpawnProjectile();
+        projectileSpawnTimer = 0;
+    }
+    
+    // Mise à jour des projectiles existants
+    for (int i = 0; i < MAX_PROJECTILES; i++) {
+        if (projectiles[i].active) {
+            projectiles[i].x += projectiles[i].vx;
+            
+            // Désactive le projectile s'il sort de l'écran
+            if (projectiles[i].x < 0 || projectiles[i].x > MAP_WIDTH * TILE_SIZE) {
+                projectiles[i].active = 0;
+            }
+        }
+    }
+}
+
+// Fonction pour dessiner un cercle rempli (assiette)
+void DrawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius) {
+    for (int y = -radius; y <= radius; y++) {
+        for (int x = -radius; x <= radius; x++) {
+            if (x*x + y*y <= radius*radius) {
+                SDL_RenderDrawPoint(renderer, centerX + x, centerY + y);
+            }
+        }
+    }
+}
+
+// Fonction pour dessiner le contour d'un cercle
+void DrawCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius) {
+    int x = radius;
+    int y = 0;
+    int err = 0;
+    while (x >= y) {
+        SDL_RenderDrawPoint(renderer, centerX + x, centerY + y);
+        SDL_RenderDrawPoint(renderer, centerX + y, centerY + x);
+        SDL_RenderDrawPoint(renderer, centerX - y, centerY + x);
+        SDL_RenderDrawPoint(renderer, centerX - x, centerY + y);
+        SDL_RenderDrawPoint(renderer, centerX - x, centerY - y);
+        SDL_RenderDrawPoint(renderer, centerX - y, centerY - x);
+        SDL_RenderDrawPoint(renderer, centerX + y, centerY - x);
+        SDL_RenderDrawPoint(renderer, centerX + x, centerY - y);
+        y++;
+        if (err <= 0) { err += 2*y + 1; }
+        if (err > 0) { x--; err -= 2*x + 1; }
+    }
+}
+
+void DrawProjectiles(SDL_Renderer *renderer) {
+    // Ne dessine les projectiles que dans le niveau cauchemar
+    if (currentLevel != 10) return;
+    
+    for (int i = 0; i < MAX_PROJECTILES; i++) {
+        if (projectiles[i].active) {
+            int px = (int)projectiles[i].x;
+            int py = (int)projectiles[i].y;
+            
+            if (projectiles[i].type == 0) {
+                // === ASSIETTE RONDE (taille réduite) ===
+                int centerX = px + 6;
+                int centerY = py + 6;
+                
+                // Ombre de l'assiette
+                SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
+                DrawFilledCircle(renderer, centerX + 1, centerY + 1, 5);
+                
+                // Fond de l'assiette (blanc cassé)
+                SDL_SetRenderDrawColor(renderer, 245, 245, 240, 255);
+                DrawFilledCircle(renderer, centerX, centerY, 5);
+                
+                // Bordure extérieure dorée
+                SDL_SetRenderDrawColor(renderer, 180, 150, 80, 255);
+                DrawCircle(renderer, centerX, centerY, 5);
+                
+                // Cercle intérieur (creux de l'assiette)
+                SDL_SetRenderDrawColor(renderer, 220, 220, 215, 255);
+                DrawFilledCircle(renderer, centerX, centerY, 3);
+                
+                // Motif décoratif au centre
+                SDL_SetRenderDrawColor(renderer, 150, 120, 70, 255);
+                DrawCircle(renderer, centerX, centerY, 1);
+                
+            } else {
+                // === COUTEAU ÉLÉGANT (taille réduite) ===
+                // Direction du couteau (pointe vers la direction de déplacement)
+                int direction = (projectiles[i].vx > 0) ? 1 : -1;
+                
+                // Ombre du couteau
+                SDL_SetRenderDrawColor(renderer, 60, 60, 60, 255);
+                SDL_Rect shadow = { px + 2 + 1, py + 3 + 1, 8, 2 };
+                SDL_RenderFillRect(renderer, &shadow);
+                
+                // Lame du couteau (argentée brillante)
+                SDL_SetRenderDrawColor(renderer, 200, 205, 215, 255);
+                SDL_Rect blade = { px + 2, py + 3, 8, 2 };
+                SDL_RenderFillRect(renderer, &blade);
+                
+                // Reflet sur la lame
+                SDL_SetRenderDrawColor(renderer, 240, 245, 255, 255);
+                SDL_RenderDrawLine(renderer, px + 3, py + 3, px + 8, py + 3);
+                
+                // Tranchant de la lame (ligne fine)
+                SDL_SetRenderDrawColor(renderer, 150, 155, 165, 255);
+                SDL_RenderDrawLine(renderer, px + 2, py + 5, px + 9, py + 5);
+                
+                // Pointe du couteau
+                if (direction > 0) {
+                    SDL_SetRenderDrawColor(renderer, 180, 185, 195, 255);
+                    SDL_RenderDrawPoint(renderer, px + 10, py + 4);
+                } else {
+                    SDL_SetRenderDrawColor(renderer, 180, 185, 195, 255);
+                    SDL_RenderDrawPoint(renderer, px + 1, py + 4);
+                }
+                
+                // Manche du couteau (bois foncé)
+                SDL_SetRenderDrawColor(renderer, 90, 60, 40, 255);
+                SDL_Rect handle;
+                if (direction > 0) {
+                    handle = (SDL_Rect){ px, py + 2, 3, 4 };
+                } else {
+                    handle = (SDL_Rect){ px + 9, py + 2, 3, 4 };
+                }
+                SDL_RenderFillRect(renderer, &handle);
+                
+                // Détail du manche (rivet)
+                SDL_SetRenderDrawColor(renderer, 140, 130, 100, 255);
+                if (direction > 0) {
+                    SDL_RenderDrawPoint(renderer, px + 1, py + 4);
+                } else {
+                    SDL_RenderDrawPoint(renderer, px + 10, py + 4);
+                }
+            }
+        }
+    }
+}
+
+int CheckProjectileCollision(float px, float py, int pw, int ph) {
+    // Ne vérifie les collisions que dans le niveau cauchemar
+    if (currentLevel != 10) return 0;
+    
+    // Taille réduite des hitbox pour les projectiles (plus réaliste)
+    int projectileSize = 10;  // Taille réduite (au lieu de TILE_SIZE=16)
+    
+    for (int i = 0; i < MAX_PROJECTILES; i++) {
+        if (projectiles[i].active) {
+            // Collision AABB avec hitbox réduite
+            if (px < projectiles[i].x + projectileSize &&
+                px + pw > projectiles[i].x + 2 &&
+                py < projectiles[i].y + projectileSize &&
+                py + ph > projectiles[i].y + 2) {
+                // Désactive le projectile qui a touché
+                projectiles[i].active = 0;
+                return 1; // Collision détectée
+            }
+        }
+    }
+    return 0;
 }

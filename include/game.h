@@ -12,8 +12,8 @@
 #define LOGICAL_HEIGHT 240
 #define MAP_WIDTH 20        
 #define MAP_HEIGHT 15  
-#define NB_LEVELS 10 
-#define PLAYER_SPEED 2.0f 
+#define NB_LEVELS 12
+#define PLAYER_SPEED 2.5f 
 
 
 // #define FANTOME_SPEED 0.5f 
@@ -32,8 +32,18 @@ typedef struct{
     int timer;     // Nombre de frames restantes avant de changer de direction
 } Fantome;
 
+// Structure pour les projectiles de la salle à manger
+#define MAX_PROJECTILES 20
+typedef struct {
+    float x, y;
+    float vx;       // Vitesse horizontale (-1 = gauche à droite, 1 = droite à gauche)
+    int active;     // 1 si actif, 0 sinon
+    int type;       // 0 = assiette, 1 = couteau
+} Projectile;
+
 extern Joueur player;
 extern Fantome fantome;
+extern Projectile projectiles[MAX_PROJECTILES];
 
 extern float FANTOME_SPEED;
 
@@ -48,6 +58,13 @@ void DrawTexte(char *texteAffiche, SDL_Renderer *renderer,TTF_Font *font, int x,
 void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText);
 void TrouveCoordonnees(int *nvx, int *nvy, int indexObjet, int CurrLvl);
 int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance, int x, int y);
+
+// Fonctions pour les projectiles
+void InitProjectiles(void);
+void UpdateProjectiles(void);
+void DrawProjectiles(SDL_Renderer *renderer);
+void SpawnProjectile(void);
+int CheckProjectileCollision(float px, float py, int pw, int ph);
 
 extern int currentLevel; 
 
