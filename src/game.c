@@ -154,11 +154,17 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 -chambre parents-
 185 = commode avec télécommande (bas)
 186 = suite commode (haut)
-187,188,189, 190 = lit haut avec monstre qui dort 
+187,188,189, 190 = lit haut avec monstre yeux ouverts 
 191,192,193,194 = lit bas
 195,196,197,198 = lit haut haut
 199,200,201,202 = lit bas bas
-
+207,208,209 = bas commode PAS FINIT
+210,211,212 = mid commode PAS FINIT
+213,214,215 = haut commode PAS FINIT
+216 = lego bleu
+217 = legos rouge vert
+218 = commode sans télécommande
+219,220,221,222 = monstre endormis
 
 */
 
@@ -169,8 +175,8 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
 
  {      //carte 1 (chambre) index 0
         {2,  2,  2,  2,  2,  2,  2,  2,  0,  0,  0,  0, 2,  2,  5,  2,  8,  9,  2, 2}, // Trou en haut   
-        {2,  2,  2, 36, 37,  2,  2,  2,  0,  1,  0,  0, 2,  2, 41,  2, 10, 11,  2, 2}, 
-        {2,  1,  0, 32, 33, 21,  0,  1,  0,  1,  1,  1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2,  2,  2, 36, 37,  2,  2,  2,  0,  0,  0,  0, 2,  2, 41,  2, 10, 11,  2, 2}, 
+        {2,  1,  0, 32, 33, 21,  0,  1,  0,  0,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
         {2,  1,  0, 34, 35,  1,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
         {2,  1, 30, 31,  0,  1,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
         {2,  1,  0, 20,  0,  1,  0,  1,  0,  1, 44,  1, 0,  1,  0,  1,  0,  1,  0, 2},
@@ -354,16 +360,16 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2,  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
         {2, 2,  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8, 2, 2},
         {2, 2,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2,  0, 0, 0, 0,217, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2,185, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2,186, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2,195,196,197,198, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2,187,188,189,190, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2,219,220,221,222, 0, 0, 0, 0,217, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2,191,192,193,194, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2,199,200,201,202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2,203,204,205,206, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2,203,204,205,206, 0, 0,216, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2,  0, 0, 0, 0, 0, 195,196,197,198, 0, 0, 0, 0, 0, 0, 0, 2, 2}, // Bas fermé
+        {2, 2,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2}, // Bas fermé
         {2, 2,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2,  2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}
     },
@@ -1082,7 +1088,7 @@ void UpdateGame(void) {
             }
 
             if(distance_Telecommande <= 16 && currentLevel == 10 && maps[currentLevel][telecommandeY][telecommandeX] == 185){
-                 maps[currentLevel][telecommandeY][telecommandeX] = 186;
+                 maps[currentLevel][telecommandeY][telecommandeX] = 218;
             }
             toucheE_Relache = 0; // On verrouille tant qu'on n'a pas lâché E
         }
@@ -1307,20 +1313,29 @@ void GestionPapa() {
     static Uint32 debutSequence = 0; 
     static int sequenceActive = 0;   
     static int waitRelease = 0;
-    
+    static int premiereCaseMonstreX = -1;
+    static int premiereCaseMonstreY = -1;
+    if(premiereCaseMonstreX == -1 || premiereCaseMonstreY == -1){
+        TrouveCoordonnees(&premiereCaseMonstreX, &premiereCaseMonstreY, 219, 10);
+        if (premiereCaseMonstreX == -1 || premiereCaseMonstreY == -1)return; // Problème pour assigner la ou les valeurs des coordonnées
+    }
+
     Uint32 tempsActuel = SDL_GetTicks();
 
     int caseX = (player.x + player.w / 2) / TILE_SIZE;
     int caseY = (player.y + player.h / 2) / TILE_SIZE;
-    int surDoudou = (maps[currentLevel][caseY][caseX] == 6);
+    int indexTuile = maps[currentLevel][caseY][caseX];
+    int surObjetBruit = ( indexTuile == 217 || indexTuile == 216);
+
+    if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return; // Sécurité pour pas que ça sorte de la map
 
     // Si on n'est plus sur le doudou on enlève le verrou, on peut donc re réveiller le papa
-    if (!surDoudou) {
+    if (!surObjetBruit) {
         waitRelease = 0;
     }
 
     // On est sur le doudou rien en cours et pas verrouillé
-    if (surDoudou && sequenceActive == 0 && waitRelease == 0) {
+    if (surObjetBruit && sequenceActive == 0 && waitRelease == 0) {
         sequenceActive = 1;        
         debutSequence = tempsActuel; 
         affichePapaReveil = 1;     
@@ -1333,6 +1348,11 @@ void GestionPapa() {
 
         // On laisse 400 ms de temps de réaction au joueur mais on affiche que le papa est réveillé
         if (tempsEcoule < 400) {
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX] = 187;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+1] = 188;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+2] = 189;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+3] = 190;
+
             papaReveil = 0;        
             affichePapaReveil = 1; 
         }
@@ -1343,6 +1363,10 @@ void GestionPapa() {
         }
         // Le joueur peut re bouger
         else {
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX] = 219;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+1] = 220;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+2] = 221;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+3] = 222;
             sequenceActive = 0;    
             papaReveil = 0;
             affichePapaReveil = 0;
@@ -1437,7 +1461,7 @@ float getLuminosite(int gridX, int gridY, int rayonPx) {
     for (int ly = 0; ly < MAP_HEIGHT; ly++) {
         for (int lx = 0; lx < MAP_WIDTH; lx++) {
             int indexTuile = maps[currentLevel][ly][lx];
-             if (indexTuile == 21 || (indexTuile >= 75 && indexTuile <= 76) || indexTuile == 85 || indexTuile == 86 || indexTuile == 148 || indexTuile == 187) { // Si c'est une lampe
+             if (indexTuile == 21 || (indexTuile >= 75 && indexTuile <= 76) || indexTuile == 85 || indexTuile == 86 || indexTuile == 148 || indexTuile == 186) { // Si c'est une lampe
                  float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
                  float rayonLampe = 2.5f; // Rayon d'une lampe (2.5 cases)
                  
@@ -1567,8 +1591,9 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     // --- EFFET SOMMEIL / REVEIL PARENTS ---
     if (currentLevel == 10) { 
         
-        int litX, litY;
-        TrouveCoordonnees(&litX, &litY, 187, 10);
+        static int litX = -1;
+        static int litY = -1;
+        TrouveCoordonnees(&litX, &litY, 219, 10);
         int pixelLitX = litX * TILE_SIZE;
         int pixelLitY = litY * TILE_SIZE;
 
