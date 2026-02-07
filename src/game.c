@@ -831,7 +831,7 @@ void UpdateGame(void) {
     // }
 
     if( (dirX != 0 || dirY != 0) && papaReveil==1 && currentLevel == 10){
-        player.y = (MAP_HEIGHT * TILE_SIZE)-60;
+        player.y = (MAP_HEIGHT * TILE_SIZE)-30;
         player.x = 10 * TILE_SIZE;
     }
     
@@ -1315,15 +1315,26 @@ void UpdateGame(void) {
     // printf("lvl: %d \n", currentLevel);
 }
 
+int IsDansTab(int tabIndexTuile[], int taille, int index){
+    for (int i = 0; i < taille; ++i)
+    {
+        if(tabIndexTuile[i] == index)return 1;
+    }
+    return 0;
+}
+
 void GestionPapa() {
     static Uint32 debutSequence = 0; 
     static int sequenceActive = 0;   
     static int waitRelease = 0;
     static int premiereCaseMonstreX = -1;
     static int premiereCaseMonstreY = -1;
+
+    int tabIndexObjetBruit[] = {217, 216, 223, 224, 225, 226, 227, 228, 229};
+
     if(premiereCaseMonstreX == -1 || premiereCaseMonstreY == -1){
         TrouveCoordonnees(&premiereCaseMonstreX, &premiereCaseMonstreY, 219, 10);
-        if (premiereCaseMonstreX == -1 || premiereCaseMonstreY == -1)return; // Problème pour assigner la ou les valeurs des coordonnées
+        if (premiereCaseMonstreX == -1 || premiereCaseMonstreY == -1 )return; // Problème pour assigner la ou les valeurs des coordonnées
     }
 
     Uint32 tempsActuel = SDL_GetTicks();
@@ -1331,7 +1342,9 @@ void GestionPapa() {
     int caseX = (player.x + player.w / 2) / TILE_SIZE;
     int caseY = (player.y + player.h / 2) / TILE_SIZE;
     int indexTuile = maps[currentLevel][caseY][caseX];
-    int surObjetBruit = ( indexTuile == 217 || indexTuile == 216);
+    int tailleTabObjetBruit = sizeof(tabIndexObjetBruit) / sizeof(tabIndexObjetBruit[0]);
+
+    int surObjetBruit = ( IsDansTab(tabIndexObjetBruit, tailleTabObjetBruit, indexTuile));
 
     if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return; // Sécurité pour pas que ça sorte de la map
 
