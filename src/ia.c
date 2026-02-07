@@ -214,7 +214,7 @@ void ActionFantome(int rayonDetection) {
     if (isChasing) {
         FANTOME_SPEED = 0.75f;
         // Si trop loin, on arrête la chasse
-        if (distance > (8 * TILE_SIZE) || currentLevel < 4) {
+        if (distance > (6 * TILE_SIZE) || currentLevel < 4) {
             isChasing = 0;
             fantome.timer = 0; 
             FANTOME_SPEED = 0.5f;

@@ -1302,7 +1302,7 @@ void UpdateGame(void) {
 
     hasDoudou = 1;
     if(currentLevel == 10)GestionPapa();
-    currentLevel = 10;
+    // currentLevel = 10;
 
 
 
