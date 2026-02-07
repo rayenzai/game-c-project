@@ -1302,7 +1302,7 @@ void UpdateGame(void) {
 
     hasDoudou = 1;
     if(currentLevel == 10)GestionPapa();
-    // currentLevel = 10;
+    currentLevel = 10;
 
 
 
@@ -1464,7 +1464,9 @@ float getLuminosite(int gridX, int gridY, int rayonPx) {
              if (indexTuile == 21 || (indexTuile >= 75 && indexTuile <= 76) || indexTuile == 85 || indexTuile == 86 || indexTuile == 148 || indexTuile == 186) { // Si c'est une lampe
                  float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
                  float rayonLampe = 2.5f; // Rayon d'une lampe (2.5 cases)
-                 
+                 if (indexTuile == 186) {
+                    rayonLampe = 3.5f; 
+                }
                  if (distGrid < rayonLampe) {
                      float i = 1.0f - (distGrid / rayonLampe);
                      if (i > maxIntensite) maxIntensite = i;
