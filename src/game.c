@@ -32,6 +32,12 @@ static int toucheEnter_Relache = 1;
 static SDL_Texture *tilesetTexture = NULL; 
 // static SDL_Texture *playerTexture = NULL; 
 
+
+//livre 
+SDL_Texture *textureLivre = NULL;
+int livreOuvert = 0;
+
+
 int rayon = 0;
 
  
@@ -426,6 +432,7 @@ int show_interact_prompt_statue_haut = 0;
 int show_interact_prompt_statue_bas = 0;
 int show_interact_prompt_eau = 0;
 int show_interact_prompt_dessin = 0;
+int show_interact_prompt_livre = 0;
 int interact_statue_haut = 0;
 int interact_statue_bas = 0;
 int has_water = 0;
@@ -492,8 +499,19 @@ void InitGame(SDL_Renderer *renderer) {
     } else {
         printf("ERREUR: Impossible de charger assets/tileset.bmp ! %s\n", SDL_GetError());
     }
+    
+SDL_Surface *surfLivre = SDL_LoadBMP("assets/livre.bmp");
 
+if (surfLivre) {
+    Uint32 colorkey = SDL_MapRGB(surfLivre->format, 255, 0, 255);
+    SDL_SetColorKey(surfLivre, SDL_TRUE, colorkey);
 
+    textureLivre = SDL_CreateTextureFromSurface(renderer, surfLivre);
+    SDL_FreeSurface(surfLivre);
+} else {
+    printf("Erreur : %s\n", SDL_GetError());
+}
+livreOuvert = 0;
 }
 
 // Fonction utilitaire collision
@@ -806,6 +824,19 @@ void UpdateGame(void) {
         }
         return;
     }
+    if (livreOuvert == 1)
+    {
+        if (state[SDL_SCANCODE_E]) {
+            if (toucheRelache) {
+                livreOuvert = 0;
+                toucheRelache = 0;
+            }
+        } else {
+            toucheRelache = 1;
+        }
+        return;
+    }
+    
     
 
     float dirX = 0;
@@ -917,6 +948,18 @@ void UpdateGame(void) {
     {
         show_interact_prompt_dessin = 1;
     }
+
+    show_interact_prompt_livre = 0;
+    float distance_livre = 9999.0f;
+    if (IsLocationObjet(20, 3, 179, &distance_livre, -1, -1))
+    {
+        show_interact_prompt_livre = 1;
+    }
+    if (IsLocationObjet(20, 3,180, &distance_livre, -1, -1))
+    {
+        show_interact_prompt_livre = 1;
+    }
+    
     
 
     
@@ -1013,15 +1056,15 @@ void UpdateGame(void) {
                 }
             }
 
-            if (currentLevel == 1 && distance_carafe < 14 && has_drawing == 0) {
+            if (currentLevel == 1 && distance_carafe <= 14 && has_drawing == 0) {
                 maps[1][carafeY][carafeX] = 173;
                 has_water = 1;
             }
 
-            if (currentLevel == 2 && distStatueHaut < 24 && has_water == 0) {
+            if (currentLevel == 2 && distStatueHaut <= 24 && has_water == 0) {
                 dialogue_statue_haut = 1;   
             }
-            else if (currentLevel == 2 && distStatueHaut < 24 && has_water == 1)
+            else if (currentLevel == 2 && distStatueHaut <= 24 && has_water == 1)
             {
                 maps[2][5][17] = 86;
                 statue_has_water = 1;
@@ -1029,26 +1072,31 @@ void UpdateGame(void) {
             }
             
 
-            if (currentLevel == 2 && distStatueBas < 24 && has_drawing == 0) {
+            if (currentLevel == 2 && distStatueBas <= 24 && has_drawing == 0) {
                  dialogue_statue_bas = 1;
                  toucheE_Relache = 0;
             }
-            if (currentLevel == 9 && distance_dessin < 16 && has_drawing == 0 && has_water == 0 && interact_statue_bas == 1) {
+            if (currentLevel == 9 && distance_dessin <= 16 && has_drawing == 0 && has_water == 0 && interact_statue_bas == 1) {
                 maps[9][dessinY][dessinX] = 1;
                 has_drawing = 1;
             }
-            if (currentLevel == 9 && distance_dessin < 16 && has_drawing == 0 && has_water == 1) {
+            if (currentLevel == 9 && distance_dessin <= 16 && has_drawing == 0 && has_water == 1) {
                 dialogue_max_objet = 1;
             }
-            if (currentLevel == 1 && distance_carafe < 14 && has_drawing == 1 && has_water == 0) {
+            if (currentLevel == 1 && distance_carafe <= 14 && has_drawing == 1 && has_water == 0) {
                 dialogue_max_objet = 1;
             }
-            else if (currentLevel == 2 && distStatueBas < 24 && has_drawing == 1)
+            else if (currentLevel == 2 && distStatueBas <= 24 && has_drawing == 1)
             {
                 maps[2][9][17] = 86;
                 statue_has_drawing = 1;
                 has_drawing = 0;
             }
+            if (currentLevel == 3 && distance_livre <= 20)
+            {
+                livreOuvert = 1;
+            }
+            
 
             else if(distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55){
                 currentLevel = 9;
@@ -1601,6 +1649,9 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
             }
         }
     }
+    
+
+
 
     //dialogues
     if (dialogueStep > 0) {
@@ -1753,6 +1804,59 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         
         if (sText) DrawInteractions(renderer, sText);
     }
+    if(show_interact_prompt_livre == 1 && livreOuvert == 0){
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Lire", cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (livreOuvert == 1 && textureLivre != NULL) {
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 180);
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        SDL_RenderFillRect(renderer, NULL);
+
+        int texW, texH;
+        SDL_QueryTexture(textureLivre, NULL, NULL, &texW, &texH);
+
+        int displayW = LOGICAL_WIDTH * 0.85;
+        float ratio = (float)texW / (float)texH;
+        int displayH = (int)(displayW / ratio);
+
+        if (displayH > LOGICAL_HEIGHT - 40) {
+            displayH = LOGICAL_HEIGHT - 40;
+            displayW = (int)(displayH * ratio);
+        }
+
+        SDL_Rect posLivre = {
+            (LOGICAL_WIDTH - displayW) / 2,  // Centré X
+            (LOGICAL_HEIGHT - displayH) / 2, // Centré Y
+            displayW,
+            displayH
+        };
+
+        SDL_RenderCopy(renderer, textureLivre, NULL, &posLivre);
+        
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Fermer", cBlanc);
+        
+        if (sText) {
+            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+            
+            SDL_Rect rText = {
+                (LOGICAL_WIDTH - sText->w) / 2,   
+                posLivre.y + posLivre.h + 5,      
+                sText->w,
+                sText->h
+            };
+
+            SDL_RenderCopy(renderer, tText, NULL, &rText);
+            
+            SDL_FreeSurface(sText);
+            SDL_DestroyTexture(tText);
+        }
+    }
+
 }
 
 void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText){
