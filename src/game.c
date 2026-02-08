@@ -950,12 +950,13 @@ void UpdateGame(void) {
     }
 
     show_interact_prompt_livre = 0;
-    float distance_livre = 9999.0f;
-    if (IsLocationObjet(20, 3, 179, &distance_livre, -1, -1))
+    float distance_livreD = 9999.0f;
+    float distance_livreG = 9999.0f;   //j'ai créé 2 variable car sinon la detection se faisais sur une seul tuile (pas fou)
+    if (IsLocationObjet(20, 3, 179, &distance_livreG, -1, -1))
     {
         show_interact_prompt_livre = 1;
     }
-    if (IsLocationObjet(20, 3,180, &distance_livre, -1, -1))
+    if (IsLocationObjet(20, 3,180, &distance_livreD, -1, -1))
     {
         show_interact_prompt_livre = 1;
     }
@@ -1092,7 +1093,11 @@ void UpdateGame(void) {
                 statue_has_drawing = 1;
                 has_drawing = 0;
             }
-            if (currentLevel == 3 && distance_livre <= 20)
+            if (currentLevel == 3 && distance_livreD <= 20)
+            {
+                livreOuvert = 1;
+            }
+            if (currentLevel == 3 && distance_livreG <= 20)
             {
                 livreOuvert = 1;
             }
