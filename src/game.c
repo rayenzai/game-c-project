@@ -1315,7 +1315,7 @@ void UpdateGame(void) {
 
     hasDoudou = 1;
     if(currentLevel == 10)GestionPapa();
-    // currentLevel = 10;
+    // currentLevel = 10; 
 
 
 
@@ -1337,7 +1337,7 @@ void GestionPapa() {
     static int premiereCaseMonstreX = -1;
     static int premiereCaseMonstreY = -1;
 
-    int tabIndexObjetBruit[] = {217, 216, 223, 224, 225, 226, 227, 228, 229};
+    int tabIndexObjetBruit[] = {217, 216, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236};
 
     if(premiereCaseMonstreX == -1 || premiereCaseMonstreY == -1){
         TrouveCoordonnees(&premiereCaseMonstreX, &premiereCaseMonstreY, 219, 10);
