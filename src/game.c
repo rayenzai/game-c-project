@@ -151,17 +151,64 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 167,168 = lavabo 
 169,170 = plaque cuisson 
 171 = bloc seul
-...........................
--salle à manger (Cauchemar)-
-175 = sol salle à manger
-176,177 = gargouille gauche (haut, bas)
-178,179 = gargouille droite (haut, bas)
-180 = assiette (projectile)
-181 = couteau (projectile)
-182,183 = vaisselle cassée gauche
-184,185 = vaisselle cassée droite
-186 = table longue
-
+175 = pain
+176 = os
+177 = crane + chenille
+178 = poils + seringue
+179, 180 = grimoire
+181 = tirroir mur gauche 
+182,183 = bouteille renversée 
+184 = toile d'araignée
+240 = fiole poussiere
+241 = dent
+242 = araignée 
+243 = coeur rouge 
+244 = coeur noir
+245,246,247 = bas armoire 
+248,249,250 = potions armoire 
+251,252,253 = fin armoire
+254,255,256 = bas tapis
+257,258,259 = haut tapis
+260,261,262 = bas table
+263(haut),264(bas) = chaise (coté gauche de la table)
+265 = oeil
+266,267 = bas du four 
+268,269 = haut du four
+270 = toile d'araignée (avec début araignée)
+.........................
+-chambre parents-
+185 = commode avec télécommande (bas)
+186 = suite commode (haut)
+187,188,189, 190 = lit haut avec monstre yeux ouverts 
+191,192,193,194 = lit bas
+195,196,197,198 = lit haut haut
+199,200,201,202 = lit bas bas
+207,208,209 = bas commode PAS FINIT
+210,211,212 = mid commode PAS FINIT
+213,214,215 = haut commode PAS FINIT
+216 = lego bleu
+217 = legos rouge vert
+218 = commode sans télécommande
+219,220,221,222 = monstre endormis
+223 = verre cassé
+224 = morceaux de verres 
+225 = pantalon
+226 = bonnet
+227 = t shirt 
+228 = sac 
+229 = pokeball
+230 = chausette 1
+231 = chausette 2
+232 = talon 
+233 = lunette
+234 = collier
+235 = écharpe
+236 = bas de pyj
+.................
+-salle à manger-
+237 = couteau vers la droite 
+238 = vers la gauche 
+239 = assiette
 */
 
 
@@ -171,9 +218,9 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
 
  {      //carte 1 (chambre) index 0
         {2,  2,  2,  2,  2,  2,  2,  2,  0,  0,  0,  0, 2,  2,  5,  2,  8,  9,  2, 2}, // Trou en haut   
-        {2,  2,  2, 36, 37,  2,  2,  2,  0,  1,  0,  0, 2,  2, 41,  2, 10, 11,  2, 2}, 
-        {2,  1,  0, 32, 33, 21,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
-        {2,  1,  0, 34, 35,  1,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2,  2,  2, 36, 37,  2,  2,  2,  0,  0,  0,  0, 2,  2, 41,  2, 10, 11,  2, 2}, 
+        {2,  1,  0, 32, 33, 21,  0,  1,  0,  0,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2,  1,  0, 34, 35,  1,  0,  1,  0,  0,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
         {2,  1, 30, 31,  0,  1,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
         {2,  1,  0, 20,  0,  1,  0,  1,  0,  1, 44,  1, 0,  1,  0,  1,  0,  1,  0, 2},
         {2, 42,  0,  1,  0,  1,  0,  1,  0,  1,  0, 45, 0,  1,  0,  1, 55, 56, 57, 2},
@@ -222,23 +269,23 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2,  2,  0,    0,  0,    0,    0,  0,    0,  0,  0,   0,    0,    0,    0,   0,     0,  0,  2, 2},
         {2,  2,  2,    2,  2,    2,    2,  2,    0,  0,  0,   0,    2,    2,    2,   2,     2,  2,  2, 2}
     },  
-    // CARTE 4 (Niveau 3) index 3
+    // CARTE 4 : CUISINE (Niveau 3) index 3
     {       
-        {2, 2, 2,  2,  2,   2,  2,  2,  0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
-        {2, 2, 2,  2,  2,   2,  2,  2,  0, 0, 0, 0, 2, 2, 2, 2, 2, 8, 2, 2},
-        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},  
-        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {2, 2, 0,  0,  0,   0,166,165,163, 0, 0, 0,158,159, 0, 0, 0, 0, 0, 0},
-        {2, 2, 0,  0,  0,   0,166,164,162, 0, 0, 0,156,157, 0, 0, 0, 0, 0, 0},
-        {2, 2, 0,  0,  0,   0,163,166,161, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2}, // Bas fermé
-        {2, 2, 0,171,169, 170,167,168,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 2,  2,  2,   2,  2,  2,  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+        {2, 2, 2,  2,  2,   2,  2,  2,  0, 0, 0, 0,  2,251,252,253, 2, 2, 2, 2}, // Trou en haut
+        {2, 2,270,268,269,   2,  2,  2,  0, 0, 0, 0,  2,248,250,249, 2,184, 2, 2},
+        {2, 2,242,266,267,   2,  0,  0,  0, 0, 0, 0,  0,245,246,247, 0,0, 2, 2},
+        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2},
+        {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2},
+        {2, 2, 0,182,183,   0,  0,  0,  0, 0, 0, 0,  0,  0,  0,  0, 0, 0, 0, 0},  
+        {2,184,0,  0,  0,   0,  0,  0,  0, 0, 0, 0,  0,  0,  0,  0, 0, 0, 0, 0},
+        {2, 2, 0,  0,263, 176,  0,175,  0, 0, 0, 0,158,159,  0,  0, 0, 0, 0, 0},
+        {2, 2, 0,  0,264,   0,  0,  0,  0, 0, 0, 0,156,157,  0,  0, 0, 0, 0, 0},
+        {2, 2,265, 0,263,   0,179,180,177, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2},
+        {2, 2,171, 0,264, 260,261,  0,262, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2},
+        {2, 2,181, 0,  0, 257,258,258,259, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2},
+        {2, 2, 0,  0,  0, 254,255,255,256, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2}, // Bas fermé
+        {2, 2, 0,178,169, 170,167,168,243, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2},
+        {2, 2, 2,  2,  2,   2,  2,  2,  2, 2, 2, 2,  2,  2,  2,  2, 2, 2, 2, 2}
     },
     // CARTE 5 (Niveau 4 - dernière du bloc précédent) index 4
     {    
@@ -351,50 +398,29 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {50, 50, 50, 50, 50, 50, 50,  50,  50,  50, 50,  50,  50, 50, 50, 50, 50, 50, 50, 50}, 
         {50, 50, 50, 50, 50, 50, 50,  50,  50,  50, 50,  50,  50, 50, 50, 50, 50, 50, 50, 50}
     },
-    
-    // SALLE À MANGER - CAUCHEMAR (index 10)
-    {
-        {2,   2,   2,   2,   2,   2,   2,   2, 155, 155, 155, 155,   2,   2,   2,   2,   2,   2,   2,   2},
-        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
-        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
-        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
-        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
-        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
-        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
-        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
-        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
-        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
-        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
-        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
-        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
-        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
-        {2,   2,   2,   2,   2,   2,   2,   2, 155, 155, 155, 155,   2,   2,   2,   2,   2,   2,   2,   2}
+    // Chambre des parents (index 10)
+    {    
+        {2, 2,  2,  2,  2,  2,  2,  2,  2, 2,  2,  2, 2,  2,  2,  2, 2, 2, 2, 2}, // Trou en haut
+        {2, 2,  2,  2,  2,  2,  2,  2,  2, 2,  2,  2, 2,213,214,215, 2, 2, 2, 2},
+        {2, 2,  2,  2,  2,  2,  2,  2,  2, 2,  2,  2, 2,210,211,212, 2, 2, 2, 2},
+        {2, 2,  0,  0,  0,  0,217,  0,  0, 0,229,  0, 0,207,208,209, 0, 0, 2, 2},
+        {2, 2,185,  0,  0,  0,  0,224,  0, 0,  0, 59,60,  0,  0,  0, 0, 0, 2, 2},
+        {2, 2,186,  0,231,  0,  0,  0,  0, 0,232,  0, 0,  0,  0,235, 0, 0, 2, 2},
+        {2, 2,195,196,197,198,  0,  0,230, 0,  0,  0, 0,234,  0,  0, 0, 0, 2, 2},
+        {2, 2,219,220,221,222,223,  0,  0, 0,217,  0, 0,  0,  0,  0, 0, 0, 2, 2},
+        {2, 2,191,192,193,194,  0,233,  0,58,  0,  0, 0,216,  0,  0, 0, 0, 2, 2},
+        {2, 2,199,200,201,202,  0,  0,  0, 0,  0,225, 0,  0,  0,  0, 0, 0, 2, 2},
+        {2, 2,203,204,205,206,  0,  0,216, 0,  0,  0, 0,236,  0,  0, 0, 0, 2, 2},
+        {2, 2,  0, 30, 31,  0,  0,  0,  0, 0,  0,230, 0,  0,  0,  0, 0, 0, 2, 2},
+        {2, 2,  0,  0,  0,  0,227,  0,  0, 0,226,  0, 0,228,  0,  0, 0, 0, 2, 2}, // Bas fermé
+        {2, 2,241,  0,  0,  0,  0,  0,  0, 0,  0,  0, 0,  0,  0,  0, 0, 0, 2, 2},
+        {2, 2,  2,  2,  2,  2,  2,  2,  0, 0,  0,  0, 2,  2,  2,  2, 2, 2, 2, 2}
     },
-    
-    // CHAMBRE DES PARENTS (index 11)
-    // Chambre simple entourée de murs
-    {
-        {2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
-        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
-        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
-        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
-        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
-        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
-        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
-        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
-        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
-        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
-        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2,   2,   0,   0,   0,   0,   2,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2,   2,   0,   0,   0,   0,   2,   2,   2,   2,   2,   2,   2,   2}   // Entrée en bas
-    }
 };
  
-int dialogueStep = 0; 
+int dialogueStep = 0;  
 int dialogueStep_sortie1 = 0;
-int dialogue_hasDoudou = 0;
+int dialogue_hasDoudou = 0; 
 int dialogue_statue_haut = 0;
 int dialogue_statue_bas = 0;
 int dialogue_entree_labyrinthe = 0;
@@ -442,6 +468,8 @@ int isInOrganicPath(int gridX, int gridY);
 
 int TuilesNotSpecial[] = {0, 1, 2};
 int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
+
+int papaReveil = 0;
 
 // --- INITIALISATION ---
 void InitGame(SDL_Renderer *renderer) {
@@ -692,6 +720,7 @@ void ManageMusic() {
 void UpdateGame(void) {
     const Uint8 *state = SDL_GetKeyboardState(NULL);
     // --- MODE DIALOGUE (Joueur Bloqué) ---
+    cpt_piece_tableau=4;
     if (dialogueStep > 0) {
 
         if (state[SDL_SCANCODE_RETURN]) {
@@ -858,7 +887,7 @@ void UpdateGame(void) {
     if (!touchWallX) player.x = nextX;
 
     
-    // Collision Y avec marge de sécurité
+    // Collision Y
     int touchWallY = 0;
     if (isWall(player.x + margin, nextY + margin)) touchWallY = 1;
     if (isWall(player.x + player.w - margin, nextY + margin)) touchWallY = 1;
@@ -883,7 +912,11 @@ void UpdateGame(void) {
     //     Mix_Volume(2, 0);  // On coupe le son si on arrête
     // }
 
-
+    if( (dirX != 0 || dirY != 0) && papaReveil==1 && currentLevel == 10){
+        player.y = (MAP_HEIGHT * TILE_SIZE)-60;
+        player.x = 10 * TILE_SIZE;
+    }
+    
     float distance;
 
     showInteractPrompt = 0;
@@ -1174,6 +1207,7 @@ void UpdateGame(void) {
             toucheEnter_Relache = 1;
     }
     
+
     
 
     // 1. Quitter la CHAMBRE (Niveau 0) par le HAUT
@@ -1405,7 +1439,7 @@ void UpdateGame(void) {
     if (currentLevel >= 5) {
         ActionFantome(200); 
     }
-
+    // currentLevel = 10;
     // --- GESTION COLLISION JOUEUR / FANTOME (GAME OVER / RESET) ---
     if (currentLevel >= 5 && currentLevel <=8) {
         
@@ -1447,8 +1481,39 @@ void UpdateGame(void) {
         }
     }
 
+    if (IsLocationUp(8, 13, 4, 10))
+    {
+        currentLevel = 10;
+        player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
+    }
+    else if(IsLocationDown(8, 13, 10, 20)){
+        currentLevel = 4;
+        player.y = 10;
+    }
+    hasDoudou = 1;
+    // if(currentLevel == 10)GestionPapa();
+
+
 
     // printf("lvl: %d \n", currentLevel);
+}
+
+void GestionPapa() {
+    static Uint32 dernierTemps = 0; 
+    Uint32 tempsActuel = SDL_GetTicks();
+
+    if (papaReveil == 0) {
+        if (tempsActuel - dernierTemps > 5000) {
+            papaReveil = 1;          
+            dernierTemps = tempsActuel; 
+        }
+    } 
+    else {
+        if (tempsActuel - dernierTemps > 2000) {
+            papaReveil = 0;          
+            dernierTemps = tempsActuel; 
+        }
+    }
 }
 
 int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance, int x, int y){
@@ -1682,20 +1747,54 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
             
         }
     }
-    
-    // === DESSINER LES PROJECTILES (SALLE À MANGER) ===
-    DrawProjectiles(renderer);
-    
-    // === EFFET DE FLASH ROUGE LORS D'UNE COLLISION ===
-    if (hitFlashTimer > 0) {
-        // Intensité du flash qui diminue progressivement
-        int alpha = (int)(200 * ((float)hitFlashTimer / hitFlashDuration));
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        SDL_SetRenderDrawColor(renderer, 255, 50, 50, alpha);
-        SDL_Rect flashRect = {0, 0, MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE};
-        SDL_RenderFillRect(renderer, &flashRect);
+
+    // --- EFFET SOMMEIL / REVEIL PARENTS ---
+    // Uniquement dans la chambre des parents (Index 10)
+    if (currentLevel == 10) { 
+        
+        // Coordonnées approximatives du lit des parents (à ajuster selon ta map)
+        // Disons que le lit est vers le milieu de la pièce
+        int litX = 15 * TILE_SIZE; 
+        int litY = 3 * TILE_SIZE;  
+
+        // Calcul de distance pour savoir si on réveille les parents
+        float dx = player.x - litX;
+        float dy = player.y - litY;
+        float distParents = sqrt(dx*dx + dy*dy);
+
+        // Si le joueur est proche (< 50 pixels) -> REVEIL (!)
+        if (distParents < 50 && estEclaire(15, 3, rayon) && papaReveil) {
+            SDL_Color cRouge = {255, 0, 0, 255};
+            // On utilise la grande police pour un gros "!"
+            SDL_Surface *sBang = TTF_RenderText_Solid(font, "!", cRouge); 
+            if (sBang) {
+                SDL_Texture *tBang = SDL_CreateTextureFromSurface(renderer, sBang);
+                // Le "!" s'affiche juste au-dessus du lit
+                SDL_Rect rBang = { litX, litY - 20, sBang->w, sBang->h }; 
+                SDL_RenderCopy(renderer, tBang, NULL, &rBang);
+                SDL_FreeSurface(sBang);
+                SDL_DestroyTexture(tBang);
+            }
+        } 
+        // Sinon -> DORT (Zzz...)
+        else if(estEclaire(15, 3, rayon) && !papaReveil) {
+            // Animation : Le texte monte de 0 à 10 pixels en boucle
+            // (SDL_GetTicks() / 200) ralentit le temps, % 10 crée la boucle
+            int offsetAnim = (SDL_GetTicks() / 200) % 10; 
+
+            SDL_Color cBlanc = {200, 200, 255, 255}; // Bleu très clair
+            SDL_Surface *sZzz = TTF_RenderText_Solid(fontMini, "Zzz...", cBlanc);
+            if (sZzz) {
+                SDL_Texture *tZzz = SDL_CreateTextureFromSurface(renderer, sZzz);
+                // On dessine le texte qui flotte (Y - offsetAnim)
+                SDL_Rect rZzz = { litX, litY - 10 - offsetAnim, sZzz->w, sZzz->h }; 
+                SDL_RenderCopy(renderer, tZzz, NULL, &rZzz);
+                SDL_FreeSurface(sZzz);
+                SDL_DestroyTexture(tZzz);
+            }
+        }
     }
-    
+
     //dialogues
     if (dialogueStep > 0) {
         char *texteAffiche = "";
