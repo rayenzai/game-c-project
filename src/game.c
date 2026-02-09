@@ -29,7 +29,8 @@ static int toucheEnter_Relache = 1;
 
 // --- VARIABLES GLOBALES ---
 
-static SDL_Texture *tilesetTexture = NULL; 
+static SDL_Texture *tilesetTexture = NULL;
+SDL_Texture *textureScreamer = NULL; 
 // static SDL_Texture *playerTexture = NULL; 
 
 int rayon = 0;
@@ -494,7 +495,17 @@ void InitGame(SDL_Renderer *renderer) {
     } else {
         printf("ERREUR: Impossible de charger assets/tileset.bmp ! %s\n", SDL_GetError());
     }
+    SDL_Surface *surfScreamer = SDL_LoadBMP("assets/screamer.bmp");
 
+if (surfScreamer) {
+    Uint32 colorkey = SDL_MapRGB(surfScreamer->format, 255, 0, 255);
+    SDL_SetColorKey(surfScreamer, SDL_TRUE, colorkey);
+
+    textureScreamer = SDL_CreateTextureFromSurface(renderer, surfScreamer);
+    SDL_FreeSurface(surfScreamer);
+} else {
+    printf("Erreur : %s\n", SDL_GetError());
+}
 
 }
 
