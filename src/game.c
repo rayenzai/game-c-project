@@ -353,43 +353,42 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
     },
     
     // SALLE À MANGER - CAUCHEMAR (index 10)
-    // Longue salle de banquet - couloir central avec murs décorés sur les côtés
     {
-        {2,   2,   2,   2,   2,   2,   2,   2, 155, 155, 155, 155,   2,   2,   2,   2,   2,   2,   2,   2},  // Sortie en haut (ouverte)
-        {2,   2,   2,   2,   2,   2,   2, 156, 155, 155, 155, 155, 157,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2, 158, 155, 155, 155, 155, 159,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2, 156, 155, 155, 155, 155, 157,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2, 158, 155, 155, 155, 155, 159,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2, 156, 155, 155, 155, 155, 157,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2, 158, 155, 160, 161, 155, 159,   2,   2,   2,   2,   2,   2,   2},  // Table au centre
-        {2,   2,   2,   2,   2,   2,   2, 156, 155, 162, 163, 155, 157,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2, 158, 155, 164, 165, 155, 159,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2, 156, 155, 155, 155, 155, 157,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2, 158, 155, 155, 155, 155, 159,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2, 156, 155, 155, 155, 155, 157,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2, 158, 155, 155, 155, 155, 159,   2,   2,   2,   2,   2,   2,   2},
         {2,   2,   2,   2,   2,   2,   2,   2, 155, 155, 155, 155,   2,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2,   2, 155, 155, 155, 155,   2,   2,   2,   2,   2,   2,   2,   2}   // Entrée en bas
+        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
+        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
+        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
+        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
+        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
+        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
+        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
+        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
+        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
+        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
+        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
+        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
+        {2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155,   2},
+        {2,   2,   2,   2,   2,   2,   2,   2, 155, 155, 155, 155,   2,   2,   2,   2,   2,   2,   2,   2}
     },
     
     // CHAMBRE DES PARENTS (index 11)
-    // Après la salle à manger : Chambre avec vaisselle cassée éparpillée sur le sol
+    // Chambre simple entourée de murs
     {
         {2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2},
         {2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   0,   0,  32,  33,   0,   0, 156, 157,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},  // Lit des parents + vaisselle
-        {2,   2,   0,   0,  34,  35,   0,   0, 158, 159,   0,   0, 156, 157,   0,   0,   0,   0,   2,   2},  // Vaisselle éparpillée
-        {2,   2,   0,   0,  36,  37,   0,   0,   0,   0,   0,   0, 158, 159,   0,   0,   0,   0,   2,   2},
-        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  42,  43,   0,   2,   2},  // Commode
-        {2,   2, 156, 157,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},  // Vaisselle au sol
-        {2,   2, 158, 159,   0,   0,   0,   0,  30,  31,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},  // Tapis rond
-        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 156, 157,   0,   0,   0,   0,   2,   2},  // Vaisselle
-        {2,   2,   0,   0, 156, 157,   0,   0,   0,   0,   0,   0, 158, 159,   0,   0,   0,   0,   2,   2},  // Vaisselle éparpillée
-        {2,   2,   0,   0, 158, 159,   0,   0,   0,   0,   0,   0,   0,   0,   0, 156, 157,   0,   2,   2},  // Encore de la vaisselle
-        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 158, 159,   0,   2,   2},
         {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2,   2, 155, 155, 155, 155,   2,   2,   2,   2,   2,   2,   2,   2},
-        {2,   2,   2,   2,   2,   2,   2,   2, 155, 155, 155, 155,   2,   2,   2,   2,   2,   2,   2,   2}   // Entrée en bas
+        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
+        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
+        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
+        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
+        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
+        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
+        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
+        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
+        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
+        {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2,   2,   0,   0,   0,   0,   2,   2,   2,   2,   2,   2,   2,   2},
+        {2,   2,   2,   2,   2,   2,   2,   2,   0,   0,   0,   0,   2,   2,   2,   2,   2,   2,   2,   2}   // Entrée en bas
     }
 };
  
@@ -438,6 +437,9 @@ int projectileSpawnTimer = 0;
 #define PROJECTILE_SPAWN_RATE 60  // Génère un projectile toutes les 60 frames (1 seconde à 60 FPS)
 #define PROJECTILE_SPEED 2.5f
 
+// --- DÉCLARATIONS FONCTIONS ---
+int isInOrganicPath(int gridX, int gridY);
+
 int TuilesNotSpecial[] = {0, 1, 2};
 int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
 
@@ -467,7 +469,7 @@ void InitGame(SDL_Renderer *renderer) {
     sonPickUp = chargement_son_item_pick_up();
     sonOpenDoor = chargement_son_door_open();
     sonCloseDoor = chargement_son_door_close();
-    sonProjectileHit = chargement_son_transition();  // Son de collision avec projectiles
+    sonProjectileHit = chargement_son_projectile_hit();  // Son de collision avec projectiles
     MusicInterior = chargement_son_ambiance();
     MusicExterior = chargement_son_exterieur();
     
@@ -823,8 +825,15 @@ void UpdateGame(void) {
     // }
 
     // 3. On applique la VITESSE
-    float nextX = player.x + (dirX * PLAYER_SPEED);
-    float nextY = player.y + (dirY * PLAYER_SPEED);
+    float currentSpeed = PLAYER_SPEED;
+    if (currentLevel == 10 && dialogue_chambre_parents == 0) {
+        // Vitesse réduite dans la salle à manger, diminue progressivement
+        float progressFactor = 0.55f - (1.0f - player.y / (float)(MAP_HEIGHT * TILE_SIZE)) * 0.15f;
+        currentSpeed = PLAYER_SPEED * progressFactor;
+    }
+    
+    float nextX = player.x + (dirX * currentSpeed);
+    float nextY = player.y + (dirY * currentSpeed);
     
     // Marge de sécurité pour éviter les bugs de collision (1 pixel)
     float margin = 1.0f;
@@ -836,6 +845,16 @@ void UpdateGame(void) {
     if (isWall(nextX + margin, player.y + player.h - margin)) touchWallX = 1;
     if (isWall(nextX + player.w - margin, player.y + player.h - margin)) touchWallX = 1;
 
+    // Contrainte spéciale pour la voie organique (salle à manger avant chambre parents)
+    if (currentLevel == 10 && dialogue_chambre_parents == 0) {
+        int nextGridX = (int)(nextX + player.w / 2) / TILE_SIZE;
+        int playerGridY = (int)(player.y + player.h / 2) / TILE_SIZE;
+        
+        if (!isInOrganicPath(nextGridX, playerGridY)) {
+            touchWallX = 1; // Bloque le mouvement au lieu de téléporter
+        }
+    }
+
     if (!touchWallX) player.x = nextX;
 
     
@@ -845,6 +864,16 @@ void UpdateGame(void) {
     if (isWall(player.x + player.w - margin, nextY + margin)) touchWallY = 1;
     if (isWall(player.x + margin, nextY + player.h - margin)) touchWallY = 1;
     if (isWall(player.x + player.w - margin, nextY + player.h - margin)) touchWallY = 1;
+
+    // Contrainte spéciale pour la voie organique (salle à manger avant chambre parents)
+    if (currentLevel == 10 && dialogue_chambre_parents == 0) {
+        int playerGridX = (int)(player.x + player.w / 2) / TILE_SIZE;
+        int nextGridY = (int)(nextY + player.h / 2) / TILE_SIZE;
+        
+        if (!isInOrganicPath(playerGridX, nextGridY)) {
+            touchWallY = 1; // Bloque le mouvement au lieu de téléporter
+        }
+    }
 
     if (!touchWallY) player.y = nextY;
 
@@ -1201,13 +1230,12 @@ void UpdateGame(void) {
         dialogue_salle_manger = 1;  // Déclenche le dialogue d'encouragement
     }
     
-    // === TRANSITION SALLE À MANGER CAUCHEMAR -> CHAMBRE DES PARENTS (AU RÉVEIL) ===
-    // Le joueur atteint le haut de la salle (a traversé tout le couloir)
+    // === TRANSITION SALLE À MANGER CAUCHEMAR -> CHAMBRE DES PARENTS ===
     else if (IsLocationUp(8, 13, 10, 5)) {
         currentLevel = 11;  // Chambre des parents
-        player.x = 155;  // Position centrale
+        player.x = 155;
         player.y = (MAP_HEIGHT * TILE_SIZE) - 25;
-        dialogue_chambre_parents = 1;  // Déclenche le dialogue
+        dialogue_chambre_parents = 1;
     }
     
     // === RETOURS ===
@@ -1337,34 +1365,39 @@ void UpdateGame(void) {
     if (knockbackTimer <= 0 && CheckProjectileCollision(player.x, player.y, player.w, player.h)) {
         printf("TOUCHÉ PAR UN PROJECTILE ! (%d/3)\n", hitCount + 1);
         
-        // Jouer le son de collision
         if (sonProjectileHit) {
             Mix_PlayChannel(-1, sonProjectileHit, 0);
         }
         
-        // Déclencher l'effet de flash rouge
         hitFlashTimer = hitFlashDuration;
-        
-        // Incrémenter le compteur de coups
         hitCount++;
         
-        // Calculer la direction du recul (opposée au projectile)
-        // Recule vers le bas (vers la sortie)
         knockbackVX = 0.0f;
-        knockbackVY = 4.0f;  // Recul vers le bas
-        knockbackTimer = 15;  // Durée du recul
+        knockbackVY = 4.0f;
+        knockbackTimer = 15;
         
-        // Si 3 coups, reset vers la cuisine
         if (hitCount >= 3) {
             currentLevel = 3;
             player.x = 160;
             player.y = 50;
             InitProjectiles();
-            hitCount = 0;  // Reset du compteur
+            hitCount = 0;
         }
     }
     
-    // Reset du compteur si on quitte le niveau 10
+    if (currentLevel == 10 && dialogue_chambre_parents == 0) {
+        int playerGridX = (int)(player.x + player.w / 2) / TILE_SIZE;
+        int playerGridY = (int)(player.y + player.h / 2) / TILE_SIZE;
+        
+        if (!isInOrganicPath(playerGridX, playerGridY)) {
+            currentLevel = 3;
+            player.x = 160;
+            player.y = 50;
+            InitProjectiles();
+            hitCount = 0;
+        }
+    }
+    
     if (currentLevel != 10) {
         hitCount = 0;
     }
@@ -1472,33 +1505,54 @@ void TrouveCoordonnees(int *nvx, int *nvy, int indexObjet, int CurrLvl){
 float getLuminosite(int gridX, int gridY, int rayonPx) {
     float maxIntensite = 0.0f;
 
-    // --- 1. Lumière du JOUEUR (Calcul en pixels) ---
     int tileCenterX = (gridX * TILE_SIZE) + (TILE_SIZE / 2);
     int tileCenterY = (gridY * TILE_SIZE) + (TILE_SIZE / 2);
     int playerCenterX = (int)player.x + (player.w / 2);
     int playerCenterY = (int)player.y + (player.h / 2);
 
-    float dx = (float)(tileCenterX - playerCenterX);
-    float dy = (float)(tileCenterY - playerCenterY);
-    float distPx = sqrtf(dx*dx + dy*dy);
-
-    // Formule : Plus on est proche, plus c'est fort (1.0). Plus on s'éloigne, plus ça baisse.
-    
-    if (distPx < rayonPx) {
-        float i = 1.0f - (distPx / (float)rayonPx);
-        if (i > maxIntensite) maxIntensite = i;
+    if (currentLevel == 10) {
+        if (dialogue_chambre_parents == 0) {
+            // Calcul de la distance horizontale du centre de l'écran
+            float centerX = (MAP_WIDTH * TILE_SIZE) / 2.0f;
+            float distance = fabsf((float)tileCenterX - centerX);
+            
+            // Zone floue avec gradient progressif (entre net et très flou)
+            float pathWidth = 28.0f;   // Largeur du centre de la voie
+            float fadeWidth = 52.0f;   // Zone de transition floue
+            
+            if (distance < pathWidth) {
+                // Centre de la voie - légèrement visible
+                float centerIntensity = 1.0f - (distance / pathWidth) * 0.35f;
+                maxIntensite = 0.26f * centerIntensity;
+            } else if (distance < pathWidth + fadeWidth) {
+                // Zone de transition - s'estompe progressivement
+                float fadeProgress = (distance - pathWidth) / fadeWidth;
+                float intensity = 1.0f - fadeProgress;
+                intensity = intensity * intensity;  // Courbe quadratique
+                maxIntensite = 0.12f * intensity;
+            } else {
+                // Fond complètement sombre
+                maxIntensite = 0.0f;
+            }
+        } else {
+            // Pièce normale avec murs visibles près du joueur
+            float dx = (float)(tileCenterX - playerCenterX);
+            float dy = (float)(tileCenterY - playerCenterY);
+            float distPx = sqrtf(dx*dx + dy*dy);
+            if (distPx < rayonPx) {
+                float i = 1.0f - (distPx / (float)rayonPx);
+                if (i > maxIntensite) maxIntensite = i;
+            }
+        }
+    } else {
+        float dx = (float)(tileCenterX - playerCenterX);
+        float dy = (float)(tileCenterY - playerCenterY);
+        float distPx = sqrtf(dx*dx + dy*dy);
+        if (distPx < rayonPx) {
+            float i = 1.0f - (distPx / (float)rayonPx);
+            if (i > maxIntensite) maxIntensite = i;
+        }
     }
-    /*
-    // formule expo:
-    if (distPx < rayonPx) {
-        float ratio = distPx / (float)rayonPx; // 0.0 (proche) à 1.0 (loin)
-        
-        // Formule "Carrée" : La lumière reste forte près du joueur et tombe vite à la fin
-        float i = 1.0f - (ratio * ratio); 
-        
-        if (i > maxIntensite) maxIntensite = i;
-    }
-    */
     // --- 2. Lumière des LAMPES (Calcul en cases) ---
     for (int ly = 0; ly < MAP_HEIGHT; ly++) {
         for (int lx = 0; lx < MAP_WIDTH; lx++) {
@@ -1853,6 +1907,14 @@ void DrawTexte(char *texteAffiche, SDL_Renderer *renderer,TTF_Font *font, int x,
 }
 
 
+// Fonction helper pour vérifier si une position est dans la voie organique
+int isInOrganicPath(int gridX, int gridY) {
+    // Voie centrale correspondant au voile (80 pixels de chaque côté du centre)
+    // Centre = colonne 10, pathEdge = 80 pixels = 5 tiles
+    (void)gridY;
+    return (gridX >= 5 && gridX <= 14);
+}
+
 // SYS DE PROJECTILE POUR SALLE a manger 
 
 
@@ -1864,51 +1926,46 @@ void InitProjectiles(void) {
 }
 
 void SpawnProjectile(void) {
-    // Ne géneere des projectiles que dans le niveau cauchemar (index 10)
     if (currentLevel != 10) return;
     
-    // Cherche un slot libre
+    // Si joueur atteint le haut (près chambre parents) ou a déjà visité chambre, arrêter projectiles
+    if (player.y < 32 || dialogue_chambre_parents == 1) {
+        return;
+    }
+    
     for (int i = 0; i < MAX_PROJECTILES; i++) {
         if (!projectiles[i].active) {
             projectiles[i].active = 1;
             
-            // Position Y aléatoire dans le couloir (lignes 2 à 12)
-            int spawnRow = 2 + rand() % 10;
+            int spawnRow = 0 + rand() % 14;
             projectiles[i].y = spawnRow * TILE_SIZE + (rand() % 8);
             
-            // VITESSE PROGRESSIVE 
-            // Plus le joueur avance vers le haut (y diminue), plus c'est difficile
-            // Zone de départ (bas) : vitesse lente
-            // Zone d'arrivée (haut) : vitesse rapide
+            // Difficulté progressive : vitesse augmente avec la progression
             float playerProgress = 1.0f - (player.y / (float)(MAP_HEIGHT * TILE_SIZE));
-            // playerProgress va de 0 (en bas) à 1 (en haut)
+            float baseSpeed = 1.5f;
+            float maxSpeed = 4.0f;
+            float currentSpeed = baseSpeed + (maxSpeed - baseSpeed) * playerProgress * playerProgress;
             
-            // Vitesse de base : 1.2, vitesse max : 3.5
-            float baseSpeed = 1.2f;
-            float maxSpeed = 3.5f;
-            float currentSpeed = baseSpeed + (maxSpeed - baseSpeed) * playerProgress;
-            
-            // Légère variation aléatoire (+/- 20%)
-            float variation = 0.8f + ((rand() % 40) / 100.0f);
+            float variation = 0.9f + ((rand() % 20) / 100.0f);
             currentSpeed *= variation;
             
-            // Alterne aléatoirement entre gauche et droite
             int fromLeft = rand() % 2;
             
+            // Les projectiles démarrent depuis les limites visibles du voile
+            float centerX = (MAP_WIDTH * TILE_SIZE) / 2.0f;
+            float pathEdge = 28.0f;  // Correspondant à pathWidth dans getLuminosite
+            
             if (fromLeft) {
-                // Projectile venant du mur gauche INTÉRIEUR (colonne 8)
-                projectiles[i].x = 8 * TILE_SIZE;
+                projectiles[i].x = centerX - pathEdge;  // Bord gauche du voile
                 projectiles[i].vx = currentSpeed;
             } else {
-                // Projectile venant du mur droit INTÉRIEUR (colonne 11)
-                projectiles[i].x = 11 * TILE_SIZE;
+                projectiles[i].x = centerX + pathEdge;  // Bord droit du voile
                 projectiles[i].vx = -currentSpeed;
             }
             
-            // Type aléatoire (0 = assiette, 1 = couteau)
             projectiles[i].type = rand() % 2;
             
-            break; // On ne génère qu'un projectile à la fois
+            break;
         }
     }
 }
@@ -1917,20 +1974,29 @@ void UpdateProjectiles(void) {
     // Ne met à jour les projectiles que dans le niveau cauchemar
     if (currentLevel != 10) return;
     
-    // Génération de nouveaux projectiles
+    // Génération de nouveaux projectiles (fréquence augmente avec la progression)
+    float playerProgress = 1.0f - (player.y / (float)(MAP_HEIGHT * TILE_SIZE));
+    int spawnRate = (int)(20 - 14 * playerProgress);  // De 20 frames au début à 6 frames à la fin
+    if (spawnRate < 5) spawnRate = 5;
+    
     projectileSpawnTimer++;
-    if (projectileSpawnTimer >= PROJECTILE_SPAWN_RATE) {
+    if (projectileSpawnTimer >= spawnRate) {
         SpawnProjectile();
         projectileSpawnTimer = 0;
     }
+    
+    // Limites visibles du voile
+    float centerX = (MAP_WIDTH * TILE_SIZE) / 2.0f;
+    float pathEdge = 28.0f;
     
     // Mise à jour des projectiles existants
     for (int i = 0; i < MAX_PROJECTILES; i++) {
         if (projectiles[i].active) {
             projectiles[i].x += projectiles[i].vx;
             
-            // Désactive le projectile s'il sort de l'écran
-            if (projectiles[i].x < 0 || projectiles[i].x > MAP_WIDTH * TILE_SIZE) {
+            // Désactive le projectile s'il sort de la voie visible
+            float distFromCenter = fabsf(projectiles[i].x - centerX);
+            if (distFromCenter > pathEdge) {
                 projectiles[i].active = 0;
             }
         }
@@ -1969,13 +2035,30 @@ void DrawCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius) {
 }
 
 void DrawProjectiles(SDL_Renderer *renderer) {
-    // Ne dessine les projectiles que dans le niveau cauchemar
     if (currentLevel != 10) return;
+    
+    // Si post-chambre, pas de projectiles
+    if (dialogue_chambre_parents == 1) return;
+    
+    int playerCenterX = (int)player.x + (player.w / 2);
+    int playerGridX = playerCenterX / TILE_SIZE;
+    int playerGridY = ((int)player.y + (player.h / 2)) / TILE_SIZE;
+    
+    // Si joueur pas dans voie, pas de projectiles visibles
+    if (!isInOrganicPath(playerGridX, playerGridY)) return;
+    
+    // Limites visibles du voile pour affichage des projectiles
+    float centerX = (MAP_WIDTH * TILE_SIZE) / 2.0f;
+    float pathEdge = 28.0f;
     
     for (int i = 0; i < MAX_PROJECTILES; i++) {
         if (projectiles[i].active) {
             int px = (int)projectiles[i].x;
             int py = (int)projectiles[i].y;
+            
+            // N'afficher que les projectiles dans la zone visible du voile
+            float projectileDistFromCenter = fabsf(px - centerX);
+            if (projectileDistFromCenter > pathEdge) continue;
             
             if (projectiles[i].type == 0) {
                 // === ASSIETTE RONDE (taille réduite) ===

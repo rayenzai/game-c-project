@@ -33,7 +33,7 @@ typedef struct{
 } Fantome;
 
 // Structure pour les projectiles de la salle à manger
-#define MAX_PROJECTILES 20
+#define MAX_PROJECTILES 50
 typedef struct {
     float x, y;
     float vx;       // Vitesse horizontale (-1 = gauche à droite, 1 = droite à gauche)
