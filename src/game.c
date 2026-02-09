@@ -288,9 +288,9 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
@@ -409,6 +409,24 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 0,  0,217,  0,  0,  0,  0, 0,  0,  0, 0,  0,216,  0, 0, 0, 2, 2}, // Entrée piègeuse
         {2, 2,  2,  2,  2,  2,  2,  2,  0, 0,  0,  0, 2,  2,  2,  2, 2, 2, 2, 2}  // Porte en bas
     },
+    // Salon (index 11)
+    {    
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2}, // Bas fermé
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+    },
 };
  
 int dialogueStep = 0;  
@@ -458,6 +476,8 @@ int forceSleep = 0;
 int affichePapaReveil = 0;
 int showInteractTelecommande = 0;
 int hasTelecommande = 0;
+
+int dialoguePasTelecommande = 0;
 
 // --- INITIALISATION ---
 void InitGame(SDL_Renderer *renderer) {
@@ -839,6 +859,7 @@ void UpdateGame(void) {
         return;
     }
     
+    dialoguePasTelecommande = 0; // Pour le dialogue quand le joueur veut aller dans le salon sans la télécommande
 
     float dirX = 0;
     float dirY = 0;
@@ -848,6 +869,13 @@ void UpdateGame(void) {
     if (state[SDL_SCANCODE_LEFT])  dirX -= 1;
     if (state[SDL_SCANCODE_RIGHT]) dirX += 1;
 
+    if(currentLevel == 11 && player.x >= 28 && player.x <= 32 && !hasTelecommande){
+        if(dirX > 0){
+            dirX = 0;
+        }
+        dialoguePasTelecommande = 1;
+    }
+
     // Si on bouge sur les deux axes en même temps (Diagonale)
     if (dirX != 0 && dirY != 0) {
         // On multiplie par 0.707 (environ 1/racine(2)) pour ralentir
@@ -855,11 +883,7 @@ void UpdateGame(void) {
         dirY *= 0.7071f;
     }
 
-    // if (dirX != 0 || dirY != 0) {
-    //     Mix_Volume(2, 32); 
-    // } else {
-    //     Mix_Volume(2, 0);
-    // }
+    
 
     // 3. On applique la VITESSE
     float nextX = player.x + (dirX * PLAYER_SPEED);
@@ -1403,6 +1427,15 @@ void UpdateGame(void) {
     if(currentLevel == 10)GestionPapa();
     // currentLevel = 10; 
 
+    if(IsLocationRight(5, 10, 4, 20)){
+        currentLevel = 11;
+        player.x = 5;
+    }
+    else if(IsLocationLeft(5, 10, 11, 5)){
+        currentLevel = 4;
+        player.x = (MAP_WIDTH * TILE_SIZE) - 20;
+    }
+
 
 
     // printf("lvl: %d \n", currentLevel);
@@ -1910,6 +1943,10 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
         
         if (sText) DrawInteractions(renderer, sText);
+    }
+    if(dialoguePasTelecommande){
+        char *texteAffiche = "Je dois recuperer la telecommande";
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
     }
     if (screamer ==  1 && textureScreamer != NULL) {
         SDL_Delay(200);
