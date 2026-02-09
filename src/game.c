@@ -897,8 +897,12 @@ void UpdateGame(void) {
 
         // Si le screamer n'est pas déjà affiché on le lance
         if (screamer == 0) {
-            screamer = 1;                   // Active l'image
+            screamer = 1; 
+            hasTelecommande = 0;                  
             debutScreamer = SDL_GetTicks(); // démarre le chrono
+            int telecommandeX = 2;
+            int telecommandeY = 4;
+            maps[10][telecommandeY][telecommandeX] = 185;
             
             // Lance le son
             if (screamerActive == 0) {
