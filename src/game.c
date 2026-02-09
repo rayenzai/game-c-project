@@ -434,6 +434,8 @@ int has_drawing = 0;
 int statue_has_water = 0;
 int statue_has_drawing = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
+
+int screamer = 0;
     
 int carafeX = -1;
 int carafeY = -1;
@@ -463,6 +465,7 @@ void InitGame(SDL_Renderer *renderer) {
     dialogueStep = 1;
     toucheRelache = 0;
     hasDoudou = 0;
+    screamer = 0;
 
 
     // Test pour le fantome
@@ -868,11 +871,14 @@ void UpdateGame(void) {
     // } else {
     //     Mix_Volume(2, 0);  // On coupe le son si on arrête
     // }
-
+    
     if( (dirX != 0 || dirY != 0) && papaReveil==1 && currentLevel == 10){
         player.y = (MAP_HEIGHT * TILE_SIZE)-30;
         player.x = 10 * TILE_SIZE;
+        screamer = 1;
+        
     }
+    else if(!papaReveil)screamer = 0;
     
     float distance;
 
@@ -1417,7 +1423,7 @@ void GestionPapa() {
         // Si le joueur bouge il se refait tp en début de map
         else if (tempsEcoule < 5000) {
             papaReveil = 1;        
-            affichePapaReveil = 1; 
+            affichePapaReveil = 1;
         }
         // Le joueur peut re bouger
         else {
@@ -1840,7 +1846,34 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         
         if (sText) DrawInteractions(renderer, sText);
     }
-}
+    if (screamer ==  1 && textureScreamer != NULL) {
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 180);
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        SDL_RenderFillRect(renderer, NULL);
+
+        int texW, texH;
+        SDL_QueryTexture(textureScreamer, NULL, NULL, &texW, &texH);
+
+        int displayW = LOGICAL_WIDTH;
+        float ratio = (float)texW / (float)texH;
+        int displayH = (int)(displayW / ratio);
+
+        if (displayH > LOGICAL_HEIGHT) {
+            displayH = LOGICAL_HEIGHT;
+            displayW = (int)(displayH * ratio);
+        }
+
+        SDL_Rect posScreamer = {
+            (LOGICAL_WIDTH - displayW) / 2,  // Centré X
+            (LOGICAL_HEIGHT - displayH) / 2, // Centré Y
+            displayW,
+            displayH
+        };
+
+        SDL_RenderCopy(renderer, textureScreamer, NULL, &posScreamer);
+        }
+    }
 
 void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText){
     SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);

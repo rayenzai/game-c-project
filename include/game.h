@@ -35,6 +35,7 @@ typedef struct{
 extern Joueur player;
 extern Fantome fantome;
 
+
 extern float FANTOME_SPEED;
 
 extern int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH];
