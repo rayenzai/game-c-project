@@ -454,6 +454,7 @@ int TuilesNotSpecial[] = {0, 1, 2};
 int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
 
 int papaReveil = 0;
+int forceSleep = 0;
 int affichePapaReveil = 0;
 int showInteractTelecommande = 0;
 int hasTelecommande = 0;
@@ -922,6 +923,7 @@ void UpdateGame(void) {
                 Mix_HaltChannel(2); 
                 screamerActive = 0;
             }
+            forceSleep = 1;
         }
     }
     
@@ -1420,6 +1422,23 @@ void GestionPapa() {
     static int waitRelease = 0;
     static int premiereCaseMonstreX = -1;
     static int premiereCaseMonstreY = -1;
+
+    // Si dans updateGame ça nous dit qu'on doit forcer le monstre à dormir
+    if (forceSleep == 1) {
+        if (premiereCaseMonstreX != -1 && premiereCaseMonstreY != -1) {
+            // On remet visuellement le monstre au lit
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX] = 219;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+1] = 220;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+2] = 221;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+3] = 222;
+        }
+        sequenceActive = 0;    
+        papaReveil = 0;        
+        affichePapaReveil = 0; 
+        waitRelease = 1;       
+        forceSleep = 0;        
+        return;                
+    }
 
     int tabIndexObjetBruit[] = {59, 60, 217, 216, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236};
 
