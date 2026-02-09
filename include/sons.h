@@ -12,5 +12,6 @@ Mix_Chunk *chargement_son_transition();
 Mix_Chunk *chargement_son_item_pick_up();
 Mix_Chunk *chargement_son_door_open();
 Mix_Chunk *chargement_son_door_close();
+Mix_Chunk *chargement_son_screamer();
 
 #endif 

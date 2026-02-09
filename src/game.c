@@ -18,6 +18,7 @@
 static Mix_Chunk *sonPickUp = NULL;
 static Mix_Chunk *sonOpenDoor = NULL;
 static Mix_Chunk *sonCloseDoor = NULL;
+static Mix_Chunk *sonScreamer = NULL;
 
 // Musiques D'ambiance
 static Mix_Music *MusicInterior = NULL;
@@ -405,7 +406,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2,203,204,205,206,  0,  0,216, 0,228,  0, 0,236,229,  0, 0, 0, 2, 2},
         {2, 2,  0, 30, 31,  0,234,  0,  0, 0,  0,230, 0,  0,  0,223, 0, 0, 2, 2}, // Tapis safe
         {2, 2,235,  0,  0,  0,227,  0,231, 0,226,  0, 0,228,  0,  0, 0, 0, 2, 2}, // Bas fermé mais passage
-        {2, 2,241,  0,217,  0,  0,  0,  0, 0,  0,  0, 0,  0,216,  0, 0, 0, 2, 2}, // Entrée piègeuse
+        {2, 2, 0,  0,217,  0,  0,  0,  0, 0,  0,  0, 0,  0,216,  0, 0, 0, 2, 2}, // Entrée piègeuse
         {2, 2,  2,  2,  2,  2,  2,  2,  0, 0,  0,  0, 2,  2,  2,  2, 2, 2, 2, 2}  // Porte en bas
     },
 };
@@ -455,6 +456,7 @@ int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesN
 int papaReveil = 0;
 int affichePapaReveil = 0;
 int showInteractTelecommande = 0;
+int hasTelecommande = 0;
 
 // --- INITIALISATION ---
 void InitGame(SDL_Renderer *renderer) {
@@ -483,7 +485,12 @@ void InitGame(SDL_Renderer *renderer) {
     sonCloseDoor = chargement_son_door_close();
     MusicInterior = chargement_son_ambiance();
     MusicExterior = chargement_son_exterieur();
+    sonScreamer = chargement_son_screamer();
     
+    // On lance les sons en arrière plan
+    // Mix_PlayChannel(2, sonScreamer, -1); // -1 = boucle infinie
+    // Mix_Volume(2,0);
+
     // currentLevel = 5;
     // player.x = 20; 
     // player.y = 12*TILE_SIZE ;
@@ -686,6 +693,14 @@ void ManageMusic() {
     static int currentZoneState = -1; 
     int newZoneState = 0; 
     Mix_Volume(-1, VOLUME_BRUITAGES);
+
+    // if(screamer){
+    //     Mix_Volume(2, 64); // On commence volume à 0
+    // }
+    // else{
+    //     Mix_Volume(2, 0);
+    // }
+
     // Si on est dans les niveaux 5, 6, 7 ou 8, on est à l'EXTERIEUR
     if (currentLevel >= 5 && currentLevel <= 8) {
         newZoneState = 1;
@@ -872,13 +887,39 @@ void UpdateGame(void) {
     //     Mix_Volume(2, 0);  // On coupe le son si on arrête
     // }
     
-    if( (dirX != 0 || dirY != 0) && papaReveil==1 && currentLevel == 10){
-        player.y = (MAP_HEIGHT * TILE_SIZE)-30;
+    // --- GESTION SONORE SCREAMER ---
+    static int screamerActive = 0;    
+    static Uint32 debutScreamer = 0;  
+
+    if( (dirX != 0 || dirY != 0) && papaReveil == 1 && currentLevel == 10){
+        player.y = (MAP_HEIGHT * TILE_SIZE) - 30; 
         player.x = 10 * TILE_SIZE;
-        screamer = 1;
-        
+
+        // Si le screamer n'est pas déjà affiché on le lance
+        if (screamer == 0) {
+            screamer = 1;                   // Active l'image
+            debutScreamer = SDL_GetTicks(); // démarre le chrono
+            
+            // Lance le son
+            if (screamerActive == 0) {
+                Mix_Volume(2, 128); 
+                Mix_PlayChannel(2, sonScreamer, 0); 
+                screamerActive = 1;
+            }
+        }
     }
-    else if(!papaReveil)screamer = 0;
+    
+    if (screamer == 1) {
+        if (SDL_GetTicks() - debutScreamer > 2000) {
+            screamer = 0; // On coupe l'image
+            
+            // On coupe le son
+            if (screamerActive == 1) {
+                Mix_HaltChannel(2); 
+                screamerActive = 0;
+            }
+        }
+    }
     
     float distance;
 
@@ -1140,6 +1181,7 @@ void UpdateGame(void) {
 
             if(distance_Telecommande <= 16 && currentLevel == 10 && maps[currentLevel][telecommandeY][telecommandeX] == 185){
                  maps[currentLevel][telecommandeY][telecommandeX] = 218;
+                 hasTelecommande = 1;
             }
             toucheE_Relache = 0; // On verrouille tant qu'on n'a pas lâché E
         }
@@ -1375,7 +1417,7 @@ void GestionPapa() {
     static int premiereCaseMonstreX = -1;
     static int premiereCaseMonstreY = -1;
 
-    int tabIndexObjetBruit[] = {217, 216, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236};
+    int tabIndexObjetBruit[] = {59, 60, 217, 216, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236};
 
     if(premiereCaseMonstreX == -1 || premiereCaseMonstreY == -1){
         TrouveCoordonnees(&premiereCaseMonstreX, &premiereCaseMonstreY, 219, 10);
@@ -1385,7 +1427,7 @@ void GestionPapa() {
     Uint32 tempsActuel = SDL_GetTicks();
 
     int caseX = (player.x + player.w / 2) / TILE_SIZE;
-    int caseY = (player.y + player.h / 2) / TILE_SIZE;
+    int caseY = (player.y + player.h) / TILE_SIZE;
     int indexTuile = maps[currentLevel][caseY][caseX];
     int tailleTabObjetBruit = sizeof(tabIndexObjetBruit) / sizeof(tabIndexObjetBruit[0]);
 
@@ -1847,7 +1889,7 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         if (sText) DrawInteractions(renderer, sText);
     }
     if (screamer ==  1 && textureScreamer != NULL) {
-
+        SDL_Delay(200);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 180);
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
         SDL_RenderFillRect(renderer, NULL);
