@@ -478,6 +478,8 @@ int showInteractTelecommande = 0;
 int hasTelecommande = 0;
 
 int dialoguePasTelecommande = 0;
+int interactTelecommandeTurnOn = 0;
+int teleOn = 0;
 
 // --- INITIALISATION ---
 void InitGame(SDL_Renderer *renderer) {
@@ -860,6 +862,7 @@ void UpdateGame(void) {
     }
     
     dialoguePasTelecommande = 0; // Pour le dialogue quand le joueur veut aller dans le salon sans la télécommande
+    interactTelecommandeTurnOn = 0;
 
     float dirX = 0;
     float dirY = 0;
@@ -874,6 +877,13 @@ void UpdateGame(void) {
             dirX = 0;
         }
         dialoguePasTelecommande = 1;
+    }
+
+    else if(hasTelecommande && player.x >= 28 && player.x <= 32 && !teleOn){
+        interactTelecommandeTurnOn = 1;
+        if(!teleOn && dirX > 0){
+            dirX = 0;
+        }
     }
 
     // Si on bouge sur les deux axes en même temps (Diagonale)
@@ -1212,6 +1222,10 @@ void UpdateGame(void) {
             if(distance_Telecommande <= 16 && currentLevel == 10 && maps[currentLevel][telecommandeY][telecommandeX] == 185){
                  maps[currentLevel][telecommandeY][telecommandeX] = 218;
                  hasTelecommande = 1;
+            }
+
+            if(player.x >= 28 && player.x <= 32 && hasTelecommande){
+                teleOn = 1;
             }
             toucheE_Relache = 0; // On verrouille tant qu'on n'a pas lâché E
         }
@@ -1947,6 +1961,12 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     if(dialoguePasTelecommande){
         char *texteAffiche = "Je dois recuperer la telecommande";
         DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if(interactTelecommandeTurnOn){
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Allumer la TV", cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
     }
     if (screamer ==  1 && textureScreamer != NULL) {
         SDL_Delay(200);
