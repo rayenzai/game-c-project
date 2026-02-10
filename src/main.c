@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
 
     GameState etat = ETAT_MENU;
     InitIntro();
-    InitMenu();
+    InitMenu(renderer);
 
     int running = 1;
     SDL_Event event;
