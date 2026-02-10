@@ -217,6 +217,13 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 290 = carafe sang
 291 = asiettes dents
 292 = asiette os
+.................
+-salon-
+302(g), 303(d) = bas télé sur commode 
+304,305 = haut télé
+306,307 = continuité de la table 
+308,309,310,311 = haut canapé
+312,313,314,315 = bas canapé 
 */
 
 
