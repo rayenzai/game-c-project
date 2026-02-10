@@ -728,7 +728,6 @@ void ManageMusic() {
 void UpdateGame(void) {
     const Uint8 *state = SDL_GetKeyboardState(NULL);
     // --- MODE DIALOGUE (Joueur Bloqué) ---
-    cpt_piece_tableau=4;
     if (dialogueStep > 0) {
 
         if (state[SDL_SCANCODE_RETURN]) {
@@ -1399,10 +1398,11 @@ void UpdateGame(void) {
         player.y = 10;
     }
 
-    hasDoudou = 1;
+    // hasDoudou = 1;
     if(currentLevel == 10)GestionPapa();
     // currentLevel = 10; 
-
+    // cpt_piece_tableau=4;
+    // whichTableauPiece = 1;
 
 
     // printf("lvl: %d \n", currentLevel);
