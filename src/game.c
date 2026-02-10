@@ -277,7 +277,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2,184,0,  0,  0,   0,  0,  0,  0, 0, 0, 0,  0,  0,  0,  0, 0, 0, 0, 0},
         {2, 2, 0,  0,263, 176,  0,175,  0, 0, 0, 0,158,159,  0,  0, 0, 0, 0, 0},
         {2, 2, 0,  0,264,   0,  0,  0,  0, 0, 0, 0,156,157,  0,  0, 0, 0, 0, 0},
-        {2, 2,265, 0,263,   0,179,180,177, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2},
+        {2, 2,265, 0,263,   179,180,0,177, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2},
         {2, 2,171, 0,264, 260,261,  0,262, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2},
         {2, 2,181, 0,  0, 257,258,258,259, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2},
         {2, 2, 0,  0,  0, 254,255,255,256, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2}, // Bas fermé
@@ -422,6 +422,7 @@ int dialogue_statue_haut = 0;
 int dialogue_statue_bas = 0;
 int dialogue_entree_labyrinthe = 0;
 int dialogue_max_objet = 0;
+int max_objets = 0;
 int toucheRelache = 0;
 int hasDoudou = 0;
 int showInteractPrompt = 0;
@@ -435,16 +436,36 @@ int show_interact_prompt_dessin = 0;
 int show_interact_prompt_livre = 0;
 int interact_statue_haut = 0;
 int interact_statue_bas = 0;
+int interact_truc_vert = 0;
+int interact_spider = 0;
+int interact_pain = 0;
+int interact_heart = 0;
+int interact_eye = 0;
 int has_water = 0;
 int has_drawing = 0;
 int statue_has_water = 0;
 int statue_has_drawing = 0;
+int has_truc_vert = 0;
+int has_spider = 0;
+int has_pain = 0;
+int has_heart = 0;
+int has_eye = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
     
 int carafeX = -1;
 int carafeY = -1;
 int dessinX = -1;
 int dessinY = -1;
+int truc_vertX = -1;
+int truc_vertY = -1;
+int painX = -1;
+int painY = -1;
+int spiderX = -1;
+int spiderY = -1;
+int heartX = -1;
+int heartY = -1; 
+int eyeY = -1;
+int eyeX = -1;
 
 int showInteractPromptObjetTableau = 0;
 int showInteractTableau = 0;
@@ -960,7 +981,37 @@ void UpdateGame(void) {
     {
         show_interact_prompt_livre = 1;
     }
-    
+
+    interact_truc_vert = 0;
+    float distance_truc_vert = 9999.0f;
+    TrouveCoordonnees(&truc_vertX, &truc_vertY, 177, 3);
+    if (IsLocationObjet(20, 3,177, &distance_truc_vert, -1, -1))
+    {
+        interact_truc_vert = 1;
+    }
+
+    interact_pain = 0;
+    float distance_pain = 9999.0f;
+    TrouveCoordonnees(&painX, &painY, 175, 3);
+    if (IsLocationObjet(20, 3,175, &distance_pain, -1, -1))
+    {
+        interact_pain = 1;
+    }
+
+    interact_spider = 0;
+    float distance_spider = 9999.0f;
+    TrouveCoordonnees(&spiderX, &spiderY, 242, 3);
+    if (IsLocationObjet(20, 3,242, &distance_spider, -1, -1))
+    {
+        interact_spider = 1;
+    }
+    interact_eye = 0;
+    float distance_eye = 9999.0f;
+    TrouveCoordonnees(&eyeX, &eyeY, 265, 3);
+    if (IsLocationObjet(20, 3,265, &distance_eye, -1, -1))
+    {
+        interact_eye = 1;
+    }
     
 
     
@@ -1072,7 +1123,42 @@ void UpdateGame(void) {
                 has_water = 0;
             }
             
-
+            if (currentLevel == 3 && distance_truc_vert <= 20 && max_objets == 0) {
+                has_truc_vert = 1;
+                maps[3][truc_vertY][truc_vertX] = 160;
+                max_objets = 1;
+                toucheE_Relache = 0;
+            }
+            if (currentLevel == 3 && distance_truc_vert <= 20 && max_objets == 1 && has_truc_vert == 0) {
+                dialogue_max_objet = 1;
+            } 
+            if (currentLevel == 3 && distance_pain <= 20 && max_objets == 0) {
+                has_pain = 1;
+                maps[3][painY][painX] = 160;
+                max_objets = 1;
+                toucheE_Relache = 0;
+            }
+            if (currentLevel == 3 && distance_pain <= 20 && max_objets == 1 && has_pain == 0) {
+                dialogue_max_objet = 1;
+            }
+            if (currentLevel == 3 && distance_spider <= 20 && max_objets == 0) {
+                has_spider = 1;
+                maps[3][spiderY][spiderX] = 2;
+                max_objets = 1;
+                toucheE_Relache = 0;
+            }
+            if (currentLevel == 3 && distance_spider <= 20 && max_objets == 1 && has_spider == 0) {
+                dialogue_max_objet = 1;
+            }
+            if (currentLevel == 3 && distance_eye <= 20 && max_objets == 0) {
+                has_eye = 1;
+                maps[3][eyeY][eyeX] = 181;
+                max_objets = 1;
+                toucheE_Relache = 0;
+            }
+            if (currentLevel == 3 && distance_eye <= 20 && max_objets == 1 && has_eye == 0) {
+                dialogue_max_objet = 1;
+            }
             if (currentLevel == 2 && distStatueBas <= 24 && has_drawing == 0) {
                  dialogue_statue_bas = 1;
                  toucheE_Relache = 0;
@@ -1815,6 +1901,30 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         
         if (sText) DrawInteractions(renderer, sText);
     }
+    if(interact_truc_vert == 1){
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if(interact_pain == 1){
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if(interact_spider == 1){
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if(interact_eye == 1){
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
+    }
     if (livreOuvert == 1 && textureLivre != NULL) {
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 180);
@@ -1863,6 +1973,8 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     }
 
 }
+
+
 
 void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText){
     SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
