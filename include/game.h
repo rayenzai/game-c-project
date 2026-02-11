@@ -56,6 +56,12 @@ int IsLocationDown(int xDebut, int xFin, int CurrLvl, int yDiff);
 int IsLocationRight(int yDebut, int yFin, int CurrLvl, int xDiff);
 int IsLocationLeft(int yDebut, int yFin, int CurrLvl, int xDiff);
 
+int IsDansTab(int tabIndexTuile[], int taille, int index);
+void copieTableau (int src[MAP_HEIGHT][MAP_WIDTH], int dest[MAP_HEIGHT][MAP_WIDTH]);
+
+void GestionMemoSalon();
+
+
 extern int currentLevel; 
 
 #endif
