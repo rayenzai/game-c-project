@@ -306,7 +306,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2,184,0,  0,  0,   0,  0,  0,  0, 0, 0, 0,  0,  0,  0,  0,  0,  0, 0, 0},
         {2, 2, 0,  0,263, 176,  0,175,  0, 0, 0, 0,158,159,  0,  0,  0,  0, 0, 0},
         {2, 2,275, 0,264,   0,  0,  0,  0, 0, 0, 0,156,157,  0,  0,  0,  0, 0, 0},
-        {2, 2,265, 0,263,   0,179,180,177, 0, 0, 0,  0,  0,  0,  0,  0,  0, 2, 2},
+        {2, 2,265, 0,263, 179,180,  0,177, 0, 0, 0,  0,  0,  0,  0,  0,  0, 2, 2},
         {2, 2,171, 0,264, 260,261,  0,262, 0, 0, 0,  0,  0,  0,  0,  0,  0, 2, 2},
         {2, 2,181, 0,  0, 257,258,258,259, 0, 0, 0,  0,  0,  0,  0,  0,  0, 2, 2},
         {2, 2, 0,  0,  0, 254,255,255,256, 0, 0, 0,  0,  0,  0,  0,  0,  0, 2, 2}, // Bas fermé
@@ -479,6 +479,13 @@ int has_spider = 0;
 int has_pain = 0;
 int has_heart = 0;
 int has_eye = 0;
+int chaudron_has_truc_vert = 0;
+int chaudron_has_spider = 0;
+int chaudron_has_pain = 0;
+int chaudron_has_heart = 0;
+int chaudron_has_eye = 0;
+int interact_chaudron_cuisiner = 0;
+int has_interact_livre = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
     
 int carafeX = -1;
@@ -495,6 +502,10 @@ int heartX = -1;
 int heartY = -1; 
 int eyeY = -1;
 int eyeX = -1;
+int chaudronGX = -1;
+int chaudronGY = -1;
+int chaudronDX = -1;
+int chaudronDY = -1;
 
 int showInteractPromptObjetTableau = 0;
 int showInteractTableau = 0;
@@ -1015,7 +1026,7 @@ void UpdateGame(void) {
     interact_truc_vert = 0;
     float distance_truc_vert = 9999.0f;
     TrouveCoordonnees(&truc_vertX, &truc_vertY, 177, 3);
-    if (IsLocationObjet(20, 3,177, &distance_truc_vert, -1, -1))
+    if (IsLocationObjet(20, 3,177, &distance_truc_vert, -1, -1) && has_interact_livre == 1)
     {
         interact_truc_vert = 1;
     }
@@ -1023,7 +1034,7 @@ void UpdateGame(void) {
     interact_pain = 0;
     float distance_pain = 9999.0f;
     TrouveCoordonnees(&painX, &painY, 175, 3);
-    if (IsLocationObjet(20, 3,175, &distance_pain, -1, -1))
+    if (IsLocationObjet(20, 3,175, &distance_pain, -1, -1) && has_interact_livre == 1)
     {
         interact_pain = 1;
     }
@@ -1031,23 +1042,46 @@ void UpdateGame(void) {
     interact_spider = 0;
     float distance_spider = 9999.0f;
     TrouveCoordonnees(&spiderX, &spiderY, 242, 3);
-    if (IsLocationObjet(20, 3,242, &distance_spider, -1, -1))
+    if (IsLocationObjet(20, 3,242, &distance_spider, -1, -1) && has_interact_livre == 1)
     {
         interact_spider = 1;
     }
     interact_eye = 0;
     float distance_eye = 9999.0f;
     TrouveCoordonnees(&eyeX, &eyeY, 265, 3);
-    if (IsLocationObjet(20, 3,265, &distance_eye, -1, -1))
+    if (IsLocationObjet(20, 3,265, &distance_eye, -1, -1) && has_interact_livre == 1)
     {
         interact_eye = 1;
     }
     interact_heart = 0;
     float distance_heart = 9999.0f;
     TrouveCoordonnees(&heartX, &heartY, 244, 3);
-    if (IsLocationObjet(20, 3,244, &distance_heart, -1, -1))
+    if (IsLocationObjet(20, 3,244, &distance_heart, -1, -1) && has_interact_livre == 1)
     {
         interact_heart = 1;
+    }
+    interact_chaudron_cuisiner = 0;
+    float distance_chaudronHG = 9999.0f;
+    float distance_chaudronBG = 9999.0f;
+    float distance_chaudronHD = 9999.0f;
+    float distance_chaudronBD = 9999.0f;
+    TrouveCoordonnees(&chaudronDX, &chaudronDY, 297,3);
+    TrouveCoordonnees(&chaudronGX, &chaudronGY, 296,3);
+    if (IsLocationObjet(20, 3,296, &distance_chaudronHG, -1, -1 ) && max_objets == 1)
+    {
+        interact_chaudron_cuisiner = 1;
+    }
+    if (IsLocationObjet(20, 3,297, &distance_chaudronHD, -1, -1) && max_objets == 1)
+    {
+        interact_chaudron_cuisiner = 1;
+    }
+    if (IsLocationObjet(20, 3,294, &distance_chaudronBG, -1, -1) && max_objets == 1)
+    {
+        interact_chaudron_cuisiner = 1;
+    }
+    if (IsLocationObjet(20, 3,295, &distance_chaudronBD, -1, -1) && max_objets == 1)
+    {
+        interact_chaudron_cuisiner = 1;
     }
     
 
@@ -1160,16 +1194,16 @@ void UpdateGame(void) {
                 has_water = 0;
             }
             
-            if (currentLevel == 3 && distance_truc_vert <= 20 && max_objets == 0) {
+            if (currentLevel == 3 && distance_truc_vert <= 20 && max_objets == 0 && has_interact_livre == 1) {
                 has_truc_vert = 1;
-                maps[3][truc_vertY][truc_vertX] = 160;
+                maps[3][truc_vertY][truc_vertX] = 293;
                 max_objets = 1;
                 toucheE_Relache = 0;
             }
             if (currentLevel == 3 && distance_truc_vert <= 20 && max_objets == 1 && has_truc_vert == 0) {
                 dialogue_max_objet = 1;
             } 
-            if (currentLevel == 3 && distance_pain <= 20 && max_objets == 0) {
+            if (currentLevel == 3 && distance_pain <= 20 && max_objets == 0 && has_interact_livre == 1) {
                 has_pain = 1;
                 maps[3][painY][painX] = 166;
                 max_objets = 1;
@@ -1178,7 +1212,7 @@ void UpdateGame(void) {
             if (currentLevel == 3 && distance_pain <= 20 && max_objets == 1 && has_pain == 0) {
                 dialogue_max_objet = 1;
             }
-            if (currentLevel == 3 && distance_spider <= 20 && max_objets == 0) {
+            if (currentLevel == 3 && distance_spider <= 20 && max_objets == 0 && has_interact_livre == 1) {
                 has_spider = 1;
                 maps[3][spiderY][spiderX] = 2;
                 max_objets = 1;
@@ -1187,7 +1221,7 @@ void UpdateGame(void) {
             if (currentLevel == 3 && distance_spider <= 20 && max_objets == 1 && has_spider == 0) {
                 dialogue_max_objet = 1;
             }
-            if (currentLevel == 3 && distance_eye <= 20 && max_objets == 0) {
+            if (currentLevel == 3 && distance_eye <= 20 && max_objets == 0 && has_interact_livre == 1) {
                 has_eye = 1;
                 maps[3][eyeY][eyeX] = 181;
                 max_objets = 1;
@@ -1196,7 +1230,7 @@ void UpdateGame(void) {
             if (currentLevel == 3 && distance_eye <= 20 && max_objets == 1 && has_eye == 0) {
                 dialogue_max_objet = 1;
             }
-            if (currentLevel == 3 && distance_heart <= 20 && max_objets == 0) {
+            if (currentLevel == 3 && distance_heart <= 20 && max_objets == 0 && has_interact_livre == 1) {
                 has_heart = 1;
                 maps[3][heartY][heartX] = 181;
                 max_objets = 1;
@@ -1228,12 +1262,41 @@ void UpdateGame(void) {
             if (currentLevel == 3 && distance_livreD <= 20)
             {
                 livreOuvert = 1;
+                has_interact_livre = 1;
             }
             if (currentLevel == 3 && distance_livreG <= 20)
             {
                 livreOuvert = 1;
+                has_interact_livre = 1;
             }
-            
+            if(currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_eye){
+                has_eye = 0;
+                max_objets = 0;
+                chaudron_has_eye = 1;
+                maps[3][chaudronGY][chaudronGX] = 298;
+                maps[3][chaudronDY][chaudronDX] = 299;
+            }
+            if(currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_pain){
+                has_pain = 0;
+                max_objets = 0;
+                chaudron_has_pain= 1;
+                maps[3][chaudronGY][chaudronGX] = 298;
+                maps[3][chaudronDY][chaudronDX] = 299;
+            }
+            if(currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_spider){
+                has_spider = 0;
+                max_objets = 0;
+                chaudron_has_spider = 1;
+                maps[3][chaudronGY][chaudronGX] = 298;
+                maps[3][chaudronDY][chaudronDX] = 299;
+            }
+            if(currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_truc_vert){
+                has_truc_vert = 0;
+                max_objets = 0;
+                chaudron_has_truc_vert = 1;
+                maps[3][chaudronGY][chaudronGX] = 298;
+                maps[3][chaudronDY][chaudronDX] = 299;
+            }
 
             else if(distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55){
                 currentLevel = 9;
@@ -1968,6 +2031,12 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     if(interact_eye == 1){
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if(interact_chaudron_cuisiner == 1){
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Cuisiner", cBlanc);
         
         if (sText) DrawInteractions(renderer, sText);
     }
