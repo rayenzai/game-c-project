@@ -1184,7 +1184,7 @@ void UpdateGame(void) {
                 has_water = 1;
             }
 
-            if (currentLevel == 2 && distStatueHaut <= 24 && has_water == 0) {
+            if (currentLevel == 2 && distStatueHaut <= 24 && has_water == 0 && statue_has_water == 0) {
                 dialogue_statue_haut = 1;   
             }
             else if (currentLevel == 2 && distStatueHaut <= 24 && has_water == 1)
@@ -1239,7 +1239,7 @@ void UpdateGame(void) {
             if (currentLevel == 3 && distance_heart <= 20 && max_objets == 1 && has_heart == 0) {
                 dialogue_max_objet = 1;
             }
-            if (currentLevel == 2 && distStatueBas <= 24 && has_drawing == 0) {
+            if (currentLevel == 2 && distStatueBas <= 24 && has_drawing == 0 && statue_has_drawing == 0) {
                  dialogue_statue_bas = 1;
                  toucheE_Relache = 0;
             }
