@@ -488,6 +488,7 @@ void InitGame(SDL_Renderer *renderer) {
     dialogueStep = 1;
     toucheRelache = 0;
     hasDoudou = 1;
+    show_interact_prompt_livre = 0;
 
 
     // Test pour le fantome
@@ -1012,6 +1013,13 @@ void UpdateGame(void) {
     {
         interact_eye = 1;
     }
+    interact_heart = 0;
+    float distance_heart = 9999.0f;
+    TrouveCoordonnees(&heartX, &heartY, 244, 3);
+    if (IsLocationObjet(20, 3,244, &distance_heart, -1, -1))
+    {
+        interact_heart = 1;
+    }
     
 
     
@@ -1134,7 +1142,7 @@ void UpdateGame(void) {
             } 
             if (currentLevel == 3 && distance_pain <= 20 && max_objets == 0) {
                 has_pain = 1;
-                maps[3][painY][painX] = 160;
+                maps[3][painY][painX] = 166;
                 max_objets = 1;
                 toucheE_Relache = 0;
             }
@@ -1157,6 +1165,15 @@ void UpdateGame(void) {
                 toucheE_Relache = 0;
             }
             if (currentLevel == 3 && distance_eye <= 20 && max_objets == 1 && has_eye == 0) {
+                dialogue_max_objet = 1;
+            }
+            if (currentLevel == 3 && distance_heart <= 20 && max_objets == 0) {
+                has_heart = 1;
+                maps[3][heartY][heartX] = 181;
+                max_objets = 1;
+                toucheE_Relache = 0;
+            }
+            if (currentLevel == 3 && distance_heart <= 20 && max_objets == 1 && has_heart == 0) {
                 dialogue_max_objet = 1;
             }
             if (currentLevel == 2 && distStatueBas <= 24 && has_drawing == 0) {
