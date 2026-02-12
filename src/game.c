@@ -22,11 +22,12 @@ static Mix_Chunk *sonProjectileHit = NULL;
 
 // Variables pour l'effet de flash lors d'une collision
 static int hitFlashTimer = 0;
-static int hitFlashDuration = 20;  // Durée du flash en frames
+static int hitFlashDuration = 30;  // Durée du flash en frames (plus long pour bien voir)
 static int knockbackTimer = 0;
 static float knockbackVX = 0.0f;
 static float knockbackVY = 0.0f;
-static int hitCount = 0;  // Compteur de coups (3 coups = reset)
+static int hitCount = 0;  // Compteur de coups (3 coups = retour chambre)
+static int nightmareFrame = 0;  // Compteur pour effet cauchemar pulsant
 
 // Musiques D'ambiance
 static Mix_Music *MusicInterior = NULL;
@@ -398,7 +399,27 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {50, 50, 50, 50, 50, 50, 50,  50,  50,  50, 50,  50,  50, 50, 50, 50, 50, 50, 50, 50}, 
         {50, 50, 50, 50, 50, 50, 50,  50,  50,  50, 50,  50,  50, 50, 50, 50, 50, 50, 50, 50}
     },
-    // Chambre des parents (index 10)
+    // SALLE À MANGER (Niveau 10 - Cauchemar avec projectiles)
+    // La table (160-166) a 3 voies style Subway Surfers
+    // Les projectiles (couteaux/assiettes) arrivent de la gauche et droite
+    {    
+        {2, 2, 2, 2, 2, 2, 2, 2, 155, 155, 155, 155, 2, 2, 2, 2, 2, 2, 2, 2}, // Haut: porte vers chambre parents
+        {2, 2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 2, 2}, // Espace avant table
+        {2, 2, 155, 155, 155, 155, 155, 155, 160, 166, 166, 165, 155, 155, 155, 155, 155, 155, 2, 2}, // Début table
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 163, 166, 166, 161, 155, 155, 155, 155, 155, 155, 2, 2}, // Fin table
+        {2, 2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 2, 2}, // Espace après table
+        {2, 2, 2, 2, 2, 2, 2, 2, 155, 155, 155, 155, 2, 2, 2, 2, 2, 2, 2, 2}  // Bas: porte depuis cuisine
+    },
+    // Chambre des parents (index 11)
     {    
         {2, 2,  2,  2,  2,  2,  2,  2,  2, 2,  2,  2, 2,  2,  2,  2, 2, 2, 2, 2}, // Trou en haut
         {2, 2,  2,  2,  2,  2,  2,  2,  2, 2,  2,  2, 2,213,214,215, 2, 2, 2, 2},
@@ -460,8 +481,18 @@ int cpt_piece_tableau = 4;
 // --- VARIABLES PROJECTILES ---
 Projectile projectiles[MAX_PROJECTILES];
 int projectileSpawnTimer = 0;
-#define PROJECTILE_SPAWN_RATE 60  // Génère un projectile toutes les 60 frames (1 seconde à 60 FPS)
+#define PROJECTILE_SPAWN_RATE 60
 #define PROJECTILE_SPEED 2.5f
+
+// --- VARIABLES SALLE À MANGER (3 voies style Subway Surfers) ---
+int onTable = 0;           // 0 = pas sur la table, 1 = sur la table
+int currentLane = 1;       // 0 = gauche (col 8), 1 = milieu (col 9-10), 2 = droite (col 11)
+int laneKeyReleased = 1;   // Anti-rebond pour changement de voie
+int spaceKeyReleased = 1;  // Anti-rebond pour saut (ESPACE)
+float tableLaneX[3];       // Positions X des 3 voies (calculées à l'init)
+#define TABLE_TOP_ROW 2    // Rangée du début de la table
+#define TABLE_BOT_ROW 12   // Rangée de la fin de la table
+#define TABLE_SPEED 1.2f   // Vitesse de montée auto sur la table
 
 // --- DÉCLARATIONS FONCTIONS ---
 int isInOrganicPath(int gridX, int gridY);
@@ -483,6 +514,14 @@ void InitGame(SDL_Renderer *renderer) {
 
     // Initialisation des projectiles
     InitProjectiles();
+    onTable = 0;
+    currentLane = 1;
+    laneKeyReleased = 1;
+    spaceKeyReleased = 1;
+    // Positions X des 3 voies : gauche (col 8), milieu (entre col 9-10), droite (col 11)
+    tableLaneX[0] = 8 * TILE_SIZE + 2;            // Voie gauche
+    tableLaneX[1] = 9 * TILE_SIZE + (TILE_SIZE/2); // Voie milieu
+    tableLaneX[2] = 11 * TILE_SIZE + 2;            // Voie droite
 
     // Test pour le fantome
     fantome.x = 8 * TILE_SIZE; 
@@ -832,6 +871,8 @@ void UpdateGame(void) {
     }
     
 
+    
+
     float dirX = 0;
     float dirY = 0;
 
@@ -855,10 +896,98 @@ void UpdateGame(void) {
 
     // 3. On applique la VITESSE
     float currentSpeed = PLAYER_SPEED;
-    if (currentLevel == 10 && dialogue_chambre_parents == 0) {
-        // Vitesse réduite dans la salle à manger, diminue progressivement
-        float progressFactor = 0.55f - (1.0f - player.y / (float)(MAP_HEIGHT * TILE_SIZE)) * 0.15f;
-        currentSpeed = PLAYER_SPEED * progressFactor;
+    
+    // === SALLE À MANGER : MODE 3 VOIES ===
+    if (currentLevel == 10 && dialogue_chambre_parents < 1) {
+        // Anti-rebond ESPACE
+        if (!state[SDL_SCANCODE_SPACE]) {
+            spaceKeyReleased = 1;
+        }
+        
+        if (!onTable) {
+            // Vérifier si le joueur est en haut de la salle (a traversé la table)
+            int pGridY = (int)(player.y + player.h / 2) / TILE_SIZE;
+            
+            if (pGridY < TABLE_TOP_ROW) {
+                // Zone au-dessus de la table : mouvement libre vers la chambre des parents
+                float nextX = player.x + (dirX * currentSpeed);
+                float nextY = player.y + (dirY * currentSpeed);
+                
+                float margin = 1.0f;
+                int touchWallX = 0;
+                if (isWall(nextX + margin, player.y + margin)) touchWallX = 1;
+                if (isWall(nextX + player.w - margin, player.y + margin)) touchWallX = 1;
+                if (isWall(nextX + margin, player.y + player.h - margin)) touchWallX = 1;
+                if (isWall(nextX + player.w - margin, player.y + player.h - margin)) touchWallX = 1;
+                if (!touchWallX) player.x = nextX;
+                
+                int touchWallY = 0;
+                if (isWall(player.x + margin, nextY + margin)) touchWallY = 1;
+                if (isWall(player.x + player.w - margin, nextY + margin)) touchWallY = 1;
+                if (isWall(player.x + margin, nextY + player.h - margin)) touchWallY = 1;
+                if (isWall(player.x + player.w - margin, nextY + player.h - margin)) touchWallY = 1;
+                
+                // Empêcher de redescendre sur la table
+                if (nextY > (TABLE_TOP_ROW - 1) * TILE_SIZE) {
+                    touchWallY = 1;
+                }
+                if (!touchWallY) player.y = nextY;
+            } else {
+                // Zone en bas : bloqué, doit sauter sur la table (ESPACE)
+                if (state[SDL_SCANCODE_SPACE] && spaceKeyReleased) {
+                    onTable = 1;
+                    player.x = 9 * TILE_SIZE + (TILE_SIZE / 2); // Centre de la table
+                    player.y = TABLE_BOT_ROW * TILE_SIZE;
+                    spaceKeyReleased = 0;
+                }
+            }
+        } else {
+            // Sur la table : déplacement libre (flèches directionnelles)
+            
+            float tableSpeed = PLAYER_SPEED * 0.8f;
+            
+            // Déplacement horizontal (gauche/droite) - libre, pas de voies
+            float tableLeft = 8 * TILE_SIZE + 1;
+            float tableRight = 11 * TILE_SIZE + TILE_SIZE - player.w - 1;
+            
+            if (dirX < 0) {
+                player.x -= tableSpeed;
+            } else if (dirX > 0) {
+                player.x += tableSpeed;
+            }
+            // Clamper X aux limites de la table
+            if (player.x < tableLeft) player.x = tableLeft;
+            if (player.x > tableRight) player.x = tableRight;
+            
+            // Déplacement vertical (haut/bas)
+            if (dirY < 0) {
+                player.y -= tableSpeed;  // Monter
+            } else if (dirY > 0) {
+                player.y += tableSpeed;  // Descendre
+            }
+            
+            // Clamper le joueur entre le haut et le bas de la table
+            if (player.y < TABLE_TOP_ROW * TILE_SIZE) {
+                player.y = TABLE_TOP_ROW * TILE_SIZE;
+            }
+            if (player.y > TABLE_BOT_ROW * TILE_SIZE) {
+                player.y = TABLE_BOT_ROW * TILE_SIZE;
+            }
+            
+            // Appuyer sur ESPACE en haut de la table pour descendre
+            if (state[SDL_SCANCODE_SPACE] && spaceKeyReleased) {
+                if (player.y <= (TABLE_TOP_ROW + 1) * TILE_SIZE) {
+                    // Sauter de la table : atterrir au-dessus (rangée 1)
+                    onTable = 0;
+                    player.y = 1 * TILE_SIZE;  // Au-dessus de la table
+                    player.x = 9 * TILE_SIZE;  // Centre de la porte
+                    spaceKeyReleased = 0;
+                    InitProjectiles();  // Arrêter les projectiles
+                }
+            }
+        }
+        // Skip le reste du mouvement normal
+        goto skip_normal_movement;
     }
     
     float nextX = player.x + (dirX * currentSpeed);
@@ -873,14 +1002,19 @@ void UpdateGame(void) {
     if (isWall(nextX + player.w - margin, player.y + margin)) touchWallX = 1;
     if (isWall(nextX + margin, player.y + player.h - margin)) touchWallX = 1;
     if (isWall(nextX + player.w - margin, player.y + player.h - margin)) touchWallX = 1;
-
-    // Contrainte spéciale pour la voie organique (salle à manger avant chambre parents)
-    if (currentLevel == 10 && dialogue_chambre_parents == 0) {
-        int nextGridX = (int)(nextX + player.w / 2) / TILE_SIZE;
-        int playerGridY = (int)(player.y + player.h / 2) / TILE_SIZE;
-        
-        if (!isInOrganicPath(nextGridX, playerGridY)) {
-            touchWallX = 1; // Bloque le mouvement au lieu de téléporter
+    
+    // Collision avec la table dans la salle à manger (aussi après avoir terminé)
+    if (currentLevel == 10) {
+        float tblLeft  = 8 * TILE_SIZE;
+        float tblRight = 12 * TILE_SIZE;
+        float tblTop   = TABLE_TOP_ROW * TILE_SIZE;
+        float tblBot   = (TABLE_BOT_ROW + 1) * TILE_SIZE;
+        float pL = nextX + margin;
+        float pR = nextX + player.w - margin;
+        float pT = player.y + margin;
+        float pB = player.y + player.h - margin;
+        if (pR > tblLeft && pL < tblRight && pB > tblTop && pT < tblBot) {
+            touchWallX = 1;
         }
     }
 
@@ -893,18 +1027,25 @@ void UpdateGame(void) {
     if (isWall(player.x + player.w - margin, nextY + margin)) touchWallY = 1;
     if (isWall(player.x + margin, nextY + player.h - margin)) touchWallY = 1;
     if (isWall(player.x + player.w - margin, nextY + player.h - margin)) touchWallY = 1;
-
-    // Contrainte spéciale pour la voie organique (salle à manger avant chambre parents)
-    if (currentLevel == 10 && dialogue_chambre_parents == 0) {
-        int playerGridX = (int)(player.x + player.w / 2) / TILE_SIZE;
-        int nextGridY = (int)(nextY + player.h / 2) / TILE_SIZE;
-        
-        if (!isInOrganicPath(playerGridX, nextGridY)) {
-            touchWallY = 1; // Bloque le mouvement au lieu de téléporter
+    
+    // Collision Y avec la table dans la salle à manger
+    if (currentLevel == 10) {
+        float tblLeft  = 8 * TILE_SIZE;
+        float tblRight = 12 * TILE_SIZE;
+        float tblTop   = TABLE_TOP_ROW * TILE_SIZE;
+        float tblBot   = (TABLE_BOT_ROW + 1) * TILE_SIZE;
+        float pL = player.x + margin;
+        float pR = player.x + player.w - margin;
+        float pT = nextY + margin;
+        float pB = nextY + player.h - margin;
+        if (pR > tblLeft && pL < tblRight && pB > tblTop && pT < tblBot) {
+            touchWallY = 1;
         }
     }
 
     if (!touchWallY) player.y = nextY;
+
+    skip_normal_movement: ;  // Label pour le saut de mouvement en mode salle à manger
 
     // if (dirX != 0 || dirY != 0) {
     //     Mix_Volume(2, 64); // On met le son si on bouge
@@ -912,7 +1053,7 @@ void UpdateGame(void) {
     //     Mix_Volume(2, 0);  // On coupe le son si on arrête
     // }
 
-    if( (dirX != 0 || dirY != 0) && papaReveil==1 && currentLevel == 10){
+    if( (dirX != 0 || dirY != 0) && papaReveil==1 && currentLevel == 11){
         player.y = (MAP_HEIGHT * TILE_SIZE)-60;
         player.x = 10 * TILE_SIZE;
     }
@@ -1259,26 +1400,30 @@ void UpdateGame(void) {
     // === TRANSITION CUISINE -> SALLE À MANGER (CAUCHEMAR) ===
     if (IsLocationUp(8, 13, 3, 5)) {
         currentLevel = 10;  // Salle à manger cauchemar
-        player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
-        InitProjectiles();  // Réinitialise les projectiles
-        dialogue_salle_manger = 1;  // Déclenche le dialogue d'encouragement
+        InitProjectiles();
+        onTable = 0;  // Pas encore sur la table
+        currentLane = 1;
+        hitCount = 0;  // Reset des tentatives à chaque nouvelle entrée
+        // Première entrée : positionner le joueur juste devant la table, prêt à sauter
+        player.x = 9 * TILE_SIZE + (TILE_SIZE / 2);  // Centré sur la table
+        player.y = 13 * TILE_SIZE; // Rangée 13 = juste sous la table
     }
     
     // === TRANSITION SALLE À MANGER CAUCHEMAR -> CHAMBRE DES PARENTS ===
-    else if (IsLocationUp(8, 13, 10, 5)) {
+    else if (IsLocationUp(8, 11, 10, 5)) {
         currentLevel = 11;  // Chambre des parents
         player.x = 155;
         player.y = (MAP_HEIGHT * TILE_SIZE) - 25;
-        dialogue_chambre_parents = 1;
+        dialogue_chambre_parents = 1;  // Flag : salle à manger réussie
     }
     
     // === RETOURS ===
-    // Retour de la salle à manger réalité vers la salle à manger cauchemar
+    // Retour de la chambre des parents vers la salle à manger (mode normal, plus de projectiles)
     else if (IsLocationDown(8, 13, 11, 20)) {
         currentLevel = 10;
-        player.x = 155;
-        player.y = 10;
-        InitProjectiles();
+        player.x = 9 * TILE_SIZE;  // Centre de la porte du haut
+        player.y = 1 * TILE_SIZE + 4;  // Rangée 1, en sécurité sous la porte
+        // dialogue_chambre_parents reste à 1 : pièce normale
     }
     
     // Retour du cauchemar vers la cuisine (si le joueur recule)
@@ -1380,14 +1525,30 @@ void UpdateGame(void) {
         float nextKnockY = player.y + knockbackVY;
         
         // Vérifie les collisions avec les murs pendant le recul
-        if (!isWall(nextKnockX, player.y) && !isWall(nextKnockX + player.w, player.y) &&
-            !isWall(nextKnockX, player.y + player.h) && !isWall(nextKnockX + player.w, player.y + player.h)) {
-            player.x = nextKnockX;
-        }
-        
-        if (!isWall(player.x, nextKnockY) && !isWall(player.x + player.w, nextKnockY) &&
-            !isWall(player.x, nextKnockY + player.h) && !isWall(player.x + player.w, nextKnockY + player.h)) {
-            player.y = nextKnockY;
+        if (currentLevel == 10 && onTable && dialogue_chambre_parents < 1) {
+            // En mode table/voies : pas de recul X, seulement Y (recule sur la table)
+            if (!isWall(player.x, nextKnockY) && !isWall(player.x + player.w, nextKnockY) &&
+                !isWall(player.x, nextKnockY + player.h) && !isWall(player.x + player.w, nextKnockY + player.h)) {
+                float clampedY = nextKnockY;
+                if (clampedY < TABLE_TOP_ROW * TILE_SIZE) clampedY = TABLE_TOP_ROW * TILE_SIZE;
+                if (clampedY > TABLE_BOT_ROW * TILE_SIZE) clampedY = TABLE_BOT_ROW * TILE_SIZE;
+                player.y = clampedY;
+            }
+            // Knockback Y seulement, X libre sur la table
+            float tblLeft = 8 * TILE_SIZE + 1;
+            float tblRight = 11 * TILE_SIZE + TILE_SIZE - player.w - 1;
+            if (player.x < tblLeft) player.x = tblLeft;
+            if (player.x > tblRight) player.x = tblRight;
+        } else {
+            if (!isWall(nextKnockX, player.y) && !isWall(nextKnockX + player.w, player.y) &&
+                !isWall(nextKnockX, player.y + player.h) && !isWall(nextKnockX + player.w, player.y + player.h)) {
+                player.x = nextKnockX;
+            }
+            
+            if (!isWall(player.x, nextKnockY) && !isWall(player.x + player.w, nextKnockY) &&
+                !isWall(player.x, nextKnockY + player.h) && !isWall(player.x + player.w, nextKnockY + player.h)) {
+                player.y = nextKnockY;
+            }
         }
         
         // Réduction progressive du recul
@@ -1397,38 +1558,32 @@ void UpdateGame(void) {
     
     // Vérification de collision avec les projectiles (seulement si pas déjà en recul)
     if (knockbackTimer <= 0 && CheckProjectileCollision(player.x, player.y, player.w, player.h)) {
-        printf("TOUCHÉ PAR UN PROJECTILE ! (%d/3)\n", hitCount + 1);
+        hitCount++;
+        printf("TOUCHE PAR UN PROJECTILE ! (%d/3)\n", hitCount);
         
         if (sonProjectileHit) {
             Mix_PlayChannel(-1, sonProjectileHit, 0);
         }
         
         hitFlashTimer = hitFlashDuration;
-        hitCount++;
-        
-        knockbackVX = 0.0f;
-        knockbackVY = 4.0f;
-        knockbackTimer = 15;
         
         if (hitCount >= 3) {
-            currentLevel = 3;
-            player.x = 160;
+            // 3 tentatives épuisées : retour à la chambre de l'enfant (niveau 0)
+            // Le doudou est conservé (hasDoudou reste à 1)
+            currentLevel = 0;
+            player.x = 80;
             player.y = 50;
             InitProjectiles();
             hitCount = 0;
-        }
-    }
-    
-    if (currentLevel == 10 && dialogue_chambre_parents == 0) {
-        int playerGridX = (int)(player.x + player.w / 2) / TILE_SIZE;
-        int playerGridY = (int)(player.y + player.h / 2) / TILE_SIZE;
-        
-        if (!isInOrganicPath(playerGridX, playerGridY)) {
-            currentLevel = 3;
-            player.x = 160;
-            player.y = 50;
+            onTable = 0;
+            knockbackTimer = 0;
+        } else {
+            // Tentative perdue : recommencer depuis le début de la salle à manger
             InitProjectiles();
-            hitCount = 0;
+            onTable = 0;
+            player.x = 9 * TILE_SIZE + (TILE_SIZE / 2); // Centre de la table
+            player.y = 13 * TILE_SIZE;  // Devant la table, prêt à sauter
+            knockbackTimer = 0;
         }
     }
     
@@ -1481,19 +1636,8 @@ void UpdateGame(void) {
         }
     }
 
-    if (IsLocationUp(8, 13, 4, 10))
-    {
-        currentLevel = 10;
-        player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
-    }
-    else if(IsLocationDown(8, 13, 10, 20)){
-        currentLevel = 4;
-        player.y = 10;
-    }
-    hasDoudou = 1;
+    // Transition 4→10 et 10→4 supprimée (doublon avec Cuisine 3→10→11)
     // if(currentLevel == 10)GestionPapa();
-
-
 
     // printf("lvl: %d \n", currentLevel);
 }
@@ -1575,39 +1719,22 @@ float getLuminosite(int gridX, int gridY, int rayonPx) {
     int playerCenterX = (int)player.x + (player.w / 2);
     int playerCenterY = (int)player.y + (player.h / 2);
 
-    if (currentLevel == 10) {
-        if (dialogue_chambre_parents == 0) {
-            // Calcul de la distance horizontale du centre de l'écran
-            float centerX = (MAP_WIDTH * TILE_SIZE) / 2.0f;
-            float distance = fabsf((float)tileCenterX - centerX);
-            
-            // Zone floue avec gradient progressif (entre net et très flou)
-            float pathWidth = 28.0f;   // Largeur du centre de la voie
-            float fadeWidth = 52.0f;   // Zone de transition floue
-            
-            if (distance < pathWidth) {
-                // Centre de la voie - légèrement visible
-                float centerIntensity = 1.0f - (distance / pathWidth) * 0.35f;
-                maxIntensite = 0.26f * centerIntensity;
-            } else if (distance < pathWidth + fadeWidth) {
-                // Zone de transition - s'estompe progressivement
-                float fadeProgress = (distance - pathWidth) / fadeWidth;
-                float intensity = 1.0f - fadeProgress;
-                intensity = intensity * intensity;  // Courbe quadratique
-                maxIntensite = 0.12f * intensity;
-            } else {
-                // Fond complètement sombre
-                maxIntensite = 0.0f;
-            }
-        } else {
-            // Pièce normale avec murs visibles près du joueur
-            float dx = (float)(tileCenterX - playerCenterX);
-            float dy = (float)(tileCenterY - playerCenterY);
-            float distPx = sqrtf(dx*dx + dy*dy);
-            if (distPx < rayonPx) {
-                float i = 1.0f - (distPx / (float)rayonPx);
-                if (i > maxIntensite) maxIntensite = i;
-            }
+    if (currentLevel == 10 && dialogue_chambre_parents < 1) {
+        // Salle à manger cauchemar : halo autour du joueur (même rayon que les autres pièces)
+        
+        // 1) Halo du joueur (même rayon normal)
+        float dx = (float)(tileCenterX - playerCenterX);
+        float dy = (float)(tileCenterY - playerCenterY);
+        float distPx = sqrtf(dx*dx + dy*dy);
+        if (distPx < rayonPx) {
+            float i = 1.0f - (distPx / (float)rayonPx);
+            if (i > maxIntensite) maxIntensite = i;
+        }
+        
+        // 2) Faible lueur ambiante sur la table (colonnes 8-11, rangées 2-12)
+        if (gridX >= 8 && gridX <= 11 && gridY >= TABLE_TOP_ROW && gridY <= TABLE_BOT_ROW) {
+            float tableLum = 0.10f;  // Lueur faible sur la table
+            if (tableLum > maxIntensite) maxIntensite = tableLum;
         }
     } else {
         float dx = (float)(tileCenterX - playerCenterX);
@@ -1749,8 +1876,8 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     }
 
     // --- EFFET SOMMEIL / REVEIL PARENTS ---
-    // Uniquement dans la chambre des parents (Index 10)
-    if (currentLevel == 10) { 
+    // Uniquement dans la chambre des parents (Index 11)
+    if (currentLevel == 11) { 
         
         // Coordonnées approximatives du lit des parents (à ajuster selon ta map)
         // Disons que le lit est vers le milieu de la pièce
@@ -1845,8 +1972,29 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
 
         DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
     }
+    
+    // === PROMPT SAUT SUR LA TABLE ===
+    if (currentLevel == 10 && dialogue_chambre_parents < 1) {
+        if (!onTable) {
+            // Afficher le prompt seulement si le joueur est en bas (pas encore traversé)
+            int pGridY = (int)(player.y + player.h / 2) / TILE_SIZE;
+            if (pGridY >= TABLE_TOP_ROW) {
+                SDL_Color cBlanc = {255, 255, 255, 255};
+                SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[ESPACE] Sauter sur la table", cBlanc);
+                if (sText) DrawInteractions(renderer, sText);
+            }
+            // Si pGridY < TABLE_TOP_ROW : le joueur est au-dessus, pas de prompt
+        } else if (player.y <= (TABLE_TOP_ROW + 1) * TILE_SIZE) {
+            // En haut de la table : prompt pour descendre
+            SDL_Color cBlanc = {255, 255, 255, 255};
+            SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[ESPACE] Descendre de la table", cBlanc);
+            if (sText) DrawInteractions(renderer, sText);
+        }
+    }
 
     
+    // === DESSINER LES PROJECTILES (SALLE À MANGER) ===
+    DrawProjectiles(renderer);
 
     SDL_Rect srcPlayer = { 112, 0, 16, 16 };
     SDL_Rect destPlayer = { (int)player.x - 2, (int)player.y - 2, 16, 16 };
@@ -1946,6 +2094,103 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         
         if (sText) DrawInteractions(renderer, sText);
     }
+    
+    // === AFFICHAGE DES VIES RESTANTES (salle à manger) ===
+    if (currentLevel == 10 && dialogue_chambre_parents < 1) {
+        int livesLeft = 3 - hitCount;
+        // Motif cœur 9x9 pixels (1 = pixel plein)
+        static const int heartPattern[9][9] = {
+            {0,1,1,0,0,0,1,1,0},
+            {1,1,1,1,0,1,1,1,1},
+            {1,1,1,1,1,1,1,1,1},
+            {1,1,1,1,1,1,1,1,1},
+            {0,1,1,1,1,1,1,1,0},
+            {0,0,1,1,1,1,1,0,0},
+            {0,0,0,1,1,1,0,0,0},
+            {0,0,0,0,1,0,0,0,0},
+            {0,0,0,0,0,0,0,0,0},
+        };
+        for (int i = 0; i < 3; i++) {
+            int hx = 4 + i * 14;
+            int hy = 3;
+            int r, g, b;
+            if (i < livesLeft) {
+                r = 220; g = 30; b = 30;  // Cœur plein (rouge)
+            } else {
+                r = 50; g = 15; b = 15;   // Cœur vide (sombre)
+            }
+            for (int py = 0; py < 9; py++) {
+                for (int px = 0; px < 9; px++) {
+                    if (heartPattern[py][px]) {
+                        SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+                        SDL_RenderDrawPoint(renderer, hx + px, hy + py);
+                    }
+                }
+            }
+        }
+    }
+    
+    // === YEUX JAUNES SUR LA TABLE ===
+    if (currentLevel == 10 && onTable && dialogue_chambre_parents < 1) {
+        nightmareFrame++;
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        
+        float playerProgress = 1.0f - (player.y / (float)(MAP_HEIGHT * TILE_SIZE));
+        float horror = playerProgress * playerProgress;
+        
+        // Yeux jaunes qui apparaissent dans l'obscurité sur la table
+        int numEyes = 2 + (int)(horror * 6);
+        for (int e = 0; e < numEyes; e++) {
+            int seed = e * 7723 + (nightmareFrame / 120) * 1000;
+            // Positionner les yeux seulement dans la zone sombre (hors table cols 8-11)
+            int eyeX, eyeY;
+            if (e % 2 == 0) {
+                // Côté gauche de la table
+                eyeX = 2 + (seed * 13) % (6 * TILE_SIZE);
+            } else {
+                // Côté droit de la table
+                eyeX = 12 * TILE_SIZE + (seed * 13) % (5 * TILE_SIZE);
+            }
+            eyeY = 10 + (seed * 29) % (LOGICAL_HEIGHT - 20);
+            
+            // Les yeux apparaissent/disparaissent lentement
+            float eyePhase = fmodf((nightmareFrame + seed) * 0.015f, 6.28f);
+            float eyeAlphaF = (sinf(eyePhase) + 1.0f) / 2.0f;
+            if (eyeAlphaF < 0.3f) continue;
+            
+            int alpha = (int)(eyeAlphaF * 200);
+            
+            // Oeil gauche (2 pixels)
+            SDL_SetRenderDrawColor(renderer, 220, 200, 40, alpha);
+            SDL_RenderDrawPoint(renderer, eyeX, eyeY);
+            SDL_RenderDrawPoint(renderer, eyeX + 1, eyeY);
+            // Pupille noire
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, alpha);
+            SDL_RenderDrawPoint(renderer, eyeX, eyeY);
+            
+            // Oeil droit (2 pixels)
+            SDL_SetRenderDrawColor(renderer, 220, 200, 40, alpha);
+            SDL_RenderDrawPoint(renderer, eyeX + 5, eyeY);
+            SDL_RenderDrawPoint(renderer, eyeX + 6, eyeY);
+            // Pupille noire
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, alpha);
+            SDL_RenderDrawPoint(renderer, eyeX + 5, eyeY);
+        }
+        
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+    }
+    
+    // === EFFET FLASH ROUGE (impact projectile) ===
+    if (hitFlashTimer > 0) {
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        // Intensité décroissante du flash
+        int alpha = (int)(180.0f * ((float)hitFlashTimer / (float)hitFlashDuration));
+        if (alpha > 255) alpha = 255;
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, alpha);
+        SDL_Rect fullScreen = { 0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT };
+        SDL_RenderFillRect(renderer, &fullScreen);
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+    }
 }
 
 void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText){
@@ -2006,12 +2251,11 @@ void DrawTexte(char *texteAffiche, SDL_Renderer *renderer,TTF_Font *font, int x,
 }
 
 
-// Fonction helper pour vérifier si une position est dans la voie organique
+// Fonction helper pour vérifier si une position est sur la table (le chemin)
 int isInOrganicPath(int gridX, int gridY) {
-    // Voie centrale correspondant au voile (80 pixels de chaque côté du centre)
-    // Centre = colonne 10, pathEdge = 80 pixels = 5 tiles
+    // La table occupe les colonnes 8 à 11 (tuiles 160-166)
     (void)gridY;
-    return (gridX >= 5 && gridX <= 14);
+    return (gridX >= 8 && gridX <= 11);
 }
 
 // SYS DE PROJECTILE POUR SALLE a manger 
@@ -2027,8 +2271,8 @@ void InitProjectiles(void) {
 void SpawnProjectile(void) {
     if (currentLevel != 10) return;
     
-    // Si joueur atteint le haut (près chambre parents) ou a déjà visité chambre, arrêter projectiles
-    if (player.y < 32 || dialogue_chambre_parents == 1) {
+    // Si salle déjà réussie ou pas encore sur la table, arrêter projectiles
+    if (dialogue_chambre_parents >= 1 || !onTable) {
         return;
     }
     
@@ -2036,13 +2280,27 @@ void SpawnProjectile(void) {
         if (!projectiles[i].active) {
             projectiles[i].active = 1;
             
-            int spawnRow = 0 + rand() % 14;
-            projectiles[i].y = spawnRow * TILE_SIZE + (rand() % 8);
+            // Le projectile apparaît sur une rangée de la table, près du joueur
+            // 70% de chance d'apparaître à ±3 rangées du joueur, 30% aléatoire sur la table
+            int spawnRow;
+            int playerRow = (int)(player.y / TILE_SIZE);
+            if (rand() % 10 < 7) {
+                // Proche du joueur (±3 rangées)
+                int offset = (rand() % 7) - 3;  // -3 à +3
+                spawnRow = playerRow + offset;
+            } else {
+                // Aléatoire sur toute la table
+                spawnRow = TABLE_TOP_ROW + rand() % (TABLE_BOT_ROW - TABLE_TOP_ROW + 1);
+            }
+            // Clamper aux limites de la table
+            if (spawnRow < TABLE_TOP_ROW) spawnRow = TABLE_TOP_ROW;
+            if (spawnRow > TABLE_BOT_ROW) spawnRow = TABLE_BOT_ROW;
+            projectiles[i].y = spawnRow * TILE_SIZE;
             
-            // Difficulté progressive : vitesse augmente avec la progression
+            // Difficulté progressive : vitesse augmente quand le joueur monte
             float playerProgress = 1.0f - (player.y / (float)(MAP_HEIGHT * TILE_SIZE));
-            float baseSpeed = 1.5f;
-            float maxSpeed = 4.0f;
+            float baseSpeed = 0.8f;
+            float maxSpeed = 1.8f;
             float currentSpeed = baseSpeed + (maxSpeed - baseSpeed) * playerProgress * playerProgress;
             
             float variation = 0.9f + ((rand() % 20) / 100.0f);
@@ -2050,19 +2308,16 @@ void SpawnProjectile(void) {
             
             int fromLeft = rand() % 2;
             
-            // Les projectiles démarrent depuis les limites visibles du voile
-            float centerX = (MAP_WIDTH * TILE_SIZE) / 2.0f;
-            float pathEdge = 28.0f;  // Correspondant à pathWidth dans getLuminosite
-            
+            // Les projectiles partent des bords de la salle et traversent la table
             if (fromLeft) {
-                projectiles[i].x = centerX - pathEdge;  // Bord gauche du voile
-                projectiles[i].vx = currentSpeed;
+                projectiles[i].x = 2 * TILE_SIZE;       // Bord gauche de la salle
+                projectiles[i].vx = currentSpeed;        // Vers la droite
             } else {
-                projectiles[i].x = centerX + pathEdge;  // Bord droit du voile
-                projectiles[i].vx = -currentSpeed;
+                projectiles[i].x = 17 * TILE_SIZE;      // Bord droit de la salle
+                projectiles[i].vx = -currentSpeed;       // Vers la gauche
             }
             
-            projectiles[i].type = rand() % 2;
+            projectiles[i].type = rand() % 2;  // 0 = assiette (239), 1 = couteau (237/238)
             
             break;
         }
@@ -2073,10 +2328,10 @@ void UpdateProjectiles(void) {
     // Ne met à jour les projectiles que dans le niveau cauchemar
     if (currentLevel != 10) return;
     
-    // Génération de nouveaux projectiles (fréquence augmente avec la progression)
+    // Génération de nouveaux projectiles (fréquence réduite pour meilleure jouabilité)
     float playerProgress = 1.0f - (player.y / (float)(MAP_HEIGHT * TILE_SIZE));
-    int spawnRate = (int)(20 - 14 * playerProgress);  // De 20 frames au début à 6 frames à la fin
-    if (spawnRate < 5) spawnRate = 5;
+    int spawnRate = (int)(55 - 25 * playerProgress);  // De 55 frames au début à 30 frames à la fin
+    if (spawnRate < 25) spawnRate = 25;
     
     projectileSpawnTimer++;
     if (projectileSpawnTimer >= spawnRate) {
@@ -2084,156 +2339,49 @@ void UpdateProjectiles(void) {
         projectileSpawnTimer = 0;
     }
     
-    // Limites visibles du voile
-    float centerX = (MAP_WIDTH * TILE_SIZE) / 2.0f;
-    float pathEdge = 28.0f;
-    
     // Mise à jour des projectiles existants
     for (int i = 0; i < MAX_PROJECTILES; i++) {
         if (projectiles[i].active) {
             projectiles[i].x += projectiles[i].vx;
             
-            // Désactive le projectile s'il sort de la voie visible
-            float distFromCenter = fabsf(projectiles[i].x - centerX);
-            if (distFromCenter > pathEdge) {
+            // Désactive le projectile s'il sort de la salle (murs gauche/droit)
+            if (projectiles[i].x < 1 * TILE_SIZE || projectiles[i].x > 18 * TILE_SIZE) {
                 projectiles[i].active = 0;
             }
         }
     }
 }
 
-// Fonction pour dessiner un cercle rempli (assiette)
-void DrawFilledCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius) {
-    for (int y = -radius; y <= radius; y++) {
-        for (int x = -radius; x <= radius; x++) {
-            if (x*x + y*y <= radius*radius) {
-                SDL_RenderDrawPoint(renderer, centerX + x, centerY + y);
-            }
-        }
-    }
-}
-
-// Fonction pour dessiner le contour d'un cercle
-void DrawCircle(SDL_Renderer *renderer, int centerX, int centerY, int radius) {
-    int x = radius;
-    int y = 0;
-    int err = 0;
-    while (x >= y) {
-        SDL_RenderDrawPoint(renderer, centerX + x, centerY + y);
-        SDL_RenderDrawPoint(renderer, centerX + y, centerY + x);
-        SDL_RenderDrawPoint(renderer, centerX - y, centerY + x);
-        SDL_RenderDrawPoint(renderer, centerX - x, centerY + y);
-        SDL_RenderDrawPoint(renderer, centerX - x, centerY - y);
-        SDL_RenderDrawPoint(renderer, centerX - y, centerY - x);
-        SDL_RenderDrawPoint(renderer, centerX + y, centerY - x);
-        SDL_RenderDrawPoint(renderer, centerX + x, centerY - y);
-        y++;
-        if (err <= 0) { err += 2*y + 1; }
-        if (err > 0) { x--; err -= 2*x + 1; }
-    }
-}
-
 void DrawProjectiles(SDL_Renderer *renderer) {
     if (currentLevel != 10) return;
-    
-    // Si post-chambre, pas de projectiles
-    if (dialogue_chambre_parents == 1) return;
-    
-    int playerCenterX = (int)player.x + (player.w / 2);
-    int playerGridX = playerCenterX / TILE_SIZE;
-    int playerGridY = ((int)player.y + (player.h / 2)) / TILE_SIZE;
-    
-    // Si joueur pas dans voie, pas de projectiles visibles
-    if (!isInOrganicPath(playerGridX, playerGridY)) return;
-    
-    // Limites visibles du voile pour affichage des projectiles
-    float centerX = (MAP_WIDTH * TILE_SIZE) / 2.0f;
-    float pathEdge = 28.0f;
     
     for (int i = 0; i < MAX_PROJECTILES; i++) {
         if (projectiles[i].active) {
             int px = (int)projectiles[i].x;
             int py = (int)projectiles[i].y;
             
-            // N'afficher que les projectiles dans la zone visible du voile
-            float projectileDistFromCenter = fabsf(px - centerX);
-            if (projectileDistFromCenter > pathEdge) continue;
+            // Les projectiles ne sont visibles que sur la table (colonnes 8 à 11)
+            int projGridX = px / TILE_SIZE;
+            if (projGridX < 8 || projGridX > 11) {
+                continue;  // Invisible en dehors de la table
+            }
             
+            // Choisir la tuile graphique selon le type de projectile
+            int tileIndex;
             if (projectiles[i].type == 0) {
-                // === ASSIETTE RONDE (taille réduite) ===
-                int centerX = px + 6;
-                int centerY = py + 6;
-                
-                // Ombre de l'assiette
-                SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
-                DrawFilledCircle(renderer, centerX + 1, centerY + 1, 5);
-                
-                // Fond de l'assiette (blanc cassé)
-                SDL_SetRenderDrawColor(renderer, 245, 245, 240, 255);
-                DrawFilledCircle(renderer, centerX, centerY, 5);
-                
-                // Bordure extérieure dorée
-                SDL_SetRenderDrawColor(renderer, 180, 150, 80, 255);
-                DrawCircle(renderer, centerX, centerY, 5);
-                
-                // Cercle intérieur (creux de l'assiette)
-                SDL_SetRenderDrawColor(renderer, 220, 220, 215, 255);
-                DrawFilledCircle(renderer, centerX, centerY, 3);
-                
-                // Motif décoratif au centre
-                SDL_SetRenderDrawColor(renderer, 150, 120, 70, 255);
-                DrawCircle(renderer, centerX, centerY, 1);
-                
+                tileIndex = 239;  // Assiette
             } else {
-                // === COUTEAU ÉLÉGANT (taille réduite) ===
-                // Direction du couteau (pointe vers la direction de déplacement)
-                int direction = (projectiles[i].vx > 0) ? 1 : -1;
-                
-                // Ombre du couteau
-                SDL_SetRenderDrawColor(renderer, 60, 60, 60, 255);
-                SDL_Rect shadow = { px + 2 + 1, py + 3 + 1, 8, 2 };
-                SDL_RenderFillRect(renderer, &shadow);
-                
-                // Lame du couteau (argentée brillante)
-                SDL_SetRenderDrawColor(renderer, 200, 205, 215, 255);
-                SDL_Rect blade = { px + 2, py + 3, 8, 2 };
-                SDL_RenderFillRect(renderer, &blade);
-                
-                // Reflet sur la lame
-                SDL_SetRenderDrawColor(renderer, 240, 245, 255, 255);
-                SDL_RenderDrawLine(renderer, px + 3, py + 3, px + 8, py + 3);
-                
-                // Tranchant de la lame (ligne fine)
-                SDL_SetRenderDrawColor(renderer, 150, 155, 165, 255);
-                SDL_RenderDrawLine(renderer, px + 2, py + 5, px + 9, py + 5);
-                
-                // Pointe du couteau
-                if (direction > 0) {
-                    SDL_SetRenderDrawColor(renderer, 180, 185, 195, 255);
-                    SDL_RenderDrawPoint(renderer, px + 10, py + 4);
+                if (projectiles[i].vx > 0) {
+                    tileIndex = 237;  // Couteau vers la droite
                 } else {
-                    SDL_SetRenderDrawColor(renderer, 180, 185, 195, 255);
-                    SDL_RenderDrawPoint(renderer, px + 1, py + 4);
-                }
-                
-                // Manche du couteau (bois foncé)
-                SDL_SetRenderDrawColor(renderer, 90, 60, 40, 255);
-                SDL_Rect handle;
-                if (direction > 0) {
-                    handle = (SDL_Rect){ px, py + 2, 3, 4 };
-                } else {
-                    handle = (SDL_Rect){ px + 9, py + 2, 3, 4 };
-                }
-                SDL_RenderFillRect(renderer, &handle);
-                
-                // Détail du manche (rivet)
-                SDL_SetRenderDrawColor(renderer, 140, 130, 100, 255);
-                if (direction > 0) {
-                    SDL_RenderDrawPoint(renderer, px + 1, py + 4);
-                } else {
-                    SDL_RenderDrawPoint(renderer, px + 10, py + 4);
+                    tileIndex = 238;  // Couteau vers la gauche
                 }
             }
+            
+            // Dessiner la tuile du projectile
+            SDL_Rect srcProjectile = { TILE_SIZE * tileIndex, 0, TILE_SIZE, TILE_SIZE };
+            SDL_Rect destProjectile = { px, py, TILE_SIZE, TILE_SIZE };
+            SDL_RenderCopy(renderer, tilesetTexture, &srcProjectile, &destProjectile);
         }
     }
 }
