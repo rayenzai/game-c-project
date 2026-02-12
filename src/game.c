@@ -462,6 +462,8 @@ int interact_spider = 0;
 int interact_pain = 0;
 int interact_heart = 0;
 int interact_eye = 0;
+int interact_os = 0;
+int interact_coeur_rouge = 0;
 int has_water = 0;
 int has_drawing = 0;
 int statue_has_water = 0;
@@ -488,6 +490,10 @@ int plat_pret_a_servir = 0;    // 0 = Rien, 1 = Soupe prête, 2 = Pain prêt (su
 int type_resultat_cuisson = 0; // 0 = Rien, 1 = Réussite, 2 = Raté
 int has_soupe = 0;
 int has_pain_chagrin = 0;
+int has_os = 0;
+int chaudron_has_os = 0;
+int has_coeur_rouge = 0;
+int chaudron_has_coeur_rouge = 0;
 
 int carafeX = -1;
 int carafeY = -1;
@@ -507,6 +513,10 @@ int chaudronGX = -1;
 int chaudronGY = -1;
 int chaudronDX = -1;
 int chaudronDY = -1;
+int osX = -1;
+int osY = -1;
+int coeur_rougeX = -1;
+int coeur_rougeY = -1;
 
 int showInteractPromptObjetTableau = 0;
 int showInteractTableau = 0;
@@ -886,6 +896,16 @@ void UpdateGame(void)
                 {
                     maps[3][truc_vertY][truc_vertX] = 177;
                     chaudron_has_truc_vert = 0;
+                }
+                if (chaudron_has_os == 1)
+                {
+                    maps[3][osY][osX] = 176;
+                    chaudron_has_os = 0;
+                }
+                if (chaudron_has_coeur_rouge == 1)
+                {
+                    maps[3][coeur_rougeY][coeur_rougeX] = 243;
+                    chaudron_has_coeur_rouge = 0;
                 }
 
                 max_objets = 0;
@@ -1307,6 +1327,21 @@ void UpdateGame(void)
         interact_chaudron_cuisiner = 1;
     }
 
+    interact_os = 0;
+    float dist_os = 9999.0f;
+    TrouveCoordonnees(&osX, &osY, 176, 3);
+    if (IsLocationObjet(20, 3, 176, &dist_os, -1, -1) && has_interact_livre == 1)
+    {
+        interact_os = 1;
+    }
+
+    interact_coeur_rouge = 0;
+    float dist_cr = 999;
+    TrouveCoordonnees(&coeur_rougeX, &coeur_rougeY, 243, 3);
+    if (IsLocationObjet(20, 3, 243, &dist_cr, -1, -1) && max_objets == 0 && has_interact_livre == 1)
+    {
+        interact_coeur_rouge = 1;
+    }
     // --- Calcul pour les pièces du tableau dans le labyrinthe ---
     showInteractPromptObjetTableau = 0;
 
@@ -1486,6 +1521,28 @@ void UpdateGame(void)
             {
                 dialogue_max_objet = 1;
             }
+            if (currentLevel == 3 && dist_cr <= 20 && max_objets == 0 && has_interact_livre == 1)
+            {
+                has_coeur_rouge = 1;
+                maps[3][coeur_rougeY][coeur_rougeX] = 0;
+                max_objets = 1;
+                toucheE_Relache = 0;
+            }
+            if (currentLevel == 3 && distance_heart <= 20 && max_objets == 1 && has_coeur_rouge == 0)
+            {
+                dialogue_max_objet = 1;
+            }
+            if (currentLevel == 3 && dist_os <= 20 && max_objets == 0 && has_interact_livre == 1)
+            {
+                has_os = 1;
+                maps[3][osY][osX] = 160;
+                max_objets = 1;
+                toucheE_Relache = 0;
+            }
+            if (currentLevel == 3 && distance_heart <= 20 && max_objets == 1 && has_os == 0)
+            {
+                dialogue_max_objet = 1;
+            }
             if (currentLevel == 2 && distStatueBas <= 24 && has_drawing == 0 && statue_has_drawing == 0)
             {
                 dialogue_statue_bas = 1;
@@ -1543,6 +1600,27 @@ void UpdateGame(void)
                 has_truc_vert = 0;
                 max_objets = 0;
                 chaudron_has_truc_vert = 1;
+            }
+            if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_coeur_rouge == 1)
+            {
+                has_coeur_rouge = 0;
+                max_objets = 0;
+                chaudron_has_coeur_rouge = 1;
+            }
+            if (currentLevel == 3 && dist_cr <= 20 && max_objets == 1 && has_coeur_rouge == 0)
+            {
+                dialogue_max_objet = 1;
+            }
+            if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_os == 1)
+            {
+                has_os = 0;
+                max_objets = 0;
+                maps[3][osY][osX] = 166;
+                chaudron_has_os = 1;
+            }
+            if (currentLevel == 3 && dist_os <= 20 && max_objets == 1 && has_os == 0)
+            {
+                dialogue_max_objet = 1;
             }
 
             if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && plat_pret_a_servir > 0 && max_objets == 0)
@@ -1671,7 +1749,7 @@ void UpdateGame(void)
             if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && interact_chaudron_cuisiner == 1 && has_interact_livre == 1)
             {
 
-                int chaudron_est_vide = (chaudron_has_truc_vert == 0 && chaudron_has_eye == 0 && chaudron_has_spider == 0 && chaudron_has_heart == 0 && chaudron_has_pain == 0);
+                int chaudron_est_vide = (chaudron_has_truc_vert == 0 && chaudron_has_eye == 0 && chaudron_has_spider == 0 && chaudron_has_heart == 0 && chaudron_has_pain == 0 && chaudron_has_coeur_rouge == 0 && chaudron_has_os == 0);
 
                 if (chaudron_est_vide == 0)
                 {
@@ -1681,7 +1759,7 @@ void UpdateGame(void)
 
                     if (recette1_ok || recette2_ok)
                     {
-                        // --- PRÉPARATION RÉUSSITE ---
+
                         debut_anim_chaudron = SDL_GetTicks();
                         chaudron_anim = 1;
                         type_resultat_cuisson = 1;
@@ -2543,6 +2621,22 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
         if (sText)
             DrawInteractions(renderer, sText);
     }
+    if (interact_coeur_rouge == 1)
+    {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
+
+        if (sText)
+            DrawInteractions(renderer, sText);
+    }
+    if (interact_os == 1)
+    {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
+
+        if (sText)
+            DrawInteractions(renderer, sText);
+    }
     if (interact_chaudron_cuisiner == 1 && has_interact_livre == 1)
     {
 
@@ -2565,13 +2659,17 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
             if (has_pain)
                 nomIngredient = "le pain";
             else if (has_spider)
-                nomIngredient = "l'araignée";
+                nomIngredient = "l'araignee";
             else if (has_eye)
                 nomIngredient = "l'oeil";
             else if (has_heart)
                 nomIngredient = "le coeur";
             else if (has_truc_vert)
                 nomIngredient = "la chenille";
+            else if (has_coeur_rouge)
+                nomIngredient = "le coeur rouge";
+            else if (has_os)
+                nomIngredient = "l'os";
 
             if (nomIngredient != NULL)
             {
@@ -2585,11 +2683,8 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
                     decalageY = 15;
                 }
             }
-            int chaudron_est_vide = (chaudron_has_truc_vert == 0 && chaudron_has_spider == 0 &&
-                                     chaudron_has_pain == 0 && chaudron_has_heart == 0 &&
-                                     chaudron_has_eye == 0);
+            int chaudron_est_vide = (chaudron_has_truc_vert == 0 && chaudron_has_spider == 0 && chaudron_has_pain == 0 && chaudron_has_heart == 0 && chaudron_has_eye == 0 && chaudron_has_os == 0 && chaudron_has_coeur_rouge == 0);
 
-            // ON AFFICHE "CUISINER" SEULEMENT SI LE CHAUDRON N'EST PAS VIDE
             if (chaudron_est_vide == 0)
             {
                 SDL_Surface *sTextCuisiner = TTF_RenderText_Solid(fontMini, "[ENTER] Cuisiner", cBlanc);
@@ -2622,111 +2717,111 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
             }
         }
     }
-        if (livreOuvert == 1 && textureLivre != NULL)
-        {
-
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 180);
-            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-            SDL_RenderFillRect(renderer, NULL);
-
-            int texW, texH;
-            SDL_QueryTexture(textureLivre, NULL, NULL, &texW, &texH);
-
-            int displayW = LOGICAL_WIDTH * 0.85;
-            float ratio = (float)texW / (float)texH;
-            int displayH = (int)(displayW / ratio);
-
-            if (displayH > LOGICAL_HEIGHT - 40)
-            {
-                displayH = LOGICAL_HEIGHT - 40;
-                displayW = (int)(displayH * ratio);
-            }
-
-            SDL_Rect posLivre = {
-                (LOGICAL_WIDTH - displayW) / 2,  // Centré X
-                (LOGICAL_HEIGHT - displayH) / 2, // Centré Y
-                displayW,
-                displayH};
-
-            SDL_RenderCopy(renderer, textureLivre, NULL, &posLivre);
-
-            SDL_Color cBlanc = {255, 255, 255, 255};
-            SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Fermer", cBlanc);
-
-            if (sText)
-            {
-                SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
-
-                SDL_Rect rText = {
-                    (LOGICAL_WIDTH - sText->w) / 2,
-                    posLivre.y + posLivre.h + 5,
-                    sText->w,
-                    sText->h};
-
-                SDL_RenderCopy(renderer, tText, NULL, &rText);
-
-                SDL_FreeSurface(sText);
-                SDL_DestroyTexture(tText);
-            }
-        }
-    }
-
-    void DrawInteractions(SDL_Renderer * renderer, SDL_Surface * sText)
+    if (livreOuvert == 1 && textureLivre != NULL)
     {
-        SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
 
-        // 1. Calcul de la position théorique
-        int posX = (int)player.x - (sText->w / 2) + 8;
-        int posY = (int)player.y + 20;
-
-        // 2. CORRECTION (Clamping) pour ne pas sortir de l'écran
-        if (posX < 2)
-        {
-            posX = 2; // Bloque à gauche
-        }
-        else if (posX + sText->w > LOGICAL_WIDTH - 2)
-        {
-            posX = LOGICAL_WIDTH - sText->w - 2; // Bloque à droite
-        }
-
-        // 3. On applique la position corrigée
-        SDL_Rect rText = {posX, posY, sText->w, sText->h};
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150);
-        SDL_Rect rFond = {rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2};
-        SDL_RenderFillRect(renderer, &rFond);
-
-        SDL_RenderCopy(renderer, tText, NULL, &rText);
-
-        SDL_FreeSurface(sText);
-        SDL_DestroyTexture(tText);
-    }
-
-    void DrawTexte(char *texteAffiche, SDL_Renderer *renderer, TTF_Font *font, int x, int y, int w, int h)
-    {
-        SDL_Rect rectBulle = {x, y, w, h};
-
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 180);
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        SDL_RenderFillRect(renderer, NULL);
 
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 150);
-        SDL_RenderFillRect(renderer, &rectBulle);
+        int texW, texH;
+        SDL_QueryTexture(textureLivre, NULL, NULL, &texW, &texH);
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderDrawRect(renderer, &rectBulle);
+        int displayW = LOGICAL_WIDTH * 0.85;
+        float ratio = (float)texW / (float)texH;
+        int displayH = (int)(displayW / ratio);
 
-        SDL_Color couleurNoire = {0, 0, 0, 255};
-        SDL_Surface *surfaceTexte = TTF_RenderText_Solid(font, texteAffiche, couleurNoire);
-        if (surfaceTexte)
+        if (displayH > LOGICAL_HEIGHT - 40)
         {
-            SDL_Texture *textureTexte = SDL_CreateTextureFromSurface(renderer, surfaceTexte);
-            SDL_Rect rectTexte = {
-                rectBulle.x + 10,
-                rectBulle.y + 15,
-                surfaceTexte->w,
-                surfaceTexte->h};
-            SDL_RenderCopy(renderer, textureTexte, NULL, &rectTexte);
+            displayH = LOGICAL_HEIGHT - 40;
+            displayW = (int)(displayH * ratio);
+        }
 
-            SDL_FreeSurface(surfaceTexte);
-            SDL_DestroyTexture(textureTexte);
+        SDL_Rect posLivre = {
+            (LOGICAL_WIDTH - displayW) / 2,  // Centré X
+            (LOGICAL_HEIGHT - displayH) / 2, // Centré Y
+            displayW,
+            displayH};
+
+        SDL_RenderCopy(renderer, textureLivre, NULL, &posLivre);
+
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Fermer", cBlanc);
+
+        if (sText)
+        {
+            SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+
+            SDL_Rect rText = {
+                (LOGICAL_WIDTH - sText->w) / 2,
+                posLivre.y + posLivre.h + 5,
+                sText->w,
+                sText->h};
+
+            SDL_RenderCopy(renderer, tText, NULL, &rText);
+
+            SDL_FreeSurface(sText);
+            SDL_DestroyTexture(tText);
         }
     }
+}
+
+void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText)
+{
+    SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+
+    // 1. Calcul de la position théorique
+    int posX = (int)player.x - (sText->w / 2) + 8;
+    int posY = (int)player.y + 20;
+
+    // 2. CORRECTION (Clamping) pour ne pas sortir de l'écran
+    if (posX < 2)
+    {
+        posX = 2; // Bloque à gauche
+    }
+    else if (posX + sText->w > LOGICAL_WIDTH - 2)
+    {
+        posX = LOGICAL_WIDTH - sText->w - 2; // Bloque à droite
+    }
+
+    // 3. On applique la position corrigée
+    SDL_Rect rText = {posX, posY, sText->w, sText->h};
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150);
+    SDL_Rect rFond = {rText.x - 2, rText.y - 1, rText.w + 4, rText.h + 2};
+    SDL_RenderFillRect(renderer, &rFond);
+
+    SDL_RenderCopy(renderer, tText, NULL, &rText);
+
+    SDL_FreeSurface(sText);
+    SDL_DestroyTexture(tText);
+}
+
+void DrawTexte(char *texteAffiche, SDL_Renderer *renderer, TTF_Font *font, int x, int y, int w, int h)
+{
+    SDL_Rect rectBulle = {x, y, w, h};
+
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 150);
+    SDL_RenderFillRect(renderer, &rectBulle);
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderDrawRect(renderer, &rectBulle);
+
+    SDL_Color couleurNoire = {0, 0, 0, 255};
+    SDL_Surface *surfaceTexte = TTF_RenderText_Solid(font, texteAffiche, couleurNoire);
+    if (surfaceTexte)
+    {
+        SDL_Texture *textureTexte = SDL_CreateTextureFromSurface(renderer, surfaceTexte);
+        SDL_Rect rectTexte = {
+            rectBulle.x + 10,
+            rectBulle.y + 15,
+            surfaceTexte->w,
+            surfaceTexte->h};
+        SDL_RenderCopy(renderer, textureTexte, NULL, &rectTexte);
+
+        SDL_FreeSurface(surfaceTexte);
+        SDL_DestroyTexture(textureTexte);
+    }
+}
