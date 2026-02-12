@@ -43,8 +43,6 @@ static SDL_Texture *tilesetTexture = NULL;
 // static SDL_Texture *playerTexture = NULL; 
 
 int rayon = 0;
-
- 
 int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 
 
@@ -288,23 +286,25 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 0,178,169, 170,167,168,243, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2},
         {2, 2, 2,  2,  2,   2,  2,  2,  2, 2, 2, 2,  2,  2,  2,  2, 2, 2, 2, 2}
     },
-    // CARTE 5 (Niveau 4 - dernière du bloc précédent) index 4
+    // SALLE À MANGER (Niveau 4 - Cauchemar avec projectiles)
+    // La table (160-166) a 3 voies style Subway Surfers
+    // Les projectiles (couteaux/assiettes) arrivent de la gauche et droite
     {    
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 8, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2}, // Bas fermé
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}
+        {2, 2, 2, 2, 2, 2, 2, 2, 155, 155, 155, 155, 2, 2, 2, 2, 2, 2, 2, 2}, // Haut: porte vers chambre parents
+        {2, 2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 2, 2}, // Espace avant table
+        {2, 2, 155, 155, 155, 155, 155, 155, 160, 166, 166, 165, 155, 155, 155, 155, 155, 155, 2, 2}, // Début table
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
+        {2, 2, 155, 155, 155, 155, 155, 155, 163, 166, 166, 161, 155, 155, 155, 155, 155, 155, 2, 2}, // Fin table
+        {2, 2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 2, 2}, // Espace après table
+        {2, 2, 2, 2, 2, 2, 2, 2, 155, 155, 155, 155, 2, 2, 2, 2, 2, 2, 2, 2}  // Bas: porte depuis cuisine
     },
     // --- LABYRINTHE 1 (Index 5) --- 
     {
@@ -399,27 +399,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {50, 50, 50, 50, 50, 50, 50,  50,  50,  50, 50,  50,  50, 50, 50, 50, 50, 50, 50, 50}, 
         {50, 50, 50, 50, 50, 50, 50,  50,  50,  50, 50,  50,  50, 50, 50, 50, 50, 50, 50, 50}
     },
-    // SALLE À MANGER (Niveau 10 - Cauchemar avec projectiles)
-    // La table (160-166) a 3 voies style Subway Surfers
-    // Les projectiles (couteaux/assiettes) arrivent de la gauche et droite
-    {    
-        {2, 2, 2, 2, 2, 2, 2, 2, 155, 155, 155, 155, 2, 2, 2, 2, 2, 2, 2, 2}, // Haut: porte vers chambre parents
-        {2, 2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 2, 2}, // Espace avant table
-        {2, 2, 155, 155, 155, 155, 155, 155, 160, 166, 166, 165, 155, 155, 155, 155, 155, 155, 2, 2}, // Début table
-        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
-        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
-        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
-        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
-        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
-        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
-        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
-        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
-        {2, 2, 155, 155, 155, 155, 155, 155, 162, 166, 166, 164, 155, 155, 155, 155, 155, 155, 2, 2},
-        {2, 2, 155, 155, 155, 155, 155, 155, 163, 166, 166, 161, 155, 155, 155, 155, 155, 155, 2, 2}, // Fin table
-        {2, 2, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 155, 2, 2}, // Espace après table
-        {2, 2, 2, 2, 2, 2, 2, 2, 155, 155, 155, 155, 2, 2, 2, 2, 2, 2, 2, 2}  // Bas: porte depuis cuisine
-    },
-    // Chambre des parents (index 11)
+    // Chambre des parents (index 10)
     {    
         {2, 2,  2,  2,  2,  2,  2,  2,  2, 2,  2,  2, 2,  2,  2,  2, 2, 2, 2, 2}, // Trou en haut
         {2, 2,  2,  2,  2,  2,  2,  2,  2, 2,  2,  2, 2,213,214,215, 2, 2, 2, 2},
@@ -437,6 +417,24 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2,241,  0,  0,  0,  0,  0,  0, 0,  0,  0, 0,  0,  0,  0, 0, 0, 2, 2},
         {2, 2,  2,  2,  2,  2,  2,  2,  0, 0,  0,  0, 2,  2,  2,  2, 2, 2, 2, 2}
     },
+    // CARTE LIBRE (index 11)
+    {    
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 8, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}
+    }
 };
  
 int dialogueStep = 0;  
@@ -530,8 +528,7 @@ void InitGame(SDL_Renderer *renderer) {
     fantome.h = 15;
     fantome.direction = 0; 
     fantome.timer = 0;     
-
-    // Chargement des sons
+// Chargement des sons
     // sonTransition = chargement_son_transition();
     sonPickUp = chargement_son_item_pick_up();
     sonOpenDoor = chargement_son_door_open();
@@ -541,10 +538,11 @@ void InitGame(SDL_Renderer *renderer) {
     MusicExterior = chargement_son_exterieur();
     
     // Le jeu commence dans la chambre (niveau 0)
-    // currentLevel = 10;  // Test salle à manger désactivé
+    // currentLevel = 4;  // Test salle à manger désactivé
     // player.x = 160; 
     // player.y = 200;
-    // hasDoudou = 1;
+    // hasDoudou = 1
+    MusicExterior = chargement_son_exterieur();
 
     // Chargement du Tileset
     SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");
@@ -898,7 +896,7 @@ void UpdateGame(void) {
     float currentSpeed = PLAYER_SPEED;
     
     // === SALLE À MANGER : MODE 3 VOIES ===
-    if (currentLevel == 10 && dialogue_chambre_parents < 1) {
+    if (currentLevel == 4 && dialogue_chambre_parents < 1) {
         // Anti-rebond ESPACE
         if (!state[SDL_SCANCODE_SPACE]) {
             spaceKeyReleased = 1;
@@ -1004,7 +1002,7 @@ void UpdateGame(void) {
     if (isWall(nextX + player.w - margin, player.y + player.h - margin)) touchWallX = 1;
     
     // Collision avec la table dans la salle à manger (aussi après avoir terminé)
-    if (currentLevel == 10) {
+    if (currentLevel == 4) {
         float tblLeft  = 8 * TILE_SIZE;
         float tblRight = 12 * TILE_SIZE;
         float tblTop   = TABLE_TOP_ROW * TILE_SIZE;
@@ -1029,7 +1027,7 @@ void UpdateGame(void) {
     if (isWall(player.x + player.w - margin, nextY + player.h - margin)) touchWallY = 1;
     
     // Collision Y avec la table dans la salle à manger
-    if (currentLevel == 10) {
+    if (currentLevel == 4) {
         float tblLeft  = 8 * TILE_SIZE;
         float tblRight = 12 * TILE_SIZE;
         float tblTop   = TABLE_TOP_ROW * TILE_SIZE;
@@ -1053,7 +1051,7 @@ void UpdateGame(void) {
     //     Mix_Volume(2, 0);  // On coupe le son si on arrête
     // }
 
-    if( (dirX != 0 || dirY != 0) && papaReveil==1 && currentLevel == 11){
+    if( (dirX != 0 || dirY != 0) && papaReveil==1 && currentLevel == 10){
         player.y = (MAP_HEIGHT * TILE_SIZE)-60;
         player.x = 10 * TILE_SIZE;
     }
@@ -1399,7 +1397,7 @@ void UpdateGame(void) {
     
     // === TRANSITION CUISINE -> SALLE À MANGER (CAUCHEMAR) ===
     if (IsLocationUp(8, 13, 3, 5)) {
-        currentLevel = 10;  // Salle à manger cauchemar
+        currentLevel = 4;  // Salle à manger cauchemar
         InitProjectiles();
         onTable = 0;  // Pas encore sur la table
         currentLane = 1;
@@ -1410,8 +1408,8 @@ void UpdateGame(void) {
     }
     
     // === TRANSITION SALLE À MANGER CAUCHEMAR -> CHAMBRE DES PARENTS ===
-    else if (IsLocationUp(8, 11, 10, 5)) {
-        currentLevel = 11;  // Chambre des parents
+    else if (IsLocationUp(8, 11, 4, 5)) {
+        currentLevel = 10;  // Chambre des parents
         player.x = 155;
         player.y = (MAP_HEIGHT * TILE_SIZE) - 25;
         dialogue_chambre_parents = 1;  // Flag : salle à manger réussie
@@ -1419,26 +1417,26 @@ void UpdateGame(void) {
     
     // === RETOURS ===
     // Retour de la chambre des parents vers la salle à manger (mode normal, plus de projectiles)
-    else if (IsLocationDown(8, 13, 11, 20)) {
-        currentLevel = 10;
+    else if (IsLocationDown(8, 13, 10, 20)) {
+        currentLevel = 4;
         player.x = 9 * TILE_SIZE;  // Centre de la porte du haut
         player.y = 1 * TILE_SIZE + 4;  // Rangée 1, en sécurité sous la porte
         // dialogue_chambre_parents reste à 1 : pièce normale
     }
     
     // Retour du cauchemar vers la cuisine (si le joueur recule)
-    else if (IsLocationDown(8, 13, 10, 20)) {
+    else if (IsLocationDown(8, 13, 4, 20)) {
         currentLevel = 3;
         player.y = 10;
         InitProjectiles();  // Nettoie les projectiles
     }
     
-    if (IsLocationUp(8, 13, 4, 5)) {
-            currentLevel = 4; 
+    if (IsLocationUp(8, 13, 11, 5)) {
+            currentLevel = 11; 
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
     }
 
-    else if (IsLocationDown(8, 13, 4, 20)) {
+    else if (IsLocationDown(8, 13, 11, 20)) {
         currentLevel = 3;  // On retourne à la CHAMBRE
         player.y = 10;     // On apparaît tout en HAUT de la chambre
         
@@ -1524,9 +1522,7 @@ void UpdateGame(void) {
         float nextKnockX = player.x + knockbackVX;
         float nextKnockY = player.y + knockbackVY;
         
-        // Vérifie les collisions avec les murs pendant le recul
-        if (currentLevel == 10 && onTable && dialogue_chambre_parents < 1) {
-            // En mode table/voies : pas de recul X, seulement Y (recule sur la table)
+        if (currentLevel == 4 && onTable && dialogue_chambre_parents < 1) {
             if (!isWall(player.x, nextKnockY) && !isWall(player.x + player.w, nextKnockY) &&
                 !isWall(player.x, nextKnockY + player.h) && !isWall(player.x + player.w, nextKnockY + player.h)) {
                 float clampedY = nextKnockY;
@@ -1594,7 +1590,7 @@ void UpdateGame(void) {
     if (currentLevel >= 5) {
         ActionFantome(200); 
     }
-    // currentLevel = 10;
+    // currentLevel = 4;  // Test salle à manger désactivé
     // --- GESTION COLLISION JOUEUR / FANTOME (GAME OVER / RESET) ---
     if (currentLevel >= 5 && currentLevel <=8) {
         
@@ -1635,11 +1631,6 @@ void UpdateGame(void) {
             }
         }
     }
-
-    // Transition 4→10 et 10→4 supprimée (doublon avec Cuisine 3→10→11)
-    // if(currentLevel == 10)GestionPapa();
-
-    // printf("lvl: %d \n", currentLevel);
 }
 
 void GestionPapa() {
@@ -1719,10 +1710,7 @@ float getLuminosite(int gridX, int gridY, int rayonPx) {
     int playerCenterX = (int)player.x + (player.w / 2);
     int playerCenterY = (int)player.y + (player.h / 2);
 
-    if (currentLevel == 10 && dialogue_chambre_parents < 1) {
-        // Salle à manger cauchemar : halo autour du joueur (même rayon que les autres pièces)
-        
-        // 1) Halo du joueur (même rayon normal)
+    if (currentLevel == 4 && dialogue_chambre_parents < 1) {
         float dx = (float)(tileCenterX - playerCenterX);
         float dy = (float)(tileCenterY - playerCenterY);
         float distPx = sqrtf(dx*dx + dy*dy);
@@ -1877,7 +1865,7 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
 
     // --- EFFET SOMMEIL / REVEIL PARENTS ---
     // Uniquement dans la chambre des parents (Index 11)
-    if (currentLevel == 11) { 
+    if (currentLevel == 10) { 
         
         // Coordonnées approximatives du lit des parents (à ajuster selon ta map)
         // Disons que le lit est vers le milieu de la pièce
@@ -1974,7 +1962,7 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     }
     
     // === PROMPT SAUT SUR LA TABLE ===
-    if (currentLevel == 10 && dialogue_chambre_parents < 1) {
+    if (currentLevel == 4 && dialogue_chambre_parents < 1) {
         if (!onTable) {
             // Afficher le prompt seulement si le joueur est en bas (pas encore traversé)
             int pGridY = (int)(player.y + player.h / 2) / TILE_SIZE;
@@ -2096,7 +2084,7 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     }
     
     // === AFFICHAGE DES VIES RESTANTES (salle à manger) ===
-    if (currentLevel == 10 && dialogue_chambre_parents < 1) {
+    if (currentLevel == 4 && dialogue_chambre_parents < 1) {
         int livesLeft = 3 - hitCount;
         // Motif cœur 9x9 pixels (1 = pixel plein)
         static const int heartPattern[9][9] = {
@@ -2131,7 +2119,7 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     }
     
     // === YEUX JAUNES SUR LA TABLE ===
-    if (currentLevel == 10 && onTable && dialogue_chambre_parents < 1) {
+    if (currentLevel == 4 && onTable && dialogue_chambre_parents < 1) {
         nightmareFrame++;
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
         
