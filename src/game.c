@@ -491,8 +491,13 @@ int chaudron_has_heart = 0;
 int chaudron_has_eye = 0;
 int interact_chaudron_cuisiner = 0;
 int has_interact_livre = 0;
-SDL_Rect doudouRect = { 200, 150, 12, 12 };
-    
+int chaudron_anim = 0;
+Uint32 debut_anim_chaudron = 0;   
+int cuisiner = 0;
+int dialogue_chaudron_true = 0;
+int dialogue_chaudron_false = 0;
+int plat = 0;
+
 int carafeX = -1;
 int carafeY = -1;
 int dessinX = -1;
@@ -903,6 +908,27 @@ void UpdateGame(void) {
         }
         return;
     }
+    if(dialogue_chaudron_false > 0){
+        if(state[SDL_SCANCODE_RETURN]){
+            if(toucheRelache){
+                dialogue_chaudron_false ++;
+                if (dialogue_chaudron_false > 2)
+                {
+                    dialogue_chaudron_false = 0;
+                }
+            }
+        }else{toucheRelache=1;}
+        return;
+    }   
+    if(dialogue_chaudron_true > 0){
+        if(state[SDL_SCANCODE_RETURN]){
+            if(toucheRelache){
+                dialogue_chaudron_true = 0;
+                toucheRelache = 0;
+            }
+        }else{toucheRelache=1;}
+        return;
+    }   
     
     
 
@@ -1278,29 +1304,29 @@ void UpdateGame(void) {
                 has_eye = 0;
                 max_objets = 0;
                 chaudron_has_eye = 1;
-                maps[3][chaudronGY][chaudronGX] = 298;
-                maps[3][chaudronDY][chaudronDX] = 299;
+                debut_anim_chaudron = SDL_GetTicks();
+                chaudron_anim = 1;
             }
             if(currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_pain){
                 has_pain = 0;
                 max_objets = 0;
                 chaudron_has_pain= 1;
-                maps[3][chaudronGY][chaudronGX] = 298;
-                maps[3][chaudronDY][chaudronDX] = 299;
+                debut_anim_chaudron = SDL_GetTicks();
+                chaudron_anim = 1;
             }
             if(currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_spider){
                 has_spider = 0;
                 max_objets = 0;
                 chaudron_has_spider = 1;
-                maps[3][chaudronGY][chaudronGX] = 298;
-                maps[3][chaudronDY][chaudronDX] = 299;
+                debut_anim_chaudron = SDL_GetTicks();
+                chaudron_anim = 1;
             }
             if(currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_truc_vert){
                 has_truc_vert = 0;
                 max_objets = 0;
                 chaudron_has_truc_vert = 1;
-                maps[3][chaudronGY][chaudronGX] = 298;
-                maps[3][chaudronDY][chaudronDX] = 299;
+                debut_anim_chaudron = SDL_GetTicks();
+                chaudron_anim = 1;
             }
 
             else if(distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55){
@@ -1393,8 +1419,27 @@ void UpdateGame(void) {
             toucheEnter_Relache = 1;
     }
     
-
     
+    Uint32 tempsActuel = SDL_GetTicks();
+    if(chaudron_anim == 1 && currentLevel == 3){
+
+        if (tempsActuel - debut_anim_chaudron >= 5000) {
+            maps[3][chaudronGY][chaudronGX] = 296;
+            maps[3][chaudronDY][chaudronDX] = 297;
+        }
+
+        else {
+            int frame = (tempsActuel / 300) % 2; 
+
+            if (frame == 0) {
+                maps[3][chaudronGY][chaudronGX] = 298;
+                maps[3][chaudronDY][chaudronDX] = 299;
+            } else {
+                maps[3][chaudronGY][chaudronGX] = 300;
+                maps[3][chaudronDY][chaudronDX] = 301;
+            }
+        }
+    }    
 
     // 1. Quitter la CHAMBRE (Niveau 0) par le HAUT
     // On vérifie si on est au niveau 0 ET si on dépasse le haut de l'écran (y < 5)
@@ -1908,7 +1953,27 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
 
         DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
     }
+    if (dialogue_chaudron_true > 0 && plat == 1) {
+        interact_chaudron_cuisiner = 0;
+        char *texteAffiche = "";
+        if (dialogue_chaudron_true == 1) texteAffiche = "Voila le premier plat";
 
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_chaudron_true > 0 && plat == 2) {
+        interact_chaudron_cuisiner = 0;
+        char *texteAffiche = "";
+        if (dialogue_chaudron_true == 1) texteAffiche = "Voila le deuxième plat";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_chaudron_false > 0) {
+        interact_chaudron_cuisiner = 0;
+        char *texteAffiche = "";
+        if (dialogue_chaudron_false == 1) texteAffiche = "Oups !";
+        if (dialogue_chaudron_false == 2) texteAffiche = "j'ai du me tromper dans la recette...";
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
     
 
     SDL_Rect srcPlayer = { 112, 0, 16, 16 };
