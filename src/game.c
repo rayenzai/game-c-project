@@ -222,14 +222,14 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2,  1,  0, 34, 35,  1,  0,  1,  0,  0,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
         {2,  1, 30, 31,  0,  1,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
         {2,  1,  0, 20,  0,  1,  0,  1,  0,  1, 44,  1, 0,  1,  0,  1,  0,  1,  0, 2},
-        {2, 42,  0,  1,  0,  1,  0,  1,  0,  1,  0, 45, 0,  1,  0,  1, 55, 56, 57, 2},
-        {2, 43,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1, 52, 53, 54, 2},
+        {2,  42,  0,  1,  0,  1,  0,  1,  0,  1,  0, 45, 0,  1,  0,  1, 55, 56, 57, 2},
+        {2,  43,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1, 52, 53, 54, 2},
         {2,  1,  0,  1,  0,  3, 44,  1,  0,  1,  0,  1, 0,  1,  0, 58,  0, 59, 60, 2},
-        {2,  1,  0, 40,  0,  1,  4,  1,  0,  1,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
-        {2,  1,  0,  1, 38, 39,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1, 40,  1,  0, 2},
-        {2, 78,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1, 0, 27, 28, 29,  0,  1, 81, 2},
-        {2,  1, 79,  1,  0,  1, 51,  1,  0,  1,  0,  1, 0, 24, 25, 26,  0,  1, 80, 2}, // Bas fermé
-        {2,  1,  0,  1,  0,  1, 46, 47, 48, 49,  0,  1, 0, 22, 23,  0,  0,  1,  0, 2},
+        {2,  1,  0,  40,  0,  1,  4,  1,  0,  1,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2,  1,  0,  1, 38, 39,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1,  40,  1,  0, 2},
+        {2,  78,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1, 0,  27, 28, 29,  0,  1, 81, 2},
+        {2,  1,  79,  1,  0,  1, 51,  1,  0,  1,  0,  1, 0,  24, 25, 26,  0,  1, 80, 2}, // Bas fermé
+        {2,  1,  0,  1,  0,  1, 46, 47, 48, 49,  0,  1, 0,  22, 23,  0,  0,  1,  0, 2},
         {2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2, 2,  2,  2,  2,  2,  2,  2, 2}  // Bas fermé
     },
     // CARTE 2 : COULOIR (Niveau 1) index 1
@@ -238,13 +238,13 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2}, // Toits cotés
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2}, // Murs cotés
-        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68, 76, 77,  2, 2, 2, 2, 2, 2, 2}, // Vide (Sol)
+        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68, 76, 77,  2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Vide (Sol)
         {2, 2, 2, 2, 2, 2, 2, 74, 75, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,172, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2, 71, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68, 76, 77,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68, 76, 77,  2, 2, 2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2, 74, 75, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68, 73,  2,  2, 2, 2, 2, 2, 2, 2}, // Bas (Entrée)
         {2, 2, 2, 2, 2, 2, 2,  2,  0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
@@ -277,8 +277,8 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 0,  0,  0,   0,  0,  0,  0, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2},
         {2, 2, 0,182,183,   0,  0,  0,  0, 0, 0, 0,  0,  0,  0,  0, 0, 0, 0, 0},  
         {2,184,0,  0,  0,   0,  0,  0,  0, 0, 0, 0,  0,  0,  0,  0, 0, 0, 0, 0},
-        {2, 2, 0,  0,263, 176,  0,175,  0, 0, 0, 0,158,159,  0,  0, 0, 0, 0, 0},
-        {2, 2, 0,  0,264,   0,  0,  0,  0, 0, 0, 0,156,157,  0,  0, 0, 0, 0, 0},
+        {2, 2, 0,  0,263, 176,  0,175,  0, 0, 0, 0,158,159,  0,  0, 0, 0, 0, 0, 0, 0},
+        {2, 2, 0,  0,264,   0,  0,  0,  0, 0, 0, 0,156,157,  0,  0, 0, 0, 0, 0, 0, 0},
         {2, 2,265, 0,263,   0,179,180,177, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2},
         {2, 2,171, 0,264, 260,261,  0,262, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2},
         {2, 2,181, 0,  0, 257,258,258,259, 0, 0, 0,  0,  0,  0,  0, 0, 0, 2, 2},
@@ -329,19 +329,19 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
     {
         {83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83}, // Mur Haut
         {83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 83},
-        {83, 82, 83, 83, 83, 82, 83, 82, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 82, 83},
-        {83, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83, 118, 82, 82, 82, 83, 82, 83},
-        {83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 82, 83}, // Gros bloc central
-        {83, 82, 82, 82, 83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 83},
-        {83, 83, 83, 82, 83, 82, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83},
-        {83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 83},
-        {83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 82, 83, 82, 83, 83, 83},
-        {83, 82, 83, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 83, 82, 82, 82, 83},
-        {83, 82, 83, 82, 83, 83, 83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 82, 83, 82, 83},
+        {83, 82, 83, 83, 83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 82, 83},
+        {83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 83, 82, 83},
+        {83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 82, 83}, // Gros bloc central
         {83, 82, 82, 82, 83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 83, 82, 83},
-        {82, 82, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83}, // ENTRÉE GAUCHE (Ligne 12, connectée à l'autre)
+        {83, 83, 83, 82, 83, 82, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83},
+        {83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83},
+        {83, 82, 83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83},
+        {83, 82, 82, 82, 83, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83},
+        {83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 82, 83},
+        {83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 83},
+        {82, 82, 83, 83, 83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 82, 83}, // ENTRÉE GAUCHE (Ligne 12, connectée à l'autre)
         {83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83},
-        {83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 82, 82, 83, 83, 83, 83, 83, 83, 83, 83}  // SORTIE BAS (Ligne 14, Colonnes 10-11)
+        {83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83}  // SORTIE BAS (Ligne 14, Colonnes 10-11)
     },
     // --- LABYRINTHE 3 (Index 7) ---
     {
@@ -350,10 +350,10 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {83, 82, 83, 83, 83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 82, 83},
         {83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 83, 82, 83}, // Début des fausses pistes
         {83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 82, 83, 82, 83},
-        {83, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 83, 82, 82, 83, 82, 83},
-        {83, 82, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 82, 83},
+        {83, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 83},
+        {83, 82, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 82, 83, 82, 83},
         {83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83}, // Grand couloir transversal
-        {83, 82, 83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83}, // Cul de sac massif à droite
+        {83, 82, 83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83}, // Cul de sac massif à droite
         {83, 82, 82, 82, 83, 82, 83, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 83},
         {83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 82, 83},
         {83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 83},
@@ -372,7 +372,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {83, 82, 83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 83, 82, 83},
         {83, 82, 83, 83, 83, 82, 83, 83, 83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 82, 83},
         {83, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 83},
-        {83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 82, 83},
+        {83, 82, 83, 83, 83, 83, 83, 82, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 82, 83},
         {83, 82, 83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 83, 82, 82, 82, 82, 83, 82, 83},
         {83, 82, 83, 82, 83, 83, 83, 83, 83, 82, 83, 82, 83, 83, 83, 83, 82, 83, 82, 83},
         {83, 82, 82, 82, 83, 82, 82, 82, 82, 82, 83, 82, 82, 82, 82, 82, 82, 83, 82, 83},
@@ -388,11 +388,11 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {50, 50, 50, 50, 50, 50, 50,  50,  50,  50, 50,  50,   50, 50, 50, 50, 50, 50, 50, 50},
         {50, 50, 50, 50, 50,151,152, 151, 152, 151,152, 151, 152, 151, 50, 50, 50, 50, 50, 50}, // Début Rectangle
         {50, 50, 50, 50, 50,150,  1,   0,   1,   0, 58,  41,   1, 150, 50, 50, 50, 50, 50, 50}, 
-        {50, 50, 50, 50, 50,150, 44,   0,   1,   0,  1,   0, 147, 150, 50, 50, 50, 50, 50, 50},
+        {50, 50, 50, 50, 50,150, 44,   0,   1,   0,  1,   0,   1, 150, 50, 50, 50, 50, 50, 50},
         {50, 50, 50, 50, 50,  0,  1,   0,   1,   0,  1,   0,   1, 150, 50, 50, 50, 50, 50, 50}, 
         {50, 50, 50, 50, 50,  0,  1,   0, 148,  59, 60,   0,   1, 150, 50, 50, 50, 50, 50, 50}, 
         {50, 50, 50, 50, 50,  0,  1,   0,   1,   0,149,  45, 174, 150, 50, 50, 50, 50, 50, 50}, 
-        {50, 50, 50, 50, 50,150, 58,   0,   1,   0,  1,  40,   1, 150, 50, 50, 50, 50, 50, 50},
+        {50, 50, 50, 50, 50,150, 58,   0,   1,   0,  1,   0,   1, 150, 50, 50, 50, 50, 50, 50},
         {50, 50, 50, 50, 50,150,  1,   0,   1,   0,  1,   0,   1, 150, 50, 50, 50, 50, 50, 50},
         {50, 50, 50, 50, 50,150,150, 150, 150, 150,150, 150, 150, 150, 50, 50, 50, 50, 50, 50}, // Fin Rectangle
         {50, 50, 50, 50, 50, 50, 50,  50,  50,  50, 50,  50,  50, 50, 50, 50, 50, 50, 50, 50}, // Marge Bas
@@ -886,6 +886,18 @@ void UpdateGame(void) {
         dirY *= 0.7071f;
     }
 
+    // Petit fallback : permettre de sauter sur la table si on est en bas (sécurité)
+    if (currentLevel == 4 && dialogue_chambre_parents < 1 && !onTable) {
+        int pGridY_fallback = (int)(player.y + player.h / 2) / TILE_SIZE;
+        if (pGridY_fallback >= TABLE_TOP_ROW && state[SDL_SCANCODE_SPACE] && spaceKeyReleased) {
+            onTable = 1;
+            player.x = 9 * TILE_SIZE + (TILE_SIZE / 2);
+            player.y = TABLE_BOT_ROW * TILE_SIZE;
+            spaceKeyReleased = 0;
+            goto skip_normal_movement;
+        }
+    }
+
     // if (dirX != 0 || dirY != 0) {
     //     Mix_Volume(2, 32); 
     // } else {
@@ -932,9 +944,10 @@ void UpdateGame(void) {
                 if (!touchWallY) player.y = nextY;
             } else {
                 // Zone en bas : bloqué, doit sauter sur la table (ESPACE)
+                // Monter depuis n'importe quelle position en bas (comportement d'origine)
                 if (state[SDL_SCANCODE_SPACE] && spaceKeyReleased) {
                     onTable = 1;
-                    player.x = 9 * TILE_SIZE + (TILE_SIZE / 2); // Centre de la table
+                    player.x = 9 * TILE_SIZE + (TILE_SIZE / 2); // centrer sur la table
                     player.y = TABLE_BOT_ROW * TILE_SIZE;
                     spaceKeyReleased = 0;
                 }
@@ -987,7 +1000,7 @@ void UpdateGame(void) {
         // Skip le reste du mouvement normal
         goto skip_normal_movement;
     }
-    
+
     float nextX = player.x + (dirX * currentSpeed);
     float nextY = player.y + (dirY * currentSpeed);
     
@@ -1583,7 +1596,8 @@ void UpdateGame(void) {
         }
     }
     
-    if (currentLevel != 10) {
+    // Reset hitCount seulement si on n'est PAS dans la salle à manger cauchemar
+    if (currentLevel != 4 || dialogue_chambre_parents >= 1) {
         hitCount = 0;
     }
 
@@ -1864,7 +1878,7 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     }
 
     // --- EFFET SOMMEIL / REVEIL PARENTS ---
-    // Uniquement dans la chambre des parents (Index 11)
+    // Uniquement dans la chambre des parents (Index 10)
     if (currentLevel == 10) { 
         
         // Coordonnées approximatives du lit des parents (à ajuster selon ta map)
@@ -1962,24 +1976,17 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     }
     
     // === PROMPT SAUT SUR LA TABLE ===
+    // (Affichage du prompt classique ou rien du tout)
     if (currentLevel == 4 && dialogue_chambre_parents < 1) {
         if (!onTable) {
-            // Afficher le prompt seulement si le joueur est en bas (pas encore traversé)
             int pGridY = (int)(player.y + player.h / 2) / TILE_SIZE;
             if (pGridY >= TABLE_TOP_ROW) {
                 SDL_Color cBlanc = {255, 255, 255, 255};
                 SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[ESPACE] Sauter sur la table", cBlanc);
                 if (sText) DrawInteractions(renderer, sText);
             }
-            // Si pGridY < TABLE_TOP_ROW : le joueur est au-dessus, pas de prompt
-        } else if (player.y <= (TABLE_TOP_ROW + 1) * TILE_SIZE) {
-            // En haut de la table : prompt pour descendre
-            SDL_Color cBlanc = {255, 255, 255, 255};
-            SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[ESPACE] Descendre de la table", cBlanc);
-            if (sText) DrawInteractions(renderer, sText);
         }
     }
-
     
     // === DESSINER LES PROJECTILES (SALLE À MANGER) ===
     DrawProjectiles(renderer);
@@ -2257,10 +2264,10 @@ void InitProjectiles(void) {
 }
 
 void SpawnProjectile(void) {
-    if (currentLevel != 10) return;
+    if (currentLevel != 4) return;
     
-    // Si salle déjà réussie ou pas encore sur la table, arrêter projectiles
-    if (dialogue_chambre_parents >= 1 || !onTable) {
+    // Si salle déjà réussie, arrêter projectiles
+    if (dialogue_chambre_parents >= 1) {
         return;
     }
     
@@ -2314,7 +2321,7 @@ void SpawnProjectile(void) {
 
 void UpdateProjectiles(void) {
     // Ne met à jour les projectiles que dans le niveau cauchemar
-    if (currentLevel != 10) return;
+    if (currentLevel != 4 || dialogue_chambre_parents >= 1) return;
     
     // Génération de nouveaux projectiles (fréquence réduite pour meilleure jouabilité)
     float playerProgress = 1.0f - (player.y / (float)(MAP_HEIGHT * TILE_SIZE));
@@ -2340,33 +2347,39 @@ void UpdateProjectiles(void) {
     }
 }
 
+void DrawCircleLight(SDL_Renderer *renderer, int cx, int cy, int rayon) {
+    for (int dy = -rayon; dy <= rayon; dy++) {
+        for (int dx = -rayon; dx <= rayon; dx++) {
+            int dist2 = dx*dx + dy*dy;
+            if (dist2 <= rayon*rayon) {
+                float dist = sqrtf((float)dist2);
+                float alpha = 1.0f - (dist / (float)rayon);
+                if (alpha < 0.0f) alpha = 0.0f;
+                if (alpha > 1.0f) alpha = 1.0f;
+                int a = (int)(alpha * 120); // 120 = intensité max du halo
+                SDL_SetRenderDrawColor(renderer, 255, 255, 200, a);
+                SDL_RenderDrawPoint(renderer, cx + dx, cy + dy);
+            }
+        }
+    }
+}
+
 void DrawProjectiles(SDL_Renderer *renderer) {
-    if (currentLevel != 10) return;
-    
+    if (currentLevel != 4 || dialogue_chambre_parents >= 1) return;
     for (int i = 0; i < MAX_PROJECTILES; i++) {
         if (projectiles[i].active) {
             int px = (int)projectiles[i].x;
             int py = (int)projectiles[i].y;
-            
-            // Les projectiles ne sont visibles que sur la table (colonnes 8 à 11)
             int projGridX = px / TILE_SIZE;
-            if (projGridX < 8 || projGridX > 11) {
-                continue;  // Invisible en dehors de la table
-            }
-            
-            // Choisir la tuile graphique selon le type de projectile
+            // Visible uniquement sur la table (colonnes 8 à 11)
+            if (projGridX < 8 || projGridX > 11) continue;
             int tileIndex;
             if (projectiles[i].type == 0) {
-                tileIndex = 239;  // Assiette
+                tileIndex = 239;
             } else {
-                if (projectiles[i].vx > 0) {
-                    tileIndex = 237;  // Couteau vers la droite
-                } else {
-                    tileIndex = 238;  // Couteau vers la gauche
-                }
+                tileIndex = (projectiles[i].vx > 0) ? 237 : 238;
             }
-            
-            // Dessiner la tuile du projectile
+            SDL_SetTextureColorMod(tilesetTexture, 255, 255, 255);
             SDL_Rect srcProjectile = { TILE_SIZE * tileIndex, 0, TILE_SIZE, TILE_SIZE };
             SDL_Rect destProjectile = { px, py, TILE_SIZE, TILE_SIZE };
             SDL_RenderCopy(renderer, tilesetTexture, &srcProjectile, &destProjectile);
@@ -2376,21 +2389,23 @@ void DrawProjectiles(SDL_Renderer *renderer) {
 
 int CheckProjectileCollision(float px, float py, int pw, int ph) {
     // Ne vérifie les collisions que dans le niveau cauchemar
-    if (currentLevel != 10) return 0;
+    if (currentLevel != 4 || dialogue_chambre_parents >= 1) return 0;
     
-    // Taille réduite des hitbox pour les projectiles (plus réaliste)
-    int projectileSize = 10;  // Taille réduite (au lieu de TILE_SIZE=16)
-    
+    // Vérifie collision pour chaque projectile actif
     for (int i = 0; i < MAX_PROJECTILES; i++) {
         if (projectiles[i].active) {
-            // Collision AABB avec hitbox réduite
-            if (px < projectiles[i].x + projectileSize &&
-                px + pw > projectiles[i].x + 2 &&
-                py < projectiles[i].y + projectileSize &&
-                py + ph > projectiles[i].y + 2) {
-                // Désactive le projectile qui a touché
+            // Collision simple : les deux rectangles se touchent ?
+            float projX = projectiles[i].x;
+            float projY = projectiles[i].y;
+            int projW = TILE_SIZE;
+            int projH = TILE_SIZE;
+            
+            // Est-ce que le joueur et le projectile se chevauchent ?
+            if (px < projX + projW && px + pw > projX &&
+                py < projY + projH && py + ph > projY) {
+                // Collision ! Désactive le projectile
                 projectiles[i].active = 0;
-                return 1; // Collision détectée
+                return 1;
             }
         }
     }
