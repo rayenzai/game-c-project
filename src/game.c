@@ -18,6 +18,7 @@
 static Mix_Chunk *sonPickUp = NULL;
 static Mix_Chunk *sonOpenDoor = NULL;
 static Mix_Chunk *sonCloseDoor = NULL;
+static Mix_Chunk *sonScreamer = NULL;
 
 // Musiques D'ambiance
 static Mix_Music *MusicInterior = NULL;
@@ -29,7 +30,8 @@ static int toucheEnter_Relache = 1;
 
 // --- VARIABLES GLOBALES ---
 
-static SDL_Texture *tilesetTexture = NULL; 
+static SDL_Texture *tilesetTexture = NULL;
+SDL_Texture *textureScreamer = NULL; 
 // static SDL_Texture *playerTexture = NULL; 
 
 int rayon = 0;
@@ -233,6 +235,14 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 324,325 = bas du meuble de la télé
 328,329 = bas porte fin 
 330,331 = haut porte fin
+332,333 = bas cheminée
+334,335 = haut cheminée 
+336,337 = bas tableau
+338,339 = haut tableau 
+340 = carré bleu (sol)
+341 = carré rouge 
+342 = carré vert 
+343 = lampe 
 
 */
 
@@ -242,12 +252,12 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
 
  {      //carte 1 (chambre) index 0
-        {2,  2,  2,  2,  2,  2,  2,  2,  0,  0,  0,  0, 2,  2,  5,  2,  8,  9,  2, 2}, // Trou en haut   
-        {2,  2,  2, 36, 37,  2,  2,  2,  0,  0,  0,  0, 2,  2, 41,  2, 10, 11,  2, 2}, 
-        {2,  1,  0, 32, 33, 21,  0,  1,  0,  1,  0,327, 0,  1,  0,  1,  0,  1,  2, 2},
+        {2,  2,  2,  2,  2,  2,334,335,  0,  0,  0,  0, 2,  2,  5,  2,  8,  9,  2, 2}, // Trou en haut   
+        {2,  2,  2, 36, 37,  2,332,333,  0,  0,  0,  0,338,339, 41,  2, 10, 11,  2, 2}, 
+        {2,  1,  0, 32, 33, 21,  0,  1,  0,  1,  0,327,336,337,  0,  1,  0,  1,  2, 2},
         {2,  1,  0, 34, 35,  1,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1,  0,330,331, 2},
         {2,  1, 30, 31,  0,  1,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1,  0,328,329, 2},
-        {2,  1,  0, 20,  0,  1,  0,  1,  0,  1, 44,  1, 0,  1,  0,  1,  0,  1,  2, 2},
+        {2,  1,  0, 20,  0,  1,  0,  1,  0,  1, 44,  1, 0,  1,343,  1,  0,  1,  2, 2},
         {2, 42,  0,  1,  0,  1,  0,  1,326,  1,  0, 45, 0,  1,  0,  1, 55, 56, 57, 2},
         {2, 43,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1, 52, 53, 54, 2},
         {2,  1,  0,  1,  0,  3, 44,  1,  0,  1,  0,  1, 0,  1,  0, 58,  0, 59, 60, 2},
@@ -313,16 +323,16 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 2,  2,  2,   2,  2,  2,  2, 2, 2, 2,  2,  2,  2,  2,  2,  2, 2, 2}
     },
     // CARTE 5 : SALLE A MANGER (Niveau 4 - dernière du bloc précédent) index 4
-    {    
+    {
         {2, 2, 2, 2, 2, 2, 2, 2,  0,  0,  0,  0,  2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
         {2, 2, 2, 2, 2, 2, 2, 2,  0,  0,  0,  0,  2, 2, 2, 2, 2, 8, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0,  0,281,277,292,285, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0,283,239,  0,  0,286, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0,284,  0,291,239,285, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0,283,  0,290,  0,286, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0,284,  0,  0,  0,285, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0,283,239,  0,288,286, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0,284,  0,  0,239,285, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0,284,  0,  0,  0,285, 0, 0, 0, 0, 0, 0, 0},
+        {2, 2, 0, 0, 0, 0, 0, 0,283,239,  0,288,286, 0, 0, 0, 0, 0, 0, 0},
+        {2, 2, 0, 0, 0, 0, 0, 0,284,  0,  0,239,285, 0, 0, 0, 0, 0, 0, 0},
         {2, 2, 0, 0, 0, 0, 0, 0,283,  0,287,  0,286, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0,284,  0,  0,  0,285, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0,283,239,  0,289,286, 0, 0, 0, 0, 0, 2, 2},
@@ -428,18 +438,36 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2,  2,  2,  2,  2,  2,  2,  2, 2,  2,  2, 2,  2,  2,  2, 2, 2, 2, 2}, // Trou en haut
         {2, 2,  2,  2,  2,  2,  2,  2,  2, 2,  2,  2, 2,213,214,215, 2, 2, 2, 2},
         {2, 2,  2,  2,  2,  2,  2,  2,  2, 2,  2,  2, 2,210,211,212, 2, 2, 2, 2},
-        {2, 2,  0,  0,  0,  0,217,  0,  0, 0,229,  0, 0,207,208,209, 0, 0, 2, 2},
-        {2, 2,185,  0,  0,  0,  0,224,  0, 0,  0, 59,60,  0,  0,  0, 0, 0, 2, 2},
-        {2, 2,186,  0,231,  0,  0,  0,  0, 0,232,  0, 0,  0,  0,235, 0, 0, 2, 2},
-        {2, 2,195,196,197,198,  0,  0,230, 0,  0,  0, 0,234,  0,  0, 0, 0, 2, 2},
-        {2, 2,219,220,221,222,223,  0,  0, 0,217,  0, 0,  0,  0,  0, 0, 0, 2, 2},
-        {2, 2,191,192,193,194,  0,233,  0,58,  0,  0, 0,216,  0,  0, 0, 0, 2, 2},
-        {2, 2,199,200,201,202,  0,  0,  0, 0,  0,225, 0,  0,  0,  0, 0, 0, 2, 2},
-        {2, 2,203,204,205,206,  0,  0,216, 0,  0,  0, 0,236,  0,  0, 0, 0, 2, 2},
-        {2, 2,  0, 30, 31,  0,  0,  0,  0, 0,  0,230, 0,  0,  0,  0, 0, 0, 2, 2},
-        {2, 2,  0,  0,  0,  0,227,  0,  0, 0,226,  0, 0,228,  0,  0, 0, 0, 2, 2}, // Bas fermé
-        {2, 2,241,  0,  0,  0,  0,  0,  0, 0,  0,  0, 0,  0,  0,  0, 0, 0, 2, 2},
-        {2, 2,  2,  2,  2,  2,  2,  2,  0, 0,  0,  0, 2,  2,  2,  2, 2, 2, 2, 2}
+        {2, 2,  0,234,  0,235,217,  0,228, 0,229,  0, 0,207,208,209, 0, 0, 2, 2}, // Zone haute chargée
+        {2, 2,185,231,  0,  0,  0,224,  0, 0,216, 59,60,  0,230,  0, 0, 0, 2, 2}, // Protection télécommande
+        {2, 2,186,  0,231,  0,233,  0,  0, 0,232,  0, 0,225,  0,235,226, 0, 2, 2},
+        {2, 2,195,196,197,198,  0,216,230, 0,  0,227, 0,234,  0,  0, 0, 0, 2, 2},
+        {2, 2,219,220,221,222,223,  0,  0, 0,217,  0, 0,  0,236,  0,216, 0, 2, 2}, // Le monstre dort ici
+        {2, 2,191,192,193,194,  0,233,  0,58,  0,217, 0,216,  0,224, 0, 0, 2, 2},
+        {2, 2,199,200,201,202,232,  0,225, 0,  0,225, 0,  0,  0,  0, 0, 0, 2, 2},
+        {2, 2,203,204,205,206,  0,  0,216, 0,228,  0, 0,236,229,  0, 0, 0, 2, 2},
+        {2, 2,  0, 30, 31,  0,234,  0,  0, 0,  0,230, 0,  0,  0,223, 0, 0, 2, 2}, // Tapis safe
+        {2, 2,235,  0,  0,  0,227,  0,231, 0,226,  0, 0,228,  0,  0, 0, 0, 2, 2}, // Bas fermé mais passage
+        {2, 2, 0,  0,217,  0,  0,  0,  0, 0,  0,  0, 0,  0,216,  0, 0, 0, 2, 2}, // Entrée piègeuse
+        {2, 2,  2,  2,  2,  2,  2,  2,  0, 0,  0,  0, 2,  2,  2,  2, 2, 2, 2, 2}  // Porte en bas
+    },
+    // Salon (index 11)
+    {    
+        {2, 2, 2,338,339, 2, 2, 2,334,335, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
+        {2, 2, 2,336,337, 2, 2, 2,332,333, 2, 2, 2, 2, 2, 2, 2, 8, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 21, 308,309,310,311, 21, 0, 0, 304, 305, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 312,313,314,315, 0, 0, 0, 302, 303, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 324, 325, 0, 0, 2, 2},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2}, // Bas fermé
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
     },
 };
  
@@ -467,6 +495,8 @@ int has_drawing = 0;
 int statue_has_water = 0;
 int statue_has_drawing = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
+
+int screamer = 0;
     
 int carafeX = -1;
 int carafeY = -1;
@@ -484,6 +514,17 @@ int TuilesNotSpecial[] = {0, 1, 2};
 int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
 
 int papaReveil = 0;
+int forceSleep = 0;
+int affichePapaReveil = 0;
+int showInteractTelecommande = 0;
+int hasTelecommande = 0;
+
+int dialoguePasTelecommande = 0;
+int interactTelecommandeTurnOn = 0;
+int teleOn = 0;
+Uint32 debutTeleOn = 0;
+int salonPattern[MAP_HEIGHT][MAP_WIDTH] = {0};
+Uint32 tempsTeleOn = 10000;
 
 // --- INITIALISATION ---
 void InitGame(SDL_Renderer *renderer) {
@@ -494,6 +535,7 @@ void InitGame(SDL_Renderer *renderer) {
     dialogueStep = 1;
     toucheRelache = 0;
     hasDoudou = 0;
+    screamer = 0;
 
 
     // Test pour le fantome
@@ -511,7 +553,12 @@ void InitGame(SDL_Renderer *renderer) {
     sonCloseDoor = chargement_son_door_close();
     MusicInterior = chargement_son_ambiance();
     MusicExterior = chargement_son_exterieur();
+    sonScreamer = chargement_son_screamer();
     
+    // On lance les sons en arrière plan
+    // Mix_PlayChannel(2, sonScreamer, -1); // -1 = boucle infinie
+    // Mix_Volume(2,0);
+
     // currentLevel = 5;
     // player.x = 20; 
     // player.y = 12*TILE_SIZE ;
@@ -526,7 +573,17 @@ void InitGame(SDL_Renderer *renderer) {
     } else {
         printf("ERREUR: Impossible de charger assets/tileset.bmp ! %s\n", SDL_GetError());
     }
+    SDL_Surface *surfScreamer = SDL_LoadBMP("assets/screamer.bmp");
 
+if (surfScreamer) {
+    Uint32 colorkey = SDL_MapRGB(surfScreamer->format, 255, 0, 255);
+    SDL_SetColorKey(surfScreamer, SDL_TRUE, colorkey);
+
+    textureScreamer = SDL_CreateTextureFromSurface(renderer, surfScreamer);
+    SDL_FreeSurface(surfScreamer);
+} else {
+    printf("Erreur : %s\n", SDL_GetError());
+}
 
 }
 
@@ -704,6 +761,14 @@ void ManageMusic() {
     static int currentZoneState = -1; 
     int newZoneState = 0; 
     Mix_Volume(-1, VOLUME_BRUITAGES);
+
+    // if(screamer){
+    //     Mix_Volume(2, 64); // On commence volume à 0
+    // }
+    // else{
+    //     Mix_Volume(2, 0);
+    // }
+
     // Si on est dans les niveaux 5, 6, 7 ou 8, on est à l'EXTERIEUR
     if (currentLevel >= 5 && currentLevel <= 8) {
         newZoneState = 1;
@@ -841,6 +906,8 @@ void UpdateGame(void) {
         return;
     }
     
+    dialoguePasTelecommande = 0; // Pour le dialogue quand le joueur veut aller dans le salon sans la télécommande
+    interactTelecommandeTurnOn = 0;
 
     float dirX = 0;
     float dirY = 0;
@@ -850,6 +917,24 @@ void UpdateGame(void) {
     if (state[SDL_SCANCODE_LEFT])  dirX -= 1;
     if (state[SDL_SCANCODE_RIGHT]) dirX += 1;
 
+    static int premiereFoisAllumeeTele = 0;
+
+    Uint32 tempsMtn = SDL_GetTicks();
+
+    if(currentLevel == 11 && player.x >= 28 && player.x <= 32 && !hasTelecommande){
+        if(dirX > 0){
+            dirX = 0;
+        }
+        dialoguePasTelecommande = 1;
+    }
+
+    else if(currentLevel == 11 && hasTelecommande && player.x >= 28 && player.x <= 32 && premiereFoisAllumeeTele == 0) {
+        if(!teleOn)interactTelecommandeTurnOn = 1;
+        if( (premiereFoisAllumeeTele == 0 || (tempsMtn - debutTeleOn) <= tempsTeleOn ) && dirX > 0) {
+            dirX = 0;
+        }
+    }
+
     // Si on bouge sur les deux axes en même temps (Diagonale)
     if (dirX != 0 && dirY != 0) {
         // On multiplie par 0.707 (environ 1/racine(2)) pour ralentir
@@ -857,11 +942,7 @@ void UpdateGame(void) {
         dirY *= 0.7071f;
     }
 
-    // if (dirX != 0 || dirY != 0) {
-    //     Mix_Volume(2, 32); 
-    // } else {
-    //     Mix_Volume(2, 0);
-    // }
+    
 
     // 3. On applique la VITESSE
     float nextX = player.x + (dirX * PLAYER_SPEED);
@@ -889,10 +970,44 @@ void UpdateGame(void) {
     // } else {
     //     Mix_Volume(2, 0);  // On coupe le son si on arrête
     // }
+    
+    // --- GESTION SONORE SCREAMER ---
+    static int screamerActive = 0;    
+    static Uint32 debutScreamer = 0;  
 
-    if( (dirX != 0 || dirY != 0) && papaReveil==1 && currentLevel == 10){
-        player.y = (MAP_HEIGHT * TILE_SIZE)-60;
+    if( (dirX != 0 || dirY != 0) && papaReveil == 1 && currentLevel == 10){
+        player.y = (MAP_HEIGHT * TILE_SIZE) - 30; 
         player.x = 10 * TILE_SIZE;
+
+        // Si le screamer n'est pas déjà affiché on le lance
+        if (screamer == 0) {
+            screamer = 1; 
+            hasTelecommande = 0;                  
+            debutScreamer = SDL_GetTicks(); // démarre le chrono
+            int telecommandeX = 2;
+            int telecommandeY = 4;
+            maps[10][telecommandeY][telecommandeX] = 185;
+            
+            // Lance le son
+            if (screamerActive == 0) {
+                Mix_Volume(2, 128); 
+                Mix_PlayChannel(2, sonScreamer, 0); 
+                screamerActive = 1;
+            }
+        }
+    }
+    
+    if (screamer == 1) {
+        if (SDL_GetTicks() - debutScreamer > 2000) {
+            screamer = 0; // On coupe l'image
+            
+            // On coupe le son
+            if (screamerActive == 1) {
+                Mix_HaltChannel(2); 
+                screamerActive = 0;
+            }
+            forceSleep = 1;
+        }
     }
     
     float distance;
@@ -1013,6 +1128,15 @@ void UpdateGame(void) {
         maps[1][carafeY][carafeX] = 72;
     }
     
+
+    // --- Chambre des parents ---
+    showInteractTelecommande = 0;
+    int telecommandeX, telecommandeY;
+    float distance_Telecommande;
+    TrouveCoordonnees(&telecommandeX, &telecommandeY, 185, 10);
+    if( IsLocationObjet(16, 10, 185, &distance_Telecommande, -1, -1)){
+        showInteractTelecommande = 1;
+    }
 
     if (state[SDL_SCANCODE_E]) {
         if (toucheE_Relache) {
@@ -1142,6 +1266,18 @@ void UpdateGame(void) {
                 }
                 whichTableauPiece = 0;
                 cpt_piece_tableau++;
+            }
+
+            if(distance_Telecommande <= 16 && currentLevel == 10 && maps[currentLevel][telecommandeY][telecommandeX] == 185){
+                 maps[currentLevel][telecommandeY][telecommandeX] = 218;
+                 hasTelecommande = 1;
+            }
+
+            if(player.x >= 28 && player.x <= 32 && hasTelecommande && !premiereFoisAllumeeTele && interactTelecommandeTurnOn){
+                teleOn = 1;
+                debutTeleOn = SDL_GetTicks();
+                interactTelecommandeTurnOn = 0;
+                GestionMemoSalon();
             }
             toucheE_Relache = 0; // On verrouille tant qu'on n'a pas lâché E
         }
@@ -1353,27 +1489,243 @@ void UpdateGame(void) {
         player.y = 10;
     }
     hasDoudou = 1;
-    // if(currentLevel == 10)GestionPapa();
+    if(currentLevel == 10)GestionPapa();
+    // currentLevel = 10; 
 
+    if(IsLocationRight(5, 10, 4, 20)){
+        currentLevel = 11;
+        player.x = 5;
+    }
+    else if(IsLocationLeft(5, 10, 11, 5)){
+        currentLevel = 4;
+        player.x = (MAP_WIDTH * TILE_SIZE) - 20;
+    }
 
+    // currentLevel = 11;
+    hasTelecommande = 1;
+    // --- ANIMATION TV (GRESILLEMENT) ---
+    Uint32 tempsActuel = SDL_GetTicks();
+    if (currentLevel == 11 && teleOn) {
+        
+        if (tempsActuel - debutTeleOn >= tempsTeleOn) {
+            teleOn = 0; 
+            premiereFoisAllumeeTele = 1;
+            maps[11][4][14] = 302; maps[11][4][15] = 303;
+            maps[11][3][14] = 304; maps[11][3][15] = 305;
+
+            for (int y = 6; y <= 8; y++) {
+                for (int x = 2; x <= 15; x++) { // x jusqu'à 15 pour être sûr
+                    if (maps[11][y][x] == 82) maps[11][y][x] = 0; 
+                }
+            }
+        } 
+        else {
+            int frame = (tempsActuel / 200) % 2;
+            if (frame == 0) {
+                maps[11][4][14] = 316; maps[11][4][15] = 317;
+                maps[11][3][14] = 318; maps[11][3][15] = 319;
+            } else {
+                maps[11][4][14] = 320; maps[11][4][15] = 321;
+                maps[11][3][14] = 322; maps[11][3][15] = 323;
+            }
+        }
+    }
+    else if(!teleOn && currentLevel == 1){
+        maps[11][4][14] = 302; maps[11][4][15] = 303;
+        maps[11][3][14] = 304; maps[11][3][15] = 305;
+    }
+
+    // Gestion de réussite ou non du joueur pour le chemin à mémoriser
+    if(currentLevel == 11 && !teleOn && premiereFoisAllumeeTele != 0){
+        int caseX = (player.x + player.w / 2) / TILE_SIZE;
+        int caseY = (player.y + player.h) / TILE_SIZE;
+        int indexTuile = salonPattern[caseY][caseX];
+
+        if(indexTuile != 82 && player.x >= 2*TILE_SIZE){
+            printf("mauvais chemin\n");
+            player.y = 7*TILE_SIZE;
+            player.x = 1 * TILE_SIZE;
+            premiereFoisAllumeeTele = 0;
+        }
+    }
+
+    // 302(g), 303(d) = bas télé sur commode 
+    // 304,305 = haut télé
+    // 316,317 = bas télé (effet bug v1)
+    // 318,319 = haut télé (effet bug v1)
+    // 320,321 = bas télé (effet bug v2)
+    // 322,323 = haut télé (effet bug v2)
+    
 
     // printf("lvl: %d \n", currentLevel);
 }
 
+void copieTableau (int src[MAP_HEIGHT][MAP_WIDTH], int dest[MAP_HEIGHT][MAP_WIDTH]){
+    for (int i = 0; i < MAP_HEIGHT; ++i)
+    {
+        for (int j = 0; j < MAP_WIDTH; ++j)
+        {
+            dest[i][j] = src[i][j];
+        }
+    }
+}
+
+void GestionMemoSalon() {
+    // On réinitialise le terrain pour être sûr qu'on recommence sur qlq chose de propre
+    int finX = 14;
+    for (int y = 6; y <= 8; y++) {
+        for (int x = 2; x <= finX+1; x++) {
+            if (maps[11][y][x] == 82) maps[11][y][x] = 0; 
+        }
+    }
+
+    // Uint32 tempsActuel = SDL_GetTicks();
+    // printf("%d\n",teleOn);
+    if(teleOn){
+        int curX = 2;
+        int curY = 7;
+        maps[11][curY][curX] = 82; // Point de départ
+
+        while (curX < finX) {
+
+            int futursY[4]; 
+            int nbChoix = 0;
+
+            // Tout droit (x2 pour augmenter la proba)
+            futursY[nbChoix++] = curY; 
+            futursY[nbChoix++] = curY; 
+
+            // Monter si possible
+            if (curY > 6) futursY[nbChoix++] = curY - 1;
+
+            // Descendre si possible
+            if (curY < 8) futursY[nbChoix++] = curY + 1;
+
+            // Tirage au sort
+            int targetY = futursY[rand() % nbChoix];
+            
+            if (targetY == curY) {
+                // Si on l'emplacement en Y est le même où on est déjà alors on augmente juste vers la droite
+                curX++;
+                maps[11][curY][curX] = 82;
+            } 
+            else {
+                
+                curX++;
+                if (curX > finX) break; // On a dépassé la fin du chemin on arrête
+                maps[11][curY][curX] = 82;
+
+                // On veut changer la hauteur sur la même colonne, donc on met ça pour pas avoir une diagonale sans bloc pour les relier
+                maps[11][targetY][curX] = 82;
+                curY = targetY; // Mise à jour de la hauteur
+
+                // Si on fait un mouvement celui juste après ça sera forcément d'avancer (vers la droite) pour éviter que ça fasse un pâté de blocs
+                if (curX < finX) {
+                    curX++;
+                    maps[11][curY][curX] = 82;
+                }
+            }
+        }
+        copieTableau(maps[11], salonPattern);
+    }
+
+    
+}
+
+
+int IsDansTab(int tabIndexTuile[], int taille, int index){
+    for (int i = 0; i < taille; ++i)
+    {
+        if(tabIndexTuile[i] == index)return 1;
+    }
+    return 0;
+}
+
 void GestionPapa() {
-    static Uint32 dernierTemps = 0; 
+    static Uint32 debutSequence = 0; 
+    static int sequenceActive = 0;   
+    static int waitRelease = 0;
+    static int premiereCaseMonstreX = -1;
+    static int premiereCaseMonstreY = -1;
+
+    // Si dans updateGame ça nous dit qu'on doit forcer le monstre à dormir
+    if (forceSleep == 1) {
+        if (premiereCaseMonstreX != -1 && premiereCaseMonstreY != -1) {
+            // On remet visuellement le monstre au lit
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX] = 219;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+1] = 220;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+2] = 221;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+3] = 222;
+        }
+        sequenceActive = 0;    
+        papaReveil = 0;        
+        affichePapaReveil = 0; 
+        waitRelease = 1;       
+        forceSleep = 0;        
+        return;                
+    }
+
+    int tabIndexObjetBruit[] = {59, 60, 217, 216, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236};
+
+    if(premiereCaseMonstreX == -1 || premiereCaseMonstreY == -1){
+        TrouveCoordonnees(&premiereCaseMonstreX, &premiereCaseMonstreY, 219, 10);
+        if (premiereCaseMonstreX == -1 || premiereCaseMonstreY == -1 )return; // Problème pour assigner la ou les valeurs des coordonnées
+    }
+
     Uint32 tempsActuel = SDL_GetTicks();
 
-    if (papaReveil == 0) {
-        if (tempsActuel - dernierTemps > 5000) {
-            papaReveil = 1;          
-            dernierTemps = tempsActuel; 
+    int caseX = (player.x + player.w / 2) / TILE_SIZE;
+    int caseY = (player.y + player.h) / TILE_SIZE;
+    int indexTuile = maps[currentLevel][caseY][caseX];
+    int tailleTabObjetBruit = sizeof(tabIndexObjetBruit) / sizeof(tabIndexObjetBruit[0]);
+
+    int surObjetBruit = ( IsDansTab(tabIndexObjetBruit, tailleTabObjetBruit, indexTuile));
+
+    if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT) return; // Sécurité pour pas que ça sorte de la map
+
+    // Si on n'est plus sur le doudou on enlève le verrou, on peut donc re réveiller le papa
+    if (!surObjetBruit) {
+        waitRelease = 0;
+    }
+
+    // On est sur le doudou rien en cours et pas verrouillé
+    if (surObjetBruit && sequenceActive == 0 && waitRelease == 0) {
+        sequenceActive = 1;        
+        debutSequence = tempsActuel; 
+        affichePapaReveil = 1;     
+        papaReveil = 0;            
+    }
+
+    // gestion du temps
+    if (sequenceActive == 1) {
+        Uint32 tempsEcoule = tempsActuel - debutSequence;
+
+        // On laisse 400 ms de temps de réaction au joueur mais on affiche que le papa est réveillé
+        if (tempsEcoule < 400) {
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX] = 187;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+1] = 188;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+2] = 189;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+3] = 190;
+
+            papaReveil = 0;        
+            affichePapaReveil = 1; 
         }
-    } 
-    else {
-        if (tempsActuel - dernierTemps > 2000) {
-            papaReveil = 0;          
-            dernierTemps = tempsActuel; 
+        // Si le joueur bouge il se refait tp en début de map
+        else if (tempsEcoule < 5000) {
+            papaReveil = 1;        
+            affichePapaReveil = 1;
+        }
+        // Le joueur peut re bouger
+        else {
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX] = 219;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+1] = 220;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+2] = 221;
+            maps[10][premiereCaseMonstreY][premiereCaseMonstreX+3] = 222;
+            sequenceActive = 0;    
+            papaReveil = 0;
+            affichePapaReveil = 0;
+            waitRelease = 1; // waitRelease sert à laisser la possibilité de bouger au bout de 5s même si il est encore sur le doudou
+                             // sinon il est bloqué
         }
     }
 }
@@ -1462,10 +1814,16 @@ float getLuminosite(int gridX, int gridY, int rayonPx) {
     // --- 2. Lumière des LAMPES (Calcul en cases) ---
     for (int ly = 0; ly < MAP_HEIGHT; ly++) {
         for (int lx = 0; lx < MAP_WIDTH; lx++) {
-             if (maps[currentLevel][ly][lx] == 21 || (maps[currentLevel][ly][lx] >= 75 && maps[currentLevel][ly][lx] <= 76) || maps[currentLevel][ly][lx] == 85 || maps[currentLevel][ly][lx] == 86 || maps[currentLevel][ly][lx] == 148) { // Si c'est une lampe
+            int indexTuile = maps[currentLevel][ly][lx];
+            int tabTuilesEclairees[] = {21, 75, 76, 85, 86, 148, 186, 317, 319, 321, 323};
+            int tailleTabTuilesEclairees = sizeof(tabTuilesEclairees) / sizeof(tabTuilesEclairees[0]);
+
+             if (IsDansTab(tabTuilesEclairees, tailleTabTuilesEclairees, indexTuile) || (currentLevel == 11 && indexTuile == 82) ) { // Si c'est une lampe
                  float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
                  float rayonLampe = 2.5f; // Rayon d'une lampe (2.5 cases)
-                 
+                 if (indexTuile == 186) {
+                    rayonLampe = 3.5f; 
+                }
                  if (distGrid < rayonLampe) {
                      float i = 1.0f - (distGrid / rayonLampe);
                      if (i > maxIntensite) maxIntensite = i;
@@ -1590,45 +1948,33 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     }
 
     // --- EFFET SOMMEIL / REVEIL PARENTS ---
-    // Uniquement dans la chambre des parents (Index 10)
     if (currentLevel == 10) { 
         
-        // Coordonnées approximatives du lit des parents (à ajuster selon ta map)
-        // Disons que le lit est vers le milieu de la pièce
-        int litX = 15 * TILE_SIZE; 
-        int litY = 3 * TILE_SIZE;  
+        static int litX = -1;
+        static int litY = -1;
+        TrouveCoordonnees(&litX, &litY, 219, 10);
+        int pixelLitX = litX * TILE_SIZE;
+        int pixelLitY = litY * TILE_SIZE;
 
-        // Calcul de distance pour savoir si on réveille les parents
-        float dx = player.x - litX;
-        float dy = player.y - litY;
-        float distParents = sqrt(dx*dx + dy*dy);
-
-        // Si le joueur est proche (< 50 pixels) -> REVEIL (!)
-        if (distParents < 50 && estEclaire(15, 3, rayon) && papaReveil) {
+        if (affichePapaReveil) {
             SDL_Color cRouge = {255, 0, 0, 255};
-            // On utilise la grande police pour un gros "!"
             SDL_Surface *sBang = TTF_RenderText_Solid(font, "!", cRouge); 
             if (sBang) {
                 SDL_Texture *tBang = SDL_CreateTextureFromSurface(renderer, sBang);
-                // Le "!" s'affiche juste au-dessus du lit
-                SDL_Rect rBang = { litX, litY - 20, sBang->w, sBang->h }; 
+                SDL_Rect rBang = { pixelLitX, pixelLitY - 20, sBang->w, sBang->h }; 
                 SDL_RenderCopy(renderer, tBang, NULL, &rBang);
                 SDL_FreeSurface(sBang);
                 SDL_DestroyTexture(tBang);
             }
         } 
-        // Sinon -> DORT (Zzz...)
-        else if(estEclaire(15, 3, rayon) && !papaReveil) {
-            // Animation : Le texte monte de 0 à 10 pixels en boucle
-            // (SDL_GetTicks() / 200) ralentit le temps, % 10 crée la boucle
+        else{
             int offsetAnim = (SDL_GetTicks() / 200) % 10; 
 
-            SDL_Color cBlanc = {200, 200, 255, 255}; // Bleu très clair
+            SDL_Color cBlanc = {200, 200, 255, 255}; 
             SDL_Surface *sZzz = TTF_RenderText_Solid(fontMini, "Zzz...", cBlanc);
             if (sZzz) {
                 SDL_Texture *tZzz = SDL_CreateTextureFromSurface(renderer, sZzz);
-                // On dessine le texte qui flotte (Y - offsetAnim)
-                SDL_Rect rZzz = { litX, litY - 10 - offsetAnim, sZzz->w, sZzz->h }; 
+                SDL_Rect rZzz = { pixelLitX, pixelLitY - 10 - offsetAnim, sZzz->w, sZzz->h }; 
                 SDL_RenderCopy(renderer, tZzz, NULL, &rZzz);
                 SDL_FreeSurface(sZzz);
                 SDL_DestroyTexture(tZzz);
@@ -1787,7 +2133,50 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         
         if (sText) DrawInteractions(renderer, sText);
     }
-}
+    if(showInteractTelecommande){
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if(dialoguePasTelecommande){
+        char *texteAffiche = "Je dois recuperer la telecommande";
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if(interactTelecommandeTurnOn){
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Allumer la TV", cBlanc);
+        
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (screamer ==  1 && textureScreamer != NULL) {
+        SDL_Delay(400);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 180);
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        SDL_RenderFillRect(renderer, NULL);
+
+        int texW, texH;
+        SDL_QueryTexture(textureScreamer, NULL, NULL, &texW, &texH);
+
+        int displayW = LOGICAL_WIDTH;
+        float ratio = (float)texW / (float)texH;
+        int displayH = (int)(displayW / ratio);
+
+        if (displayH > LOGICAL_HEIGHT) {
+            displayH = LOGICAL_HEIGHT;
+            displayW = (int)(displayH * ratio);
+        }
+
+        SDL_Rect posScreamer = {
+            (LOGICAL_WIDTH - displayW) / 2,  // Centré X
+            (LOGICAL_HEIGHT - displayH) / 2, // Centré Y
+            displayW,
+            displayH
+        };
+
+        SDL_RenderCopy(renderer, textureScreamer, NULL, &posScreamer);
+        }
+    }
 
 void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText){
     SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);

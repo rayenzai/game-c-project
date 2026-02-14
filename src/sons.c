@@ -44,6 +44,14 @@ Mix_Chunk *chargement_son_transition(){
 	return sonTransition;
 }
 
+Mix_Chunk *chargement_son_screamer(){
+	Mix_Chunk *sonScreamer = Mix_LoadWAV("assets/sound/screamer-jumpscare.wav");
+
+	if (!sonScreamer) printf("Erreur chargement WAV: %s\n", Mix_GetError());
+
+	return sonScreamer;
+}
+
 Mix_Chunk *chargement_son_item_pick_up(){
 	Mix_Chunk *sonPickUp = Mix_LoadWAV("assets/sound/item-pick-up.wav");
 	if (!sonPickUp) printf("Erreur chargement WAV: %s\n", Mix_GetError());

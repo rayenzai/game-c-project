@@ -9,6 +9,10 @@
 static SDL_Color NOIR = {255, 255, 255, 255}; // Visuellement Blanc (Fond)
 static SDL_Color BLANC = {0, 0, 0, 255};      // Visuellement Noir (Encre)
 
+
+static SDL_Texture *bgMenuTexture = NULL;
+
+
 static int selection = 0;
 static const char *options[] = {"JOUER", "OPTIONS", "QUITTER"};
 static int nbOptions = 3;
@@ -30,6 +34,8 @@ static void dessinerTexteMenu(SDL_Renderer *renderer, TTF_Font *font, const char
     SDL_RenderCopy(renderer, texture, NULL, &rect);
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
+
+    
 }
 
 // Fonction pour la croix de selection
@@ -41,8 +47,16 @@ static void dessinerCroix(SDL_Renderer *renderer, int y) {
     SDL_Rect p3 = {x+4, y+2, 2, 2}; SDL_RenderFillRect(renderer, &p3);
 }
 
-void InitMenu(void) {
+void InitMenu(SDL_Renderer *renderer) {
     selection = 0;
+    
+    SDL_Surface *surf = SDL_LoadBMP("assets/menu.bmp");
+    if (surf) {
+        bgMenuTexture = SDL_CreateTextureFromSurface(renderer, surf);
+        SDL_FreeSurface(surf);
+    } else {
+        printf("Erreur chargement fond menu : %s\n", SDL_GetError());
+    }
 }
 
 int UpdateMenu(SDL_Event *event) {
@@ -70,8 +84,10 @@ void DrawMenu(SDL_Renderer *renderer, TTF_Font *fontTitre, TTF_Font *fontOptions
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    // 2. Titre
-    dessinerTexteMenu(renderer, fontTitre, "nom du jeu", 30, 0);
+    if (bgMenuTexture) {
+        SDL_RenderCopy(renderer, bgMenuTexture, NULL, NULL);
+    }
+
 
     // 3. Options
     int startY = 100;
