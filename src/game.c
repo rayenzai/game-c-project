@@ -1639,10 +1639,26 @@ void UpdateGame(void)
             {
                 if (plat_pret_a_servir > 0)
                 {
+                    // --- TELEPORTATION FORCEE A LA POSITION EXACTE SUR LA CARTE ---
+                    // On utilise les vraies coordonnées (Ligne / Colonne) pour être 100% sûr que ça réapparaisse !
+                    if (has_eye)         { maps[3][9][2] = 265;   has_eye = 0; }
+                    if (has_pain)        { maps[3][7][7] = 175;   has_pain = 0; }
+                    if (has_spider)      { maps[3][2][2] = 242;   has_spider = 0; }
+                    if (has_truc_vert)   { maps[3][9][8] = 177;   has_truc_vert = 0; }
+                    if (has_heart)       { maps[3][2][16] = 244;  has_heart = 0; } // Coeur noir
+                    if (has_os)          { maps[3][7][5] = 176;   has_os = 0; }
+                    if (has_coeur_rouge) { maps[3][13][8] = 243;  has_coeur_rouge = 0; }
+
+                    // Si le joueur tenait déjà un autre plat fini, on le supprime de ses mains
+                    if (has_soupe) has_soupe = 0;
+                    if (has_pain_chagrin) has_pain_chagrin = 0;
+
+                    // --- LE JOUEUR RECUPERE LE NOUVEAU PLAT ---
                     if (plat_pret_a_servir == 1) has_soupe = 1;
                     if (plat_pret_a_servir == 2) has_pain_chagrin = 1;
                     
                     plat_pret_a_servir = 0;
+                    max_objets = 1; // Le joueur garde les mains pleines avec le plat
                     toucheE_Relache = 0;
                 }
                 else
@@ -1773,9 +1789,9 @@ void UpdateGame(void)
 
                 if (chaudron_est_vide == 0)
                 {
-                    int recette1_ok = (chaudron_has_truc_vert == 1 && chaudron_has_eye == 1 && chaudron_has_spider == 1 && chaudron_has_heart == 0 && chaudron_has_pain == 0);
+                    int recette1_ok = (chaudron_has_truc_vert == 1 && chaudron_has_eye == 1 && chaudron_has_spider == 1 && chaudron_has_heart == 0 && chaudron_has_pain == 0 && chaudron_has_os == 0 && chaudron_has_coeur_rouge == 0);
 
-                    int recette2_ok = (chaudron_has_pain == 1 && chaudron_has_heart == 1 && chaudron_has_truc_vert == 0 && chaudron_has_eye == 0 && chaudron_has_spider == 0);
+                    int recette2_ok = (chaudron_has_pain == 1 && chaudron_has_heart == 1 && chaudron_has_truc_vert == 0 && chaudron_has_eye == 0 && chaudron_has_spider == 0 && chaudron_has_os == 0 && chaudron_has_coeur_rouge == 0);
 
                     if (recette1_ok || recette2_ok)
                     {
