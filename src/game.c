@@ -576,7 +576,6 @@ int InitGameStepByStep(SDL_Renderer *renderer, int *pourcentage) {
         *pourcentage = 35;
     }
     else if (etapeChargement == 3) {
-        // Etape 6 : Chargement du Screamer
         SDL_Surface *surfScreamer = SDL_LoadBMP("assets/screamer.bmp");
         if (surfScreamer) {
             Uint32 colorkey = SDL_MapRGB(surfScreamer->format, 255, 0, 255);
@@ -590,7 +589,7 @@ int InitGameStepByStep(SDL_Renderer *renderer, int *pourcentage) {
         SDL_Surface *surface = SDL_LoadBMP("assets/livre.bmp");
         if (surface) {
             SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 255, 0, 255));
-            tilesetTexture = SDL_CreateTextureFromSurface(renderer, surface);
+            textureLivre = SDL_CreateTextureFromSurface(renderer, surface);
             SDL_FreeSurface(surface);
         }
         *pourcentage = 80;
