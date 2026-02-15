@@ -1292,7 +1292,7 @@ void UpdateGame(void)
     interact_truc_vert = 0;
     float distance_truc_vert = 9999.0f;
     TrouveCoordonnees(&truc_vertX, &truc_vertY, 177, 3);
-    if (IsLocationObjet(20, 3, 177, &distance_truc_vert, -1, -1) && has_interact_livre == 1)
+    if (IsLocationObjet(20, 3, 177, &distance_truc_vert, -1, -1) && has_interact_livre == 1 && chaudron_anim == 0)
     {
         interact_truc_vert = 1;
     }
@@ -1300,7 +1300,7 @@ void UpdateGame(void)
     interact_pain = 0;
     float distance_pain = 9999.0f;
     TrouveCoordonnees(&painX, &painY, 175, 3);
-    if (IsLocationObjet(20, 3, 175, &distance_pain, -1, -1) && has_interact_livre == 1)
+    if (IsLocationObjet(20, 3, 175, &distance_pain, -1, -1) && has_interact_livre == 1 && chaudron_anim == 0)
     {
         interact_pain = 1;
     }
@@ -1308,21 +1308,21 @@ void UpdateGame(void)
     interact_spider = 0;
     float distance_spider = 9999.0f;
     TrouveCoordonnees(&spiderX, &spiderY, 242, 3);
-    if (IsLocationObjet(20, 3, 242, &distance_spider, -1, -1) && has_interact_livre == 1)
+    if (IsLocationObjet(20, 3, 242, &distance_spider, -1, -1) && has_interact_livre == 1 && chaudron_anim == 0)
     {
         interact_spider = 1;
     }
     interact_eye = 0;
     float distance_eye = 9999.0f;
     TrouveCoordonnees(&eyeX, &eyeY, 265, 3);
-    if (IsLocationObjet(20, 3, 265, &distance_eye, -1, -1) && has_interact_livre == 1)
+    if (IsLocationObjet(20, 3, 265, &distance_eye, -1, -1) && has_interact_livre == 1 && chaudron_anim == 0)
     {
         interact_eye = 1;
     }
     interact_heart = 0;
     float distance_heart = 9999.0f;
     TrouveCoordonnees(&heartX, &heartY, 244, 3);
-    if (IsLocationObjet(20, 3, 244, &distance_heart, -1, -1) && has_interact_livre == 1)
+    if (IsLocationObjet(20, 3, 244, &distance_heart, -1, -1) && has_interact_livre == 1 && chaudron_anim == 0)
     {
         interact_heart = 1;
     }
@@ -1374,7 +1374,7 @@ void UpdateGame(void)
     interact_os = 0;
     float dist_os = 9999.0f;
     TrouveCoordonnees(&osX, &osY, 176, 3);
-    if (IsLocationObjet(20, 3, 176, &dist_os, -1, -1) && has_interact_livre == 1)
+    if (IsLocationObjet(20, 3, 176, &dist_os, -1, -1) && has_interact_livre == 1 && chaudron_anim == 0)
     {
         interact_os = 1;
     }
@@ -1382,7 +1382,7 @@ void UpdateGame(void)
     interact_coeur_rouge = 0;
     float dist_cr = 999;
     TrouveCoordonnees(&coeur_rougeX, &coeur_rougeY, 243, 3);
-    if (IsLocationObjet(20, 3, 243, &dist_cr, -1, -1) && max_objets == 0 && has_interact_livre == 1)
+    if (IsLocationObjet(20, 3, 243, &dist_cr, -1, -1) && has_interact_livre == 1 && chaudron_anim == 0)
     {
         interact_coeur_rouge = 1;
     }
@@ -1510,7 +1510,7 @@ void UpdateGame(void)
                 has_water = 0;
             }
 
-            if (currentLevel == 3 && distance_truc_vert <= 20 && max_objets == 0 && has_interact_livre == 1)
+            if (currentLevel == 3 && distance_truc_vert <= 20 && max_objets == 0 && has_interact_livre == 1 && chaudron_anim == 0)
             {
                 has_truc_vert = 1;
                 maps[3][truc_vertY][truc_vertX] = 293;
@@ -1521,7 +1521,7 @@ void UpdateGame(void)
             {
                 dialogue_max_objet = 1;
             }
-            if (currentLevel == 3 && distance_pain <= 20 && max_objets == 0 && has_interact_livre == 1)
+            if (currentLevel == 3 && distance_pain <= 20 && max_objets == 0 && has_interact_livre == 1 && chaudron_anim == 0)
             {
                 has_pain = 1;
                 maps[3][painY][painX] = 166;
@@ -1532,7 +1532,7 @@ void UpdateGame(void)
             {
                 dialogue_max_objet = 1;
             }
-            if (currentLevel == 3 && distance_spider <= 20 && max_objets == 0 && has_interact_livre == 1)
+            if (currentLevel == 3 && distance_spider <= 20 && max_objets == 0 && has_interact_livre == 1 && chaudron_anim == 0)
             {
                 has_spider = 1;
                 maps[3][spiderY][spiderX] = 2;
@@ -1543,7 +1543,7 @@ void UpdateGame(void)
             {
                 dialogue_max_objet = 1;
             }
-            if (currentLevel == 3 && distance_eye <= 20 && max_objets == 0 && has_interact_livre == 1)
+            if (currentLevel == 3 && distance_eye <= 20 && max_objets == 0 && has_interact_livre == 1 && chaudron_anim == 0)
             {
                 has_eye = 1;
                 maps[3][eyeY][eyeX] = 181;
@@ -1554,7 +1554,7 @@ void UpdateGame(void)
             {
                 dialogue_max_objet = 1;
             }
-            if (currentLevel == 3 && distance_heart <= 20 && max_objets == 0 && has_interact_livre == 1)
+            if (currentLevel == 3 && distance_heart <= 20 && max_objets == 0 && has_interact_livre == 1 && chaudron_anim == 0)
             {
                 has_heart = 1;
                 maps[3][heartY][heartX] = 0;
@@ -1565,7 +1565,7 @@ void UpdateGame(void)
             {
                 dialogue_max_objet = 1;
             }
-            if (currentLevel == 3 && dist_cr <= 20 && max_objets == 0 && has_interact_livre == 1)
+            if (currentLevel == 3 && dist_cr <= 20 && max_objets == 0 && has_interact_livre == 1 && chaudron_anim == 0)
             {
                 has_coeur_rouge = 1;
                 maps[3][coeur_rougeY][coeur_rougeX] = 0;
@@ -1576,7 +1576,7 @@ void UpdateGame(void)
             {
                 dialogue_max_objet = 1;
             }
-            if (currentLevel == 3 && dist_os <= 20 && max_objets == 0 && has_interact_livre == 1)
+            if (currentLevel == 3 && dist_os <= 20 && max_objets == 0 && has_interact_livre == 1 && chaudron_anim == 0)
             {
                 has_os = 1;
                 maps[3][osY][osX] = 160;
@@ -1592,7 +1592,7 @@ void UpdateGame(void)
                 dialogue_statue_bas = 1;
                 toucheE_Relache = 0;
             }
-            if (currentLevel == 9 && distance_dessin <= 16 && has_drawing == 0 && has_water == 0 && interact_statue_bas == 1)
+            if (currentLevel == 9 && distance_dessin <= 16 && has_drawing == 0 && has_water == 0 && interact_statue_bas == 1 && chaudron_anim == 0)
             {
                 maps[9][dessinY][dessinX] = 1;
                 has_drawing = 1;
