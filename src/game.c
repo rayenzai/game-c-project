@@ -914,7 +914,11 @@ void UpdateGame(void)
                     chaudron_has_coeur_rouge = 0;
                 }
 
-                max_objets = 0;
+                if (has_eye == 0 && has_pain == 0 && has_spider == 0 && has_truc_vert == 0 && 
+                    has_heart == 0 && has_os == 0 && has_coeur_rouge == 0) 
+                {
+                    max_objets = 0;
+                }
             }
 
             type_resultat_cuisson = 0;
