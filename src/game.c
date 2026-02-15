@@ -480,27 +480,15 @@ int InitGameStepByStep(SDL_Renderer *renderer, int *pourcentage) {
         *pourcentage = 20;
     }
     else if (etapeChargement == 2) {
-        sonPickUp = chargement_son_item_pick_up();
-        sonOpenDoor = chargement_son_door_open();
-        sonCloseDoor = chargement_son_door_close();
-        sonScreamer = chargement_son_screamer();
-        *pourcentage = 45;
-    }
-    else if (etapeChargement == 3) {
-        MusicInterior = chargement_son_ambiance();
-        MusicExterior = chargement_son_exterieur();
-        *pourcentage = 70;
-    }
-    else if (etapeChargement == 4) {
         SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");
         if (surface) {
             SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 255, 0, 255));
             tilesetTexture = SDL_CreateTextureFromSurface(renderer, surface);
             SDL_FreeSurface(surface);
         }
-        *pourcentage = 85;
+        *pourcentage = 35;
     }
-    else if (etapeChargement == 5) {
+    else if (etapeChargement == 3) {
         // Etape 6 : Chargement du Screamer
         SDL_Surface *surfScreamer = SDL_LoadBMP("assets/screamer.bmp");
         if (surfScreamer) {
@@ -509,9 +497,30 @@ int InitGameStepByStep(SDL_Renderer *renderer, int *pourcentage) {
             textureScreamer = SDL_CreateTextureFromSurface(renderer, surfScreamer);
             SDL_FreeSurface(surfScreamer);
         }
-        *pourcentage = 100;
+        *pourcentage = 60;
+    }
+    else if (etapeChargement == 4) {
+        SDL_Surface *surface = SDL_LoadBMP("assets/livre.bmp");
+        if (surface) {
+            SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 255, 0, 255));
+            tilesetTexture = SDL_CreateTextureFromSurface(renderer, surface);
+            SDL_FreeSurface(surface);
+        }
+        *pourcentage = 80;
+    }
+    else if (etapeChargement == 5) {
+        sonPickUp = chargement_son_item_pick_up();
+        sonOpenDoor = chargement_son_door_open();
+        sonCloseDoor = chargement_son_door_close();
+        sonScreamer = chargement_son_screamer();
+        *pourcentage = 90;
     }
     else if (etapeChargement == 6) {
+        MusicInterior = chargement_son_ambiance();
+        MusicExterior = chargement_son_exterieur();
+        *pourcentage = 100;
+    }
+    else if (etapeChargement == 7) {
         etapeChargement = 0; 
         return 1; 
     }
