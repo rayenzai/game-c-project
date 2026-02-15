@@ -15,6 +15,7 @@
 typedef enum {
     ETAT_MENU,
     ETAT_INTRO,
+    ETAT_CHARGEMENT,
     ETAT_JEU
 } GameState;
 
@@ -61,6 +62,8 @@ int main(int argc, char* argv[]) {
     GameState etat = ETAT_MENU;
     InitIntro();
     InitMenu(renderer);
+    int vraiPourcentage = 0;
+
 
     int running = 1;
     SDL_Event event;
@@ -94,15 +97,14 @@ int main(int argc, char* argv[]) {
             if (etat == ETAT_MENU) {
                 int action = UpdateMenu(&event);
                 if (action == 1) { 
-                    etat = ETAT_JEU; 
-                    InitGame(renderer);
+                    etat = ETAT_CHARGEMENT; 
+                    vraiPourcentage = 0;
                 }
                 if (action == 2) running = 0;
             }
             else if (etat == ETAT_INTRO) {
                 if (HandleIntroInput(&event) == 1) {
-                    etat = ETAT_JEU;
-                    InitGame(renderer);
+                    etat = ETAT_CHARGEMENT;
                 }
             }
             else if (etat == ETAT_JEU) {
@@ -118,6 +120,13 @@ int main(int argc, char* argv[]) {
         if (etat == ETAT_INTRO) {
             UpdateIntroTimer();
         }
+        else if (etat == ETAT_CHARGEMENT) {
+            int fini = InitGameStepByStep(renderer, &vraiPourcentage);
+            
+            if (fini == 1) {
+                etat = ETAT_JEU;
+            }
+        }
 
         else if (etat == ETAT_JEU)
         {
@@ -131,6 +140,35 @@ int main(int argc, char* argv[]) {
         }
         else if (etat == ETAT_INTRO) {
             DrawIntro(renderer, fontPetit);
+        }
+       else if (etat == ETAT_CHARGEMENT) {
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+
+            int largeurMax = LOGICAL_WIDTH - 40; 
+            int hauteurBarre = 4;                
+            int posX = 20;                       
+            int posY = LOGICAL_HEIGHT - 20;      
+
+            SDL_Color cGris = {150, 150, 150, 255}; 
+            SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "Chargement...", cGris);
+            if (sText) {
+                SDL_Texture *tText = SDL_CreateTextureFromSurface(renderer, sText);
+                SDL_Rect rText = { posX + largeurMax - sText->w, posY - sText->h - 4, sText->w, sText->h };
+                SDL_RenderCopy(renderer, tText, NULL, &rText);
+                SDL_FreeSurface(sText);
+                SDL_DestroyTexture(tText);
+            }
+
+            SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255); 
+            SDL_Rect rFondBarre = { posX, posY, largeurMax, hauteurBarre };
+            SDL_RenderFillRect(renderer, &rFondBarre);
+
+            int remplissage = (vraiPourcentage * largeurMax) / 100; 
+            
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); 
+            SDL_Rect rRemplissage = { posX, posY, remplissage, hauteurBarre };
+            SDL_RenderFillRect(renderer, &rRemplissage);
         }
         else if (etat == ETAT_JEU) {
             DrawGame(renderer,fontPetit, fontMini);
