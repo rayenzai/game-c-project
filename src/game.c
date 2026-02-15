@@ -2331,7 +2331,7 @@ float getLuminosite(int gridX, int gridY, int rayonPx)
     for (int ly = 0; ly < MAP_HEIGHT; ly++) {
         for (int lx = 0; lx < MAP_WIDTH; lx++) {
             int indexTuile = maps[currentLevel][ly][lx];
-             if (indexTuile == 21 || (indexTuile >= 75 && indexTuile <= 76) || indexTuile == 85 || indexTuile == 86 || indexTuile == 148 || indexTuile == 186) { // Si c'est une lampe
+             if (indexTuile == 21 || (indexTuile >= 75 && indexTuile <= 76) || indexTuile == 85 || indexTuile == 86 || indexTuile == 148 || indexTuile == 186 || ((maps[currentLevel][ly][lx] == 111 || maps[currentLevel][ly][lx] == 112 || maps[currentLevel][ly][lx] == 113 || maps[currentLevel][ly][lx] == 114) && statue_has_drawing ==1 && statue_has_water == 1)) { // Si c'est une lampe
                  float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
                  float rayonLampe = 2.5f; // Rayon d'une lampe (2.5 cases)
                  if (indexTuile == 186) {
