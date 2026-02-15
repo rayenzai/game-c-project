@@ -1628,11 +1628,13 @@ void UpdateGame(void)
             if (currentLevel == 3 && (distance_boucheBD <= 20 || distance_boucheBG <= 20 || distance_boucheHD <= 20 || distance_boucheHG <= 20) && has_pain_chagrin == 1)
             {
                 bouche_has_pain = 1;
+                max_objets = 0;
                 has_pain_chagrin = 0;
             }
             if (currentLevel == 3 && (distance_boucheBD <= 20 || distance_boucheBG <= 20 || distance_boucheHD <= 20 || distance_boucheHG <= 20) && has_soupe == 1)
             {
                 bouche_has_soupe = 1;
+                max_objets = 0;
                 has_soupe = 0;
             }
             if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20))
