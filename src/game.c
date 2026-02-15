@@ -460,64 +460,64 @@ int showInteractTelecommande = 0;
 int hasTelecommande = 0;
 
 // --- INITIALISATION ---
-void InitGame(SDL_Renderer *renderer) {
-    player.x = 80; 
-    player.y = 50; 
-    player.w = 12; 
-    player.h = 12;
-    dialogueStep = 1;
-    toucheRelache = 0;
-    hasDoudou = 0;
-    screamer = 0;
+int etapeChargement = 0;
 
-
-    // Test pour le fantome
-    fantome.x = 8 * TILE_SIZE; 
-    fantome.y = 11 * TILE_SIZE;
-    fantome.w = 15;
-    fantome.h = 15;
-    fantome.direction = 0; 
-    fantome.timer = 0;     
-
-    // Chargement des sons
-    // sonTransition = chargement_son_transition();
-    sonPickUp = chargement_son_item_pick_up();
-    sonOpenDoor = chargement_son_door_open();
-    sonCloseDoor = chargement_son_door_close();
-    MusicInterior = chargement_son_ambiance();
-    MusicExterior = chargement_son_exterieur();
-    sonScreamer = chargement_son_screamer();
-    
-    // On lance les sons en arrière plan
-    // Mix_PlayChannel(2, sonScreamer, -1); // -1 = boucle infinie
-    // Mix_Volume(2,0);
-
-    // currentLevel = 5;
-    // player.x = 20; 
-    // player.y = 12*TILE_SIZE ;
-    // hasDoudou = 1;
-
-    // Chargement du Tileset
-    SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");
-    if (surface) {
-        SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 255, 0, 255));
-        tilesetTexture = SDL_CreateTextureFromSurface(renderer, surface);
-        SDL_FreeSurface(surface);
-    } else {
-        printf("ERREUR: Impossible de charger assets/tileset.bmp ! %s\n", SDL_GetError());
+int InitGameStepByStep(SDL_Renderer *renderer, int *pourcentage) {
+    if (etapeChargement == 0) {
+        player.x = 80;
+        player.y = 50; 
+        player.w = 12; 
+        player.h = 12;
+        dialogueStep = 1; 
+        toucheRelache = 0; 
+        hasDoudou = 0; 
+        screamer = 0;
+        *pourcentage = 10;
     }
-    SDL_Surface *surfScreamer = SDL_LoadBMP("assets/screamer.bmp");
-
-if (surfScreamer) {
-    Uint32 colorkey = SDL_MapRGB(surfScreamer->format, 255, 0, 255);
-    SDL_SetColorKey(surfScreamer, SDL_TRUE, colorkey);
-
-    textureScreamer = SDL_CreateTextureFromSurface(renderer, surfScreamer);
-    SDL_FreeSurface(surfScreamer);
-} else {
-    printf("Erreur : %s\n", SDL_GetError());
-}
-
+    else if (etapeChargement == 1) {
+        fantome.x = 8 * TILE_SIZE; fantome.y = 11 * TILE_SIZE;
+        fantome.w = 15; fantome.h = 15; fantome.direction = 0; fantome.timer = 0;
+        *pourcentage = 20;
+    }
+    else if (etapeChargement == 2) {
+        sonPickUp = chargement_son_item_pick_up();
+        sonOpenDoor = chargement_son_door_open();
+        sonCloseDoor = chargement_son_door_close();
+        sonScreamer = chargement_son_screamer();
+        *pourcentage = 45;
+    }
+    else if (etapeChargement == 3) {
+        MusicInterior = chargement_son_ambiance();
+        MusicExterior = chargement_son_exterieur();
+        *pourcentage = 70;
+    }
+    else if (etapeChargement == 4) {
+        SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");
+        if (surface) {
+            SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 255, 0, 255));
+            tilesetTexture = SDL_CreateTextureFromSurface(renderer, surface);
+            SDL_FreeSurface(surface);
+        }
+        *pourcentage = 85;
+    }
+    else if (etapeChargement == 5) {
+        // Etape 6 : Chargement du Screamer
+        SDL_Surface *surfScreamer = SDL_LoadBMP("assets/screamer.bmp");
+        if (surfScreamer) {
+            Uint32 colorkey = SDL_MapRGB(surfScreamer->format, 255, 0, 255);
+            SDL_SetColorKey(surfScreamer, SDL_TRUE, colorkey);
+            textureScreamer = SDL_CreateTextureFromSurface(renderer, surfScreamer);
+            SDL_FreeSurface(surfScreamer);
+        }
+        *pourcentage = 100;
+    }
+    else if (etapeChargement == 6) {
+        etapeChargement = 0; 
+        return 1; 
+    }
+    
+    etapeChargement++;
+    return 0;
 }
 
 // Fonction utilitaire collision

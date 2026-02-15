@@ -40,7 +40,7 @@ extern float FANTOME_SPEED;
 
 extern int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH];
 
-void InitGame(SDL_Renderer *renderer);
+int InitGameStepByStep(SDL_Renderer *renderer, int *pourcentage);
 void UpdateGame(void);
 void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini);
 void ActionFantome();
