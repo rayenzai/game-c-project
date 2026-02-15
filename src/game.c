@@ -297,7 +297,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
     {
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 251, 252, 253, 2, 2, 2, 2}, // Trou en haut
         {2, 2, 270, 268, 269, 2, 273, 2, 0, 0, 0, 0, 2, 248, 250, 249, 2, 184, 2, 2},
-        {2, 2, 242, 266, 267, 271, 272, 0, 0, 0, 0, 0, 0, 245, 246, 247, 0, 0, 2, 2},
+        {2, 2, 242, 266, 267, 271, 272, 0, 0, 0, 0, 0, 0, 245, 246, 247, 244, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 158, 159, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 156, 157, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -494,6 +494,10 @@ int has_os = 0;
 int chaudron_has_os = 0;
 int has_coeur_rouge = 0;
 int chaudron_has_coeur_rouge = 0;
+int bouche_has_soupe = 0;
+int bouche_has_pain = 0;
+int interact_bouche = 0;
+int dialogue_entree_SAM = 0;
 
 int carafeX = -1;
 int carafeY = -1;
@@ -858,13 +862,15 @@ void UpdateGame(void)
                 maps[3][chaudronDY][chaudronDX] = 297;
             }
 
-            if (type_resultat_cuisson == 1)
+            if (type_resultat_cuisson == 1 || type_resultat_cuisson == 3)
             {
                 plat++;
-                if (plat == 1)
+                if (type_resultat_cuisson == 1) {
                     plat_pret_a_servir = 1;
-                if (plat == 2)
-                    plat_pret_a_servir = 2;
+                }
+                else if (type_resultat_cuisson == 3) {
+                    plat_pret_a_servir = 2; 
+                }
                 dialogue_chaudron_true = 1;
             }
 
@@ -1027,6 +1033,23 @@ void UpdateGame(void)
             if (toucheRelache)
             {
                 dialogue_entree_labyrinthe = 0; // On ferme le dialogue
+                toucheRelache = 0;
+            }
+        }
+        else
+        {
+            toucheRelache = 1;
+        }
+        return;
+    }
+    dialogue_entree_SAM = 0;
+    if (dialogue_entree_SAM > 0)
+    {
+        if (state[SDL_SCANCODE_RETURN])
+        {
+            if (toucheRelache)
+            {
+                dialogue_entree_SAM = 0; // On ferme le dialogue
                 toucheRelache = 0;
             }
         }
@@ -1326,6 +1349,27 @@ void UpdateGame(void)
     {
         interact_chaudron_cuisiner = 1;
     }
+    interact_bouche = 0;
+    float distance_boucheHG = 9999.0f;
+    float distance_boucheHD = 9999.0f;
+    float distance_boucheBG = 9999.0f;
+    float distance_boucheBD = 9999.0f;
+    if (IsLocationObjet(20, 3, 158, &distance_boucheHG, -1, -1))
+    {
+        interact_bouche = 1;
+    }
+    if (IsLocationObjet(20, 3, 159, &distance_boucheHD, -1, -1))
+    {
+        interact_bouche = 1;
+    }
+    if (IsLocationObjet(20, 3, 156, &distance_boucheBG, -1, -1))
+    {
+        interact_bouche = 1;
+    }
+    if (IsLocationObjet(20, 3, 157, &distance_boucheBD, -1, -1))
+    {
+        interact_bouche = 1;
+    }
 
     interact_os = 0;
     float dist_os = 9999.0f;
@@ -1513,7 +1557,7 @@ void UpdateGame(void)
             if (currentLevel == 3 && distance_heart <= 20 && max_objets == 0 && has_interact_livre == 1)
             {
                 has_heart = 1;
-                maps[3][heartY][heartX] = 181;
+                maps[3][heartY][heartX] = 0;
                 max_objets = 1;
                 toucheE_Relache = 0;
             }
@@ -1528,7 +1572,7 @@ void UpdateGame(void)
                 max_objets = 1;
                 toucheE_Relache = 0;
             }
-            if (currentLevel == 3 && distance_heart <= 20 && max_objets == 1 && has_coeur_rouge == 0)
+            if (currentLevel == 3 && dist_cr <= 20 && max_objets == 1 && has_coeur_rouge == 0)
             {
                 dialogue_max_objet = 1;
             }
@@ -1539,7 +1583,7 @@ void UpdateGame(void)
                 max_objets = 1;
                 toucheE_Relache = 0;
             }
-            if (currentLevel == 3 && distance_heart <= 20 && max_objets == 1 && has_os == 0)
+            if (currentLevel == 3 && dist_os <= 20 && max_objets == 1 && has_os == 0)
             {
                 dialogue_max_objet = 1;
             }
@@ -1577,6 +1621,16 @@ void UpdateGame(void)
                 livreOuvert = 1;
                 has_interact_livre = 1;
             }
+            if (currentLevel == 3 && (distance_boucheBD <= 20 || distance_boucheBG <= 20 || distance_boucheHD <= 20 || distance_boucheHG <= 20) && has_pain_chagrin == 1)
+            {
+                bouche_has_pain = 1;
+                has_pain_chagrin = 0;
+            }
+            if (currentLevel == 3 && (distance_boucheBD <= 20 || distance_boucheBG <= 20 || distance_boucheHD <= 20 || distance_boucheHG <= 20) && has_soupe == 1)
+            {
+                bouche_has_soupe = 1;
+                has_soupe = 0;
+            }
             if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_eye)
             {
                 has_eye = 0;
@@ -1606,6 +1660,12 @@ void UpdateGame(void)
                 has_coeur_rouge = 0;
                 max_objets = 0;
                 chaudron_has_coeur_rouge = 1;
+            }
+            if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_heart == 1)
+            {
+                has_heart = 0;
+                max_objets = 0;
+                chaudron_has_heart = 1;
             }
             if (currentLevel == 3 && dist_cr <= 20 && max_objets == 1 && has_coeur_rouge == 0)
             {
@@ -1762,7 +1822,11 @@ void UpdateGame(void)
 
                         debut_anim_chaudron = SDL_GetTicks();
                         chaudron_anim = 1;
-                        type_resultat_cuisson = 1;
+                        if (recette1_ok == 1) {
+                            type_resultat_cuisson = 1; // Code 1 = Soupe
+                        } else {
+                            type_resultat_cuisson = 3; // Code 3 = Pain
+                        }
 
                         chaudron_has_eye = 0;
                         chaudron_has_heart = 0;
@@ -1865,11 +1929,6 @@ void UpdateGame(void)
         currentLevel = 2;
         player.x = 5;
     }
-    if (IsLocationUp(8, 13, 3, 5))
-    {
-        currentLevel = 4;
-        player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
-    }
 
     else if (IsLocationDown(8, 13, 4, 20))
     {
@@ -1890,6 +1949,19 @@ void UpdateGame(void)
     {
 
         dialogue_entree_labyrinthe = 1;
+    }
+    if (IsLocationUp(8, 13, 3, 20) && (bouche_has_soupe == 0 || bouche_has_pain == 0))
+    {
+        dialogue_entree_SAM = 1;
+    }
+    if (IsLocationUp(8, 13, 3, 5) && (bouche_has_soupe == 0 || bouche_has_pain == 0))
+    {
+        player.y = 5;
+    }
+    if (IsLocationUp(8, 13, 3, 5) && (bouche_has_soupe == 1 && bouche_has_pain == 1))
+    {
+        currentLevel = 4;
+        player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
     }
 
     // 2. Retour couloir (5 -> 2)
@@ -2348,11 +2420,11 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
     {
         int idPlat = 0;
 
-        if (plat == 1)
+        if (plat_pret_a_servir == 1)
             idPlat = 326; // Soupe
-        else if (plat == 2)
+        else if (plat_pret_a_servir == 2)
             idPlat = 327; // Pain
-
+        
         if (idPlat != 0)
         {
             // sinusoide pour les mouvement (merci rayen <3)
@@ -2434,6 +2506,14 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
 
         DrawTexte(texteAffiche, renderer, font, 20, 180, 280, 50);
     }
+    if (dialogue_entree_SAM > 0)
+    {
+        char *texteAffiche = "";
+        if (dialogue_entree_SAM == 1)
+            texteAffiche = "Je dois d'abord cuisiner...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180, 280, 50);
+    }
     if (dialogue_max_objet > 0)
     {
         show_interact_prompt_dessin = 0;
@@ -2444,21 +2524,21 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
 
         DrawTexte(texteAffiche, renderer, font, 20, 180, 280, 50);
     }
-    if (dialogue_chaudron_true > 0 && plat == 1)
+    if (dialogue_chaudron_true > 0 && plat_pret_a_servir == 1)
     {
         interact_chaudron_cuisiner = 0;
         char *texteAffiche = "";
         if (dialogue_chaudron_true == 1)
-            texteAffiche = "Voila le premier plat";
+            texteAffiche = "Voila la soupe aux cauchemars ! ";
 
         DrawTexte(texteAffiche, renderer, font, 20, 180, 280, 50);
     }
-    if (dialogue_chaudron_true > 0 && plat == 2)
+    if (dialogue_chaudron_true > 0 && plat_pret_a_servir == 2)
     {
         interact_chaudron_cuisiner = 0;
         char *texteAffiche = "";
         if (dialogue_chaudron_true == 1)
-            texteAffiche = "Voila le deuxième plat";
+            texteAffiche = "Voila le pain du chagrin !";
 
         DrawTexte(texteAffiche, renderer, font, 20, 180, 280, 50);
     }
@@ -2621,6 +2701,14 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
         if (sText)
             DrawInteractions(renderer, sText);
     }
+    if (interact_heart == 1)
+    {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
+
+        if (sText)
+            DrawInteractions(renderer, sText);
+    }
     if (interact_coeur_rouge == 1)
     {
         SDL_Color cBlanc = {255, 255, 255, 255};
@@ -2633,6 +2721,14 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
     {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
+
+        if (sText)
+            DrawInteractions(renderer, sText);
+    }
+    if (interact_bouche == 1 && (has_pain_chagrin == 1 || has_soupe == 1))
+    {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Nourrir", cBlanc);
 
         if (sText)
             DrawInteractions(renderer, sText);
