@@ -1631,74 +1631,30 @@ void UpdateGame(void)
                 bouche_has_soupe = 1;
                 has_soupe = 0;
             }
-            if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_eye)
+            if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20))
             {
-                has_eye = 0;
-                max_objets = 0;
-                chaudron_has_eye = 1;
-            }
-            if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_pain)
-            {
-                has_pain = 0;
-                max_objets = 0;
-                chaudron_has_pain = 1;
-            }
-            if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_spider)
-            {
-                has_spider = 0;
-                max_objets = 0;
-                chaudron_has_spider = 1;
-            }
-            if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_truc_vert)
-            {
-                has_truc_vert = 0;
-                max_objets = 0;
-                chaudron_has_truc_vert = 1;
-            }
-            if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_coeur_rouge == 1)
-            {
-                has_coeur_rouge = 0;
-                max_objets = 0;
-                chaudron_has_coeur_rouge = 1;
-            }
-            if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_heart == 1)
-            {
-                has_heart = 0;
-                max_objets = 0;
-                chaudron_has_heart = 1;
-            }
-            if (currentLevel == 3 && dist_cr <= 20 && max_objets == 1 && has_coeur_rouge == 0)
-            {
-                dialogue_max_objet = 1;
-            }
-            if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && has_os == 1)
-            {
-                has_os = 0;
-                max_objets = 0;
-                maps[3][osY][osX] = 166;
-                chaudron_has_os = 1;
-            }
-            if (currentLevel == 3 && dist_os <= 20 && max_objets == 1 && has_os == 0)
-            {
-                dialogue_max_objet = 1;
-            }
-
-            if (currentLevel == 3 && (distance_chaudronBD <= 20 || distance_chaudronBG <= 20 || distance_chaudronHD <= 20 || distance_chaudronHG <= 20) && plat_pret_a_servir > 0 && max_objets == 0)
-            {
-                if (plat_pret_a_servir == 1)
+                if (plat_pret_a_servir > 0)
                 {
-                    has_soupe = 1;
+                    if (plat_pret_a_servir == 1) has_soupe = 1;
+                    if (plat_pret_a_servir == 2) has_pain_chagrin = 1;
+                    
+                    plat_pret_a_servir = 0;
+                    toucheE_Relache = 0;
                 }
-                if (plat_pret_a_servir == 2)
+                else
                 {
-                    has_pain_chagrin = 1;
+                    if (has_eye) { has_eye = 0; max_objets = 0; chaudron_has_eye = 1; toucheE_Relache = 0; }
+                    else if (has_pain) { has_pain = 0; max_objets = 0; chaudron_has_pain = 1; toucheE_Relache = 0; }
+                    else if (has_spider) { has_spider = 0; max_objets = 0; chaudron_has_spider = 1; toucheE_Relache = 0; }
+                    else if (has_truc_vert) { has_truc_vert = 0; max_objets = 0; chaudron_has_truc_vert = 1; toucheE_Relache = 0; }
+                    else if (has_coeur_rouge) { has_coeur_rouge = 0; max_objets = 0; chaudron_has_coeur_rouge = 1; toucheE_Relache = 0; }
+                    else if (has_heart) { has_heart = 0; max_objets = 0; chaudron_has_heart = 1; toucheE_Relache = 0; }
+                    else if (has_os) { has_os = 0; max_objets = 0; maps[3][osY][osX] = 166; chaudron_has_os = 1; toucheE_Relache = 0; }
                 }
-
-                plat_pret_a_servir = 0;
-                max_objets = 0;
-                toucheE_Relache = 0;
             }
 
+            if (currentLevel == 3 && dist_cr <= 20 && max_objets == 1 && has_coeur_rouge == 0) dialogue_max_objet = 1;
+            if (currentLevel == 3 && dist_os <= 20 && max_objets == 1 && has_os == 0) dialogue_max_objet = 1;
             else if (distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55)
             {
                 currentLevel = 9;
