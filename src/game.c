@@ -1570,18 +1570,18 @@ void UpdateGame(void) {
     }
 
     // Gestion de réussite ou non du joueur pour le chemin à mémoriser
-    if(currentLevel == 11 && !teleOn && premiereFoisAllumeeTele != 0){
-        int caseX = (player.x + player.w / 2) / TILE_SIZE;
-        int caseY = (player.y + player.h) / TILE_SIZE;
-        int indexTuile = salonPattern[caseY][caseX];
+    // if(currentLevel == 11 && !teleOn && premiereFoisAllumeeTele != 0){
+    //     int caseX = (player.x + player.w / 2) / TILE_SIZE;
+    //     int caseY = (player.y + player.h) / TILE_SIZE;
+    //     int indexTuile = salonPattern[caseY][caseX];
 
-        if(indexTuile != 82 && player.x >= 2*TILE_SIZE){
-            printf("mauvais chemin\n");
-            player.y = 7*TILE_SIZE;
-            player.x = 1 * TILE_SIZE;
-            premiereFoisAllumeeTele = 0;
-        }
-    }
+    //     if(indexTuile != 82 && player.x >= 2*TILE_SIZE){
+    //         printf("mauvais chemin\n");
+    //         player.y = 7*TILE_SIZE;
+    //         player.x = 1 * TILE_SIZE;
+    //         premiereFoisAllumeeTele = 0;
+    //     }
+    // }
 
     // 302(g), 303(d) = bas télé sur commode 
     // 304,305 = haut télé
