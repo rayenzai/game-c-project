@@ -6,8 +6,8 @@
 #include "game.h"
 #include "sons.h"
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 960
+#define WINDOW_HEIGHT 720
 #define LOGICAL_WIDTH 320
 #define LOGICAL_HEIGHT 240
 #define FPS 60
@@ -48,6 +48,12 @@ int main(int argc, char* argv[]) {
 
     SDL_Window *window = SDL_CreateWindow("Lights Out", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE); //acceleration materiel : SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
+
+    // Force la SDL à garder des gros carrés de pixels parfaits (sans flou)
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"); 
+
+    // Force la SDL à utiliser un ratio parfait (x2, x3, etc.) sans jamais déformer l'image
+    SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
 
     SDL_RenderSetLogicalSize(renderer, LOGICAL_WIDTH, LOGICAL_HEIGHT);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest"); //nearest pour une sorte de Vsync 
