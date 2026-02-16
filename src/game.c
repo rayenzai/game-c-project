@@ -45,7 +45,7 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 2 = mur en brique
 3 = cube 1
 4 = cube 2
-5 = affiche perso
+5 = perso
 6 = doudou
 7 = perso actuel
 8 = haut gauche armoire fermée 
@@ -245,12 +245,19 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 343 = lampe 
 ................
 personnage 
+7 = perso actuel de face
 344 = perso profil droit jambe levé
 345 = perso profil gauche jambe levé
 346 = perso profil droit
 347 = perso profil gauche
 348 = perso de dos
-
+349 = perso profil droit jambe derriere levé
+350 = perso profil gauche jambe derriere levé
+351 = perso de dos jambe droite levé 
+352 = perso de dos jambe gauche levé
+353 = perso perso profil droit (décalage pixel)
+354 = perso profil gauche (décalage pixel)
+355 = perso de face cligne les yeux
 */
 
 
