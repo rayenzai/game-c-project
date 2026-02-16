@@ -1545,7 +1545,7 @@ void UpdateGame(void) {
 
     if(currentLevel == 11 && player.x >= 15*TILE_SIZE)aFiniSalon = 1;
 
-    Gestion de réussite ou non du joueur pour le chemin à mémoriser
+    // Gestion de réussite ou non du joueur pour le chemin à mémoriser
     if(currentLevel == 11 && !teleOn && premiereFoisAllumeeTele != 0 && !aFiniSalon){
         int caseX = (player.x + player.w / 2) / TILE_SIZE;
         int caseY = (player.y + player.h) / TILE_SIZE;
