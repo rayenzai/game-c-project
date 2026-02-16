@@ -525,6 +525,7 @@ int teleOn = 0;
 Uint32 debutTeleOn = 0;
 int salonPattern[MAP_HEIGHT][MAP_WIDTH] = {0};
 Uint32 tempsTeleOn = 10000;
+int aFiniSalon = 0;
 
 // --- INITIALISATION ---
 void InitGame(SDL_Renderer *renderer) {
@@ -1273,7 +1274,7 @@ void UpdateGame(void) {
                  hasTelecommande = 1;
             }
 
-            if(player.x >= 28 && player.x <= 32 && hasTelecommande && !premiereFoisAllumeeTele && interactTelecommandeTurnOn){
+            if(player.x >= 28 && player.x <= 32 && hasTelecommande && !premiereFoisAllumeeTele && interactTelecommandeTurnOn && !aFiniSalon){
                 teleOn = 1;
                 debutTeleOn = SDL_GetTicks();
                 interactTelecommandeTurnOn = 0;
@@ -1535,13 +1536,15 @@ void UpdateGame(void) {
         maps[11][3][14] = 304; maps[11][3][15] = 305;
     }
 
+    if(currentLevel == 11 && player.x >= 15*TILE_SIZE)aFiniSalon = 1;
+
     // Gestion de réussite ou non du joueur pour le chemin à mémoriser
-    if(currentLevel == 11 && !teleOn && premiereFoisAllumeeTele != 0){
+    if(currentLevel == 11 && !teleOn && premiereFoisAllumeeTele != 0 && !aFiniSalon){
         int caseX = (player.x + player.w / 2) / TILE_SIZE;
         int caseY = (player.y + player.h) / TILE_SIZE;
         int indexTuile = salonPattern[caseY][caseX];
 
-        if(indexTuile != 340 && indexTuile != 341 && indexTuile != 342 && player.x >= 2*TILE_SIZE){
+        if(indexTuile != 340 && indexTuile != 341 && indexTuile != 342 && player.x >= 2*TILE_SIZE && player.x <= 14*TILE_SIZE){
             printf("mauvais chemin\n");
             player.y = 7*TILE_SIZE;
             player.x = 1 * TILE_SIZE;
