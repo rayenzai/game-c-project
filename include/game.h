@@ -12,7 +12,7 @@
 #define LOGICAL_HEIGHT 240
 #define MAP_WIDTH 20        
 #define MAP_HEIGHT 15  
-#define NB_LEVELS 11 
+#define NB_LEVELS 12 
 #define PLAYER_SPEED 2.0f 
 
 
@@ -51,6 +51,17 @@ void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText);
 void TrouveCoordonnees(int *nvx, int *nvy, int indexObjet, int CurrLvl);
 int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance, int x, int y);
 void GestionPapa();
+
+int IsLocationUp(int xDebut, int xFin, int CurrLvl, int yDiff);
+int IsLocationDown(int xDebut, int xFin, int CurrLvl, int yDiff);
+int IsLocationRight(int yDebut, int yFin, int CurrLvl, int xDiff);
+int IsLocationLeft(int yDebut, int yFin, int CurrLvl, int xDiff);
+
+int IsDansTab(int tabIndexTuile[], int taille, int index);
+void copieTableau (int src[MAP_HEIGHT][MAP_WIDTH], int dest[MAP_HEIGHT][MAP_WIDTH]);
+
+void GestionMemoSalon();
+
 
 extern int currentLevel; 
 

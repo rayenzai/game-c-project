@@ -64,7 +64,6 @@ int main(int argc, char* argv[]) {
     InitMenu(renderer);
     int vraiPourcentage = 0;
 
-
     int running = 1;
     SDL_Event event;
 
