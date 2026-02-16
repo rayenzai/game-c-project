@@ -1515,7 +1515,7 @@ void UpdateGame(void) {
 
             for (int y = 6; y <= 8; y++) {
                 for (int x = 2; x <= 15; x++) { // x jusqu'à 15 pour être sûr
-                    if (maps[11][y][x] == 82) maps[11][y][x] = 0; 
+                    if (maps[11][y][x] == 340 || maps[11][y][x] == 341 || maps[11][y][x] == 342) maps[11][y][x] = 0; 
                 }
             }
         } 
@@ -1541,7 +1541,7 @@ void UpdateGame(void) {
         int caseY = (player.y + player.h) / TILE_SIZE;
         int indexTuile = salonPattern[caseY][caseX];
 
-        if(indexTuile != 82 && player.x >= 2*TILE_SIZE){
+        if(indexTuile != 340 && indexTuile != 341 && indexTuile != 342 && player.x >= 2*TILE_SIZE){
             printf("mauvais chemin\n");
             player.y = 7*TILE_SIZE;
             player.x = 1 * TILE_SIZE;
@@ -1571,65 +1571,55 @@ void copieTableau (int src[MAP_HEIGHT][MAP_WIDTH], int dest[MAP_HEIGHT][MAP_WIDT
 }
 
 void GestionMemoSalon() {
-    // On réinitialise le terrain pour être sûr qu'on recommence sur qlq chose de propre
+    // On réinitialise le terrain
     int finX = 14;
     for (int y = 6; y <= 8; y++) {
         for (int x = 2; x <= finX+1; x++) {
-            if (maps[11][y][x] == 82) maps[11][y][x] = 0; 
+            // On efface toutes les tuiles pour repartir sur un chemin vierge
+            if ((maps[11][y][x] >= 340 && maps[11][y][x] <= 342)) {
+                maps[11][y][x] = 0; 
+            }
         }
     }
 
-    // Uint32 tempsActuel = SDL_GetTicks();
-    // printf("%d\n",teleOn);
     if(teleOn){
         int curX = 2;
         int curY = 7;
-        maps[11][curY][curX] = 82; // Point de départ
+        
+        // Point de départ avec calcul de la tuile
+        maps[11][curY][curX] = 340 + (curY - 6); 
 
         while (curX < finX) {
-
             int futursY[4]; 
             int nbChoix = 0;
 
-            // Tout droit (x2 pour augmenter la proba)
             futursY[nbChoix++] = curY; 
             futursY[nbChoix++] = curY; 
-
-            // Monter si possible
             if (curY > 6) futursY[nbChoix++] = curY - 1;
-
-            // Descendre si possible
             if (curY < 8) futursY[nbChoix++] = curY + 1;
 
-            // Tirage au sort
             int targetY = futursY[rand() % nbChoix];
             
             if (targetY == curY) {
-                // Si on l'emplacement en Y est le même où on est déjà alors on augmente juste vers la droite
                 curX++;
-                maps[11][curY][curX] = 82;
+                maps[11][curY][curX] = 340 + (curY - 6);
             } 
             else {
-                
                 curX++;
-                if (curX > finX) break; // On a dépassé la fin du chemin on arrête
-                maps[11][curY][curX] = 82;
+                if (curX > finX) break; 
+                maps[11][curY][curX] = 340 + (curY - 6);
 
-                // On veut changer la hauteur sur la même colonne, donc on met ça pour pas avoir une diagonale sans bloc pour les relier
-                maps[11][targetY][curX] = 82;
-                curY = targetY; // Mise à jour de la hauteur
+                maps[11][targetY][curX] = 340 + (targetY - 6);
+                curY = targetY; 
 
-                // Si on fait un mouvement celui juste après ça sera forcément d'avancer (vers la droite) pour éviter que ça fasse un pâté de blocs
                 if (curX < finX) {
                     curX++;
-                    maps[11][curY][curX] = 82;
+                    maps[11][curY][curX] = 340 + (curY - 6);
                 }
             }
         }
         copieTableau(maps[11], salonPattern);
     }
-
-    
 }
 
 
@@ -1815,10 +1805,10 @@ float getLuminosite(int gridX, int gridY, int rayonPx) {
     for (int ly = 0; ly < MAP_HEIGHT; ly++) {
         for (int lx = 0; lx < MAP_WIDTH; lx++) {
             int indexTuile = maps[currentLevel][ly][lx];
-            int tabTuilesEclairees[] = {21, 75, 76, 85, 86, 148, 186, 317, 319, 321, 323};
+            int tabTuilesEclairees[] = {21, 75, 76, 85, 86, 148, 186, 317, 319, 321, 323, 340, 341, 342};
             int tailleTabTuilesEclairees = sizeof(tabTuilesEclairees) / sizeof(tabTuilesEclairees[0]);
 
-             if (IsDansTab(tabTuilesEclairees, tailleTabTuilesEclairees, indexTuile) || (currentLevel == 11 && indexTuile == 82) ) { // Si c'est une lampe
+             if (IsDansTab(tabTuilesEclairees, tailleTabTuilesEclairees, indexTuile) ) { // Si c'est une lampe
                  float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
                  float rayonLampe = 2.5f; // Rayon d'une lampe (2.5 cases)
                  if (indexTuile == 186) {
