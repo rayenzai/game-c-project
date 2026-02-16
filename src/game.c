@@ -246,18 +246,20 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 ................
 personnage 
 7 = perso actuel de face
-344 = perso profil droit jambe levé
-345 = perso profil gauche jambe levé
+344 = perso profil droit jambe levé (avance vers la droite)
+345 = perso profil gauche jambe levé (avance vers la gauche)
 346 = perso profil droit
 347 = perso profil gauche
 348 = perso de dos
-349 = perso profil droit jambe derriere levé
-350 = perso profil gauche jambe derriere levé
-351 = perso de dos jambe droite levé 
-352 = perso de dos jambe gauche levé
-353 = perso perso profil droit (décalage pixel)
-354 = perso profil gauche (décalage pixel)
-355 = perso de face cligne les yeux
+349 = perso profil droit jambe derriere levé (avance vers la droite)
+350 = perso profil gauche jambe derriere levé (avance vers la gauche)
+351 = perso de dos jambe droite levé (avance dos à nous)
+352 = perso de dos jambe gauche levé (avance dos à nous)
+353 = perso perso profil droit (très rapproché)
+354 = perso profil gauche
+355 = perso de face cligne les yeux (respiration)
+356 = perso de face jambe en avant gauche (avance vers nous)
+357 = perso en avant jambe droite en avant (avance vers nous)
 */
 
 
