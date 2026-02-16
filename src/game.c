@@ -243,6 +243,13 @@ int currentLevel = 0;   // 0 = Chambre, 1 = Couloir
 341 = carré rouge 
 342 = carré vert 
 343 = lampe 
+................
+personnage 
+344 = perso profil droit jambe levé
+345 = perso profil gauche jambe levé
+346 = perso profil droit
+347 = perso profil gauche
+348 = perso de dos
 
 */
 
