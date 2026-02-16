@@ -2066,59 +2066,64 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
     // --- ANIMATION DU JOUEUR ---
     int indexJoueur = 7; // Par défaut (face)
 
-    // 1. Vers le BAS (Face)
+    // 1. Vers le BAS (Face vers nous)
     if (playerDir == 0) {
-        // TODO anim de marche 
-        indexJoueur = 7; 
-        if (!isPlayerMoving && ((SDL_GetTicks() / 120) % 30 == 0)) {
-            indexJoueur = 355;
+        if (!isPlayerMoving) {
+            indexJoueur = 7; // Immobile de face
+            // Clin d'œil (respiration) régulier quand on ne bouge pas
+            if ((SDL_GetTicks() / 150) % 20 == 0) {
+                indexJoueur = 355;
+            }
+        } else {
+            int etape = (SDL_GetTicks() / 120) % 4; // Vitesse d'animation à 120 (petits pas)
+            if (etape == 0)      indexJoueur = 356; // Jambe gauche en avant
+            else if (etape == 1) indexJoueur = 7;   // Immobile (milieu)
+            else if (etape == 2) indexJoueur = 357; // Jambe droite en avant
+            else if (etape == 3) indexJoueur = 7;   // Immobile (milieu)
         }
     }
     // 2. Vers la GAUCHE
     else if (playerDir == 1) {
         if (!isPlayerMoving) {
-            indexJoueur = 347; // Immobile
+            indexJoueur = 347; // Immobile profil gauche
         } else {
             int etape = (SDL_GetTicks() / 120) % 4;
-            if (etape == 0)      indexJoueur = 345; // Jambe devant
+            if (etape == 0)      indexJoueur = 345; // Jambe avant levée
             else if (etape == 1) indexJoueur = 347; // Immobile (milieu)
-            else if (etape == 2) indexJoueur = 350; // Jambe derrière
+            else if (etape == 2) indexJoueur = 350; // Jambe arrière levée
             else if (etape == 3) indexJoueur = 347; // Immobile (milieu)
         }
     }
     // 3. Vers la DROITE
     else if (playerDir == 2) {
         if (!isPlayerMoving) {
-            indexJoueur = 346;
+            indexJoueur = 346; // Immobile profil droit
         } else {
             int etape = (SDL_GetTicks() / 120) % 4;
-            if (etape == 0)      indexJoueur = 344; // Jambe devant
+            if (etape == 0)      indexJoueur = 344; // Jambe avant levée
             else if (etape == 1) indexJoueur = 346; // Immobile (milieu)
-            else if (etape == 2) indexJoueur = 349; // Jambe derrière
+            else if (etape == 2) indexJoueur = 349; // Jambe arrière levée
             else if (etape == 3) indexJoueur = 346; // Immobile (milieu)
         }
     }
-    // 4. Vers le HAUT (Dos)
+    // 4. Vers le HAUT (Dos à nous)
     else if (playerDir == 3) {
         if (!isPlayerMoving) {
-            indexJoueur = 348;
+            indexJoueur = 348; // Immobile de dos
         } else {
             int etape = (SDL_GetTicks() / 120) % 4;
-            if (etape == 0)      indexJoueur = 351; // Jambe droite
+            if (etape == 0)      indexJoueur = 352; // Jambe gauche levée
             else if (etape == 1) indexJoueur = 348; // Immobile (milieu)
-            else if (etape == 2) indexJoueur = 352; // Jambe gauche
+            else if (etape == 2) indexJoueur = 351; // Jambe droite levée
             else if (etape == 3) indexJoueur = 348; // Immobile (milieu)
         }
     }
-    
-   
 
+    // On multiplie l'index par 16 (la taille d'une tuile) pour trouver le pixel X
     SDL_Rect srcPlayer = { indexJoueur * 16, 0, 16, 16 };
-     int decalageCorrection = 0;
-    if (indexJoueur == 355) {
-        decalageCorrection = 1;
-    }
-    SDL_Rect destPlayer = { (int)player.x - 2 + decalageCorrection, (int)player.y - 2, 16, 16 };
+
+
+    SDL_Rect destPlayer = { (int)roundf(player.x) - 2, (int)roundf(player.y) - 2, 16, 16 };
     SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
 
 
