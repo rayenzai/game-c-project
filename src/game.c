@@ -1545,7 +1545,7 @@ void UpdateGame(void) {
 
     if(currentLevel == 11 && player.x >= 15*TILE_SIZE)aFiniSalon = 1;
 
-    // Gestion de réussite ou non du joueur pour le chemin à mémoriser
+    Gestion de réussite ou non du joueur pour le chemin à mémoriser
     if(currentLevel == 11 && !teleOn && premiereFoisAllumeeTele != 0 && !aFiniSalon){
         int caseX = (player.x + player.w / 2) / TILE_SIZE;
         int caseY = (player.y + player.h) / TILE_SIZE;
@@ -1815,7 +1815,7 @@ float getLuminosite(int gridX, int gridY, int rayonPx) {
     for (int ly = 0; ly < MAP_HEIGHT; ly++) {
         for (int lx = 0; lx < MAP_WIDTH; lx++) {
             int indexTuile = maps[currentLevel][ly][lx];
-            int tabTuilesEclairees[] = {21, 75, 76, 85, 86, 148, 186, 317, 319, 321, 323, 340, 341, 342};
+            int tabTuilesEclairees[] = {21, 75, 76, 85, 86, 148, 186, 317, 319, 321, 323, 340, 341, 342, 343};
             int tailleTabTuilesEclairees = sizeof(tabTuilesEclairees) / sizeof(tabTuilesEclairees[0]);
 
              if (IsDansTab(tabTuilesEclairees, tailleTabTuilesEclairees, indexTuile) ) { // Si c'est une lampe
