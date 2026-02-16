@@ -260,6 +260,12 @@ personnage
 355 = perso de face cligne les yeux (respiration)
 356 = perso de face jambe en avant gauche (avance vers nous)
 357 = perso en avant jambe droite en avant (avance vers nous)
+358 = perso de face avec 1 pixel en +
+359 = perso de dos respiration
+360 = perso profil droit respiration 
+361 = perso profil gauche respiration
+362 = perso profil droit espiration fin (pixel en +)
+363 = perso profil gauche espiration fin (pixel en +)
 */
 
 
