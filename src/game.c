@@ -48,7 +48,7 @@ int currentLevel = 0; // 0 = Chambre, 1 = Couloir
 2 = mur en brique
 3 = cube 1
 4 = cube 2
-5 = affiche perso
+5 = perso
 6 = doudou
 7 = perso actuel
 8 = haut gauche armoire fermée
@@ -248,12 +248,27 @@ int currentLevel = 0; // 0 = Chambre, 1 = Couloir
 343 = lampe 
 ................
 personnage 
-344 = perso profil droit jambe levé
-345 = perso profil gauche jambe levé
+7 = perso actuel de face
+344 = perso profil droit jambe levé (avance vers la droite)
+345 = perso profil gauche jambe levé (avance vers la gauche)
 346 = perso profil droit
 347 = perso profil gauche
 348 = perso de dos
-
+349 = perso profil droit jambe derriere levé (avance vers la droite)
+350 = perso profil gauche jambe derriere levé (avance vers la gauche)
+351 = perso de dos jambe droite levé (avance dos à nous)
+352 = perso de dos jambe gauche levé (avance dos à nous)
+353 = perso perso profil droit (très rapproché)
+354 = perso profil gauche
+355 = perso de face cligne les yeux (respiration)
+356 = perso de face jambe en avant gauche (avance vers nous)
+357 = perso en avant jambe droite en avant (avance vers nous)
+358 = perso de face avec 1 pixel en +
+359 = perso de dos respiration
+360 = perso profil droit respiration 
+361 = perso profil gauche respiration
+362 = perso profil droit espiration fin (pixel en +)
+363 = perso profil gauche espiration fin (pixel en +)
 */
 
 // --- LA CARTE DU NIVEAU ---
@@ -318,8 +333,8 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 242, 266, 267, 271, 272, 0, 0, 0, 0, 0, 0, 245, 246, 247, 244, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 158, 159, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 156, 157, 0, 0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {2, 184, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
+        {2, 184, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 263, 176, 0, 175, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {2, 2, 275, 0, 264, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {2, 2, 265, 0, 263, 179, 180, 0, 177, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
@@ -510,6 +525,9 @@ int has_drawing = 0;
 int statue_has_water = 0;
 int statue_has_drawing = 0;
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
+
+static int playerDir = 0;       // 0=Bas, 1=Gauche, 2=Droite, 3=Haut
+static int isPlayerMoving = 0;  // 0=Immobile, 1=Marche
 
 int screamer = 0;
     
@@ -1234,6 +1252,15 @@ void UpdateGame(void)
     if (state[SDL_SCANCODE_RIGHT])
         dirX += 1;
 
+    isPlayerMoving = 0;
+    if (dirX != 0 || dirY != 0) {
+        isPlayerMoving = 1;
+        
+        if (dirY > 0)      playerDir = 0; // Vers le Bas
+        else if (dirY < 0) playerDir = 3; // Vers le Haut
+        else if (dirX < 0) playerDir = 1; // Vers la Gauche
+        else if (dirX > 0) playerDir = 2; // Vers la Droite
+    }
     static int premiereFoisAllumeeTele = 0;
 
     Uint32 tempsMtn = SDL_GetTicks();
@@ -2263,6 +2290,18 @@ void UpdateGame(void)
             premiereFoisAllumeeTele = 0;
         }
     }
+    // if(currentLevel == 11 && !teleOn && premiereFoisAllumeeTele != 0){
+    //     int caseX = (player.x + player.w / 2) / TILE_SIZE;
+    //     int caseY = (player.y + player.h) / TILE_SIZE;
+    //     int indexTuile = salonPattern[caseY][caseX];
+
+    //     if(indexTuile != 82 && player.x >= 2*TILE_SIZE){
+    //         printf("mauvais chemin\n");
+    //         player.y = 7*TILE_SIZE;
+    //         player.x = 1 * TILE_SIZE;
+    //         premiereFoisAllumeeTele = 0;
+    //     }
+    // }
 
     // 302(g), 303(d) = bas télé sur commode 
     // 304,305 = haut télé
@@ -2710,8 +2749,141 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
         }
     }
 
-    SDL_Rect srcPlayer = {112, 0, 16, 16};
-    SDL_Rect destPlayer = {(int)player.x - 2, (int)player.y - 2, 16, 16};
+
+    
+    //dialogues
+    if (dialogueStep > 0) {
+        char *texteAffiche = "";
+        if (dialogueStep == 1) texteAffiche = "Maman ? Papa ? Il fait tout noir...";
+        if (dialogueStep == 2) texteAffiche = "J'ai peur... Ou est mon Doudou ?";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogueStep_sortie1 > 0) {
+        char *texteAffiche = "";
+        if (dialogueStep_sortie1 == 1) texteAffiche = "je peux pas sortir sans mon doudou...";
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_hasDoudou > 0) {
+        char *texteAffiche = "";
+        if (dialogue_hasDoudou == 1) texteAffiche = "je te tiens";
+        if (dialogue_hasDoudou == 2) texteAffiche = "OH...";
+        if (dialogue_hasDoudou == 3) texteAffiche = "De la lumiere !";
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_statue_haut > 0) {
+        show_interact_prompt_statue_haut = 0;
+        char *texteAffiche = "";
+        if (dialogue_statue_haut == 1) texteAffiche = "Cette statue tient une coupe vide,";
+        if (dialogue_statue_haut == 2) texteAffiche = "elle doit avoir soif...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_statue_bas > 0) {
+        show_interact_prompt_statue_bas = 0;
+        char *texteAffiche = "";
+        if (dialogue_statue_bas == 1) texteAffiche = "Son visage est tordu par la haine.";
+        if (dialogue_statue_bas == 2) texteAffiche = "Un sourir ne ferait pas de mal...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_entree_labyrinthe > 0) {
+        char *texteAffiche = "";
+        if (dialogue_entree_labyrinthe == 1) texteAffiche = "Les statues bloquent le passage...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_max_objet > 0) {
+        show_interact_prompt_dessin = 0;
+        show_interact_prompt_eau = 0;
+        char *texteAffiche = "";
+        if (dialogue_max_objet == 1) texteAffiche = "Je n'ai que deux mains...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+
+    
+    // ANIMATION
+    int indexJoueur = 7; 
+
+    if (isPlayerMoving) {
+        int etape = (SDL_GetTicks() / 120) % 4; 
+        // de face
+        if (playerDir == 0) {
+            if (etape == 0) {
+                indexJoueur = 356; 
+            } 
+            else if (etape == 1 || etape == 3) { 
+                if ((SDL_GetTicks() % 3000) < 150) {
+                    indexJoueur = 355; 
+                } else {
+                    indexJoueur = 7; 
+                }
+            } 
+            else if (etape == 2) {
+                indexJoueur = 357; 
+            }
+        }
+        // 2. Vers la GAUCHE
+        else if (playerDir == 1) {
+            if (etape == 0)      indexJoueur = 345; 
+            else if (etape == 1) indexJoueur = 347; 
+            else if (etape == 2) indexJoueur = 350; 
+            else if (etape == 3) indexJoueur = 347; 
+        }
+        // 3. Vers la DROITE
+        else if (playerDir == 2) {
+            if (etape == 0)      indexJoueur = 344; 
+            else if (etape == 1) indexJoueur = 346; 
+            else if (etape == 2) indexJoueur = 349; 
+            else if (etape == 3) indexJoueur = 346; 
+        }
+        // 4. Vers le HAUT (Dos)
+        else if (playerDir == 3) {
+            if (etape == 0)      indexJoueur = 352; 
+            else if (etape == 1) indexJoueur = 348; 
+            else if (etape == 2) indexJoueur = 351; 
+            else if (etape == 3) indexJoueur = 348; 
+        }
+    } 
+    else {
+        //idle
+        int idleTime = SDL_GetTicks() % 2000;
+        
+        // 1. Vers le BAS (Face)
+        if (playerDir == 0) {
+            if (idleTime < 1200) {
+                if ((SDL_GetTicks() % 3000) < 150) {
+                    indexJoueur = 355; 
+                } else {
+                    indexJoueur = 7;   
+                }
+            } 
+            else if (idleTime < 1600) indexJoueur = 358; 
+            else                      indexJoueur = 7;  
+        }
+        // 2. Vers la GAUCHE
+        else if (playerDir == 1) {
+            if (idleTime < 1200)      indexJoueur = 347; 
+            else if (idleTime < 1600) indexJoueur = 361; 
+            else                      indexJoueur = 363; 
+        }
+        // 3. Vers la DROITE
+        else if (playerDir == 2) {
+            if (idleTime < 1200)      indexJoueur = 346; 
+            else if (idleTime < 1600) indexJoueur = 360; 
+            else                      indexJoueur = 362; 
+        }
+        // 4. Vers le HAUT (Dos)
+        else if (playerDir == 3) {
+            if (idleTime < 1200)      indexJoueur = 348; 
+            else if (idleTime < 1600) indexJoueur = 359; 
+            else                      indexJoueur = 348; 
+        }
+    }
+    SDL_Rect srcPlayer = { indexJoueur * 16, 0, 16, 16 };
+    
+    SDL_Rect destPlayer = { (int)roundf(player.x) - 2, (int)roundf(player.y) - 2, 16, 16 };
     SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
 
     int caseX = (int)(fantome.x / TILE_SIZE);
