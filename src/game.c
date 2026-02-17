@@ -2016,6 +2016,8 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         }
     }
 
+
+    
     //dialogues
     if (dialogueStep > 0) {
         char *texteAffiche = "";
@@ -2069,70 +2071,78 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
 
     
 
-    // --- ANIMATION DU JOUEUR ---
-    int indexJoueur = 7; // Par défaut (face)
+    int indexJoueur = 7; 
 
-    // 1. Vers le BAS (Face vers nous)
-    if (playerDir == 0) {
-        if (!isPlayerMoving) {
-            indexJoueur = 7; // Immobile de face
-            // Clin d'œil (respiration) régulier quand on ne bouge pas
-            if ((SDL_GetTicks() / 150) % 20 == 0) {
-                indexJoueur = 355;
-            }
-        } else {
-            int etape = (SDL_GetTicks() / 120) % 4; // Vitesse d'animation à 120 (petits pas)
-            if (etape == 0)      indexJoueur = 356; // Jambe gauche en avant
-            else if (etape == 1) indexJoueur = 7;   // Immobile (milieu)
-            else if (etape == 2) indexJoueur = 357; // Jambe droite en avant
-            else if (etape == 3) indexJoueur = 7;   // Immobile (milieu)
+    if (isPlayerMoving) {
+        int etape = (SDL_GetTicks() / 120) % 4; 
+        // 1. Vers le BAS (Face)
+        if (playerDir == 0) {
+            if (etape == 0)      indexJoueur = 356; 
+            else if (etape == 1) indexJoueur = 7;   
+            else if (etape == 2) indexJoueur = 357; 
+            else if (etape == 3) indexJoueur = 7;   
         }
-    }
-    // 2. Vers la GAUCHE
-    else if (playerDir == 1) {
-        if (!isPlayerMoving) {
-            indexJoueur = 347; // Immobile profil gauche
-        } else {
-            int etape = (SDL_GetTicks() / 120) % 4;
-            if (etape == 0)      indexJoueur = 345; // Jambe avant levée
-            else if (etape == 1) indexJoueur = 347; // Immobile (milieu)
-            else if (etape == 2) indexJoueur = 350; // Jambe arrière levée
-            else if (etape == 3) indexJoueur = 347; // Immobile (milieu)
+        // 2. Vers la GAUCHE
+        else if (playerDir == 1) {
+            if (etape == 0)      indexJoueur = 345; 
+            else if (etape == 1) indexJoueur = 347; 
+            else if (etape == 2) indexJoueur = 350; 
+            else if (etape == 3) indexJoueur = 347; 
         }
-    }
-    // 3. Vers la DROITE
-    else if (playerDir == 2) {
-        if (!isPlayerMoving) {
-            indexJoueur = 346; // Immobile profil droit
-        } else {
-            int etape = (SDL_GetTicks() / 120) % 4;
-            if (etape == 0)      indexJoueur = 344; // Jambe avant levée
-            else if (etape == 1) indexJoueur = 346; // Immobile (milieu)
-            else if (etape == 2) indexJoueur = 349; // Jambe arrière levée
-            else if (etape == 3) indexJoueur = 346; // Immobile (milieu)
+        // 3. Vers la DROITE
+        else if (playerDir == 2) {
+            if (etape == 0)      indexJoueur = 344; 
+            else if (etape == 1) indexJoueur = 346; 
+            else if (etape == 2) indexJoueur = 349; 
+            else if (etape == 3) indexJoueur = 346; 
         }
-    }
-    // 4. Vers le HAUT (Dos à nous)
-    else if (playerDir == 3) {
-        if (!isPlayerMoving) {
-            indexJoueur = 348; // Immobile de dos
-        } else {
-            int etape = (SDL_GetTicks() / 120) % 4;
-            if (etape == 0)      indexJoueur = 352; // Jambe gauche levée
-            else if (etape == 1) indexJoueur = 348; // Immobile (milieu)
-            else if (etape == 2) indexJoueur = 351; // Jambe droite levée
-            else if (etape == 3) indexJoueur = 348; // Immobile (milieu)
+        // 4. Vers le HAUT (Dos)
+        else if (playerDir == 3) {
+            if (etape == 0)      indexJoueur = 352; 
+            else if (etape == 1) indexJoueur = 348; 
+            else if (etape == 2) indexJoueur = 351; 
+            else if (etape == 3) indexJoueur = 348; 
         }
-    }
+    } 
+    else {
 
-    // On multiplie l'index par 16 (la taille d'une tuile) pour trouver le pixel X
+        int idleTime = SDL_GetTicks() % 2000;
+        
+        // 1. Vers le BAS (Face)
+        if (playerDir == 0) {
+            if (idleTime < 1200) {
+                if ((SDL_GetTicks() % 3000) < 150) {
+                    indexJoueur = 355; 
+                } else {
+                    indexJoueur = 7;   
+                }
+            } 
+            else if (idleTime < 1600) indexJoueur = 358; // Respiration (s'étire)
+            else                      indexJoueur = 7;   // Retour normal
+        }
+        // 2. Vers la GAUCHE
+        else if (playerDir == 1) {
+            if (idleTime < 1200)      indexJoueur = 347; // Normal
+            else if (idleTime < 1600) indexJoueur = 361; // Respiration
+            else                      indexJoueur = 363; // Fin d'expiration (pixel en +)
+        }
+        // 3. Vers la DROITE
+        else if (playerDir == 2) {
+            if (idleTime < 1200)      indexJoueur = 346; // Normal
+            else if (idleTime < 1600) indexJoueur = 360; // Respiration
+            else                      indexJoueur = 362; // Fin d'expiration (pixel en +)
+        }
+        // 4. Vers le HAUT (Dos)
+        else if (playerDir == 3) {
+            if (idleTime < 1200)      indexJoueur = 348; // Normal
+            else if (idleTime < 1600) indexJoueur = 359; // Respiration
+            else                      indexJoueur = 348; // Retour normal
+        }
+    }
     SDL_Rect srcPlayer = { indexJoueur * 16, 0, 16, 16 };
-
-
+    
     SDL_Rect destPlayer = { (int)roundf(player.x) - 2, (int)roundf(player.y) - 2, 16, 16 };
     SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
-
-
 
     int caseX = (int)(fantome.x / TILE_SIZE);
     int caseY = (int)(fantome.y / TILE_SIZE);
