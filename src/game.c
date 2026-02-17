@@ -2075,12 +2075,21 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
 
     if (isPlayerMoving) {
         int etape = (SDL_GetTicks() / 120) % 4; 
-        // 1. Vers le BAS (Face)
+        // de face
         if (playerDir == 0) {
-            if (etape == 0)      indexJoueur = 356; 
-            else if (etape == 1) indexJoueur = 7;   
-            else if (etape == 2) indexJoueur = 357; 
-            else if (etape == 3) indexJoueur = 7;   
+            if (etape == 0) {
+                indexJoueur = 356; 
+            } 
+            else if (etape == 1 || etape == 3) { 
+                if ((SDL_GetTicks() % 3000) < 150) {
+                    indexJoueur = 355; 
+                } else {
+                    indexJoueur = 7; 
+                }
+            } 
+            else if (etape == 2) {
+                indexJoueur = 357; 
+            }
         }
         // 2. Vers la GAUCHE
         else if (playerDir == 1) {
@@ -2105,7 +2114,7 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
         }
     } 
     else {
-
+        //idle
         int idleTime = SDL_GetTicks() % 2000;
         
         // 1. Vers le BAS (Face)
@@ -2117,26 +2126,26 @@ void DrawGame(SDL_Renderer *renderer,TTF_Font *font, TTF_Font *fontMini) {
                     indexJoueur = 7;   
                 }
             } 
-            else if (idleTime < 1600) indexJoueur = 358; // Respiration (s'étire)
-            else                      indexJoueur = 7;   // Retour normal
+            else if (idleTime < 1600) indexJoueur = 358; 
+            else                      indexJoueur = 7;  
         }
         // 2. Vers la GAUCHE
         else if (playerDir == 1) {
-            if (idleTime < 1200)      indexJoueur = 347; // Normal
-            else if (idleTime < 1600) indexJoueur = 361; // Respiration
-            else                      indexJoueur = 363; // Fin d'expiration (pixel en +)
+            if (idleTime < 1200)      indexJoueur = 347; 
+            else if (idleTime < 1600) indexJoueur = 361; 
+            else                      indexJoueur = 363; 
         }
         // 3. Vers la DROITE
         else if (playerDir == 2) {
-            if (idleTime < 1200)      indexJoueur = 346; // Normal
-            else if (idleTime < 1600) indexJoueur = 360; // Respiration
-            else                      indexJoueur = 362; // Fin d'expiration (pixel en +)
+            if (idleTime < 1200)      indexJoueur = 346; 
+            else if (idleTime < 1600) indexJoueur = 360; 
+            else                      indexJoueur = 362; 
         }
         // 4. Vers le HAUT (Dos)
         else if (playerDir == 3) {
-            if (idleTime < 1200)      indexJoueur = 348; // Normal
-            else if (idleTime < 1600) indexJoueur = 359; // Respiration
-            else                      indexJoueur = 348; // Retour normal
+            if (idleTime < 1200)      indexJoueur = 348; 
+            else if (idleTime < 1600) indexJoueur = 359; 
+            else                      indexJoueur = 348; 
         }
     }
     SDL_Rect srcPlayer = { indexJoueur * 16, 0, 16, 16 };
