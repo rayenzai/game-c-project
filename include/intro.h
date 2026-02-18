@@ -3,15 +3,9 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
-
-void InitIntro(void);
-
-// Gère le clavier (Entrée pour passer) - Retourne 1 si fini
-int HandleIntroInput(SDL_Event *event);
-
-// Gère l'animation du texte (Timer) - A appeler à chaque image
-void UpdateIntroTimer(void);
-
-void DrawIntro(SDL_Renderer *renderer, TTF_Font *font);
+void SkipIntro(void);
+void StartIntro(SDL_Renderer *renderer);
+int UpdateIntroTimer(void);
+void DrawIntro(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini);
 
 #endif

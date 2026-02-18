@@ -2625,12 +2625,17 @@ int estVisible(int x, int y, int rayonJoueur)
 
 void DrawTuiles(float x, float y, int indexTuile, SDL_Renderer *renderer, int luminosite)
 {
-    SDL_SetTextureColorMod(tilesetTexture, luminosite, luminosite, luminosite);
+    extern int isColorMode;
+    
+    if (isColorMode == 1) {
+        luminosite = 255; 
+        indexTuile = indexTuile ; 
+    }
 
+    SDL_SetTextureColorMod(tilesetTexture, luminosite, luminosite, luminosite);
     SDL_Rect srcTuile = {TILE_SIZE * indexTuile, 0, TILE_SIZE, TILE_SIZE};
     SDL_Rect destTuile = {(int)x * TILE_SIZE, (int)y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
     SDL_RenderCopy(renderer, tilesetTexture, &srcTuile, &destTuile);
-
     SDL_SetTextureColorMod(tilesetTexture, 255, 255, 255);
 }
 
@@ -2667,6 +2672,7 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
             // rayonLumiere = 30;
             rayon = 30;
         }
+extern int isColorMode; 
 
         for (int y = 0; y < MAP_HEIGHT; y++)
         {
@@ -2674,12 +2680,14 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
             {
                 float intensite = getLuminosite(x, y, rayon);
 
-                // Si c'est totalement noir, on ne dessine rien (opti)
+                if (isColorMode == 1) {
+                    intensite = 1.0f;
+                }
+
                 if (intensite <= 0.0f)
                 {
                     continue;
                 }
-
                 // 2. On convertit en valeur 0-255
                 int lum = (int)(intensite * 255);
 

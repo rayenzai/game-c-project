@@ -66,7 +66,6 @@ int main(int argc, char* argv[]) {
     if (!fontGrand || !fontPetit || !fontMini) { printf("Erreur Font\n"); return 1; }
 
     GameState etat = ETAT_MENU;
-    InitIntro();
     InitMenu(renderer);
     int vraiPourcentage = 0;
 
@@ -108,8 +107,9 @@ int main(int argc, char* argv[]) {
                 if (action == 2) running = 0;
             }
             else if (etat == ETAT_INTRO) {
-                if (HandleIntroInput(&event) == 1) {
-                    etat = ETAT_CHARGEMENT;
+                if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN) {
+                    SkipIntro();
+                    etat = ETAT_JEU; 
                 }
             }
             else if (etat == ETAT_JEU) {
@@ -122,14 +122,17 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        if (etat == ETAT_INTRO) {
-            UpdateIntroTimer();
+       if (etat == ETAT_INTRO) {
+            if (UpdateIntroTimer() == 1) {
+                etat = ETAT_JEU;
+            }
         }
         else if (etat == ETAT_CHARGEMENT) {
             int fini = InitGameStepByStep(renderer, &vraiPourcentage);
             
             if (fini == 1) {
-                etat = ETAT_JEU;
+                etat = ETAT_INTRO;
+                StartIntro(renderer);
             }
         }
 
@@ -144,7 +147,7 @@ int main(int argc, char* argv[]) {
             DrawMenu(renderer, fontGrand, fontPetit);
         }
         else if (etat == ETAT_INTRO) {
-            DrawIntro(renderer, fontPetit);
+            DrawIntro(renderer, fontPetit, fontMini);
         }
        else if (etat == ETAT_CHARGEMENT) {
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
