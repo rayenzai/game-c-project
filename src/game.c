@@ -857,20 +857,56 @@ int isWall(float x, float y)
         return 0;
     }
 
-    if (type == 21 || type == 20)
-    {
+    int isTopCorner = (y < player.y + 6);
+
+    if (type == 20) {
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localX >= 10) return 0; // On laisse passer complètement à droite
+        if (isTopCorner) return 0;  // La tête passe (perspective)
+        
+        return 1; // Le corps et les pieds tapent comme dans un mur en brique
+    }
+
+    // --- COLLISION LAMPE (21) ---
+    if (type == 21) {
+        int localX = (int)x % TILE_SIZE;
+        
+        // Ajuste ce "11" (entre 8 et 15) pour définir jusqu'où on peut rentrer par la droite
+        if (localX >= 11) return 0; 
+        
+        if (isTopCorner) return 0;  // La tête passe au-dessus du pied de la lampe
+        
+        return 1; // Les pieds bloquent
+    }
+
+    // --- COLLISION COMMODE (42, 43) ---
+    if (type == 42 || type == 43) {
+        int localX = (int)x % TILE_SIZE;
+        
+        if (localX >= 8) return 0; // La moitié droite est libre
+        
+        // Le meuble entier bloque les pieds, mais laisse passer la tête
+        if (isTopCorner) return 0; 
+        
         return 1;
     }
 
-    if (type == 42 || type == 43) {
-        if (localX >= 8) {
-            return 0;
+    // --- COLLISION LIT (32, 33, 34, 35) ---
+    if (type == 32 || type == 33 || type == 34 || type == 35) {
+        // Le lit entier est géré d'un coup !
+        if (isTopCorner) return 0; // La tête passe par-dessus les draps
+        
+        return 1; // Les pieds tapent le matelas
+    }
+
+    if (type == 32 || type == 33 || type == 34 || type == 35) {
+
+        if (type == 32 || type == 33) {
+            return 1;
         }
-        if (type == 42) {
-            return 1; 
-        } 
-        else if (type == 43) {
-            if (localY < 4) {
+        if (type == 34 || type == 35) {
+            if (localY < 6) { 
                 return 1;
             }
             return 0;
@@ -2707,30 +2743,126 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
                 DrawTuiles(x, y, type, renderer, lum); // On passe 'lum'
 
                 int type_maps = maps[currentLevel][y][x];
-                if (IsTuileSpecial(type_maps))
+                if (type_maps != 78 && IsTuileSpecial(type_maps))
                 {
                     DrawTuiles(x, y, type_maps, renderer, lum); // On passe 'lum'
                 }
-
-                // --- B. DESSINER LE CONTOUR (Lignes) ---
-                // On utilise aussi 'lum' pour que les lignes blanches s'assombrissent
-                /*SDL_SetRenderDrawColor(renderer, lum, lum, lum, 255);
-
-                int px = x * TILE_SIZE;
-                int py = y * TILE_SIZE;
-                int ts = TILE_SIZE;
-
-                // On garde estVisible juste pour savoir si le voisin est NOIR ou pas
-                // (Si le voisin a une intensité <= 0, on dessine le trait)
-
-                if (getLuminosite(x, y - 1, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px, py, px + ts, py);       // Haut
-                if (getLuminosite(x, y + 1, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px, py + ts, px + ts, py + ts); // Bas
-                if (getLuminosite(x - 1, y, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px, py, px, py + ts);       // Gauche
-                if (getLuminosite(x + 1, y, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px + ts, py, px + ts, py + ts); // Droite
-                */
             }
         }
     }
+
+    // ANIMATION
+    int indexJoueur = 7; 
+
+    if (isPlayerMoving) {
+        int etape = (SDL_GetTicks() / 120) % 4; 
+        // de face
+        if (playerDir == 0) {
+            if (etape == 0) {
+                indexJoueur = 356; 
+            } 
+            else if (etape == 1 || etape == 3) { 
+                if ((SDL_GetTicks() % 3000) < 150) {
+                    indexJoueur = 355; 
+                } else {
+                    indexJoueur = 7; 
+                }
+            } 
+            else if (etape == 2) {
+                indexJoueur = 357; 
+            }
+        }
+        // 2. Vers la GAUCHE
+        else if (playerDir == 1) {
+            if (etape == 0)      indexJoueur = 345; 
+            else if (etape == 1) indexJoueur = 347; 
+            else if (etape == 2) indexJoueur = 350; 
+            else if (etape == 3) indexJoueur = 347; 
+        }
+        // 3. Vers la DROITE
+        else if (playerDir == 2) {
+            if (etape == 0)      indexJoueur = 344; 
+            else if (etape == 1) indexJoueur = 346; 
+            else if (etape == 2) indexJoueur = 349; 
+            else if (etape == 3) indexJoueur = 346; 
+        }
+        // 4. Vers le HAUT (Dos)
+        else if (playerDir == 3) {
+            if (etape == 0)      indexJoueur = 352; 
+            else if (etape == 1) indexJoueur = 348; 
+            else if (etape == 2) indexJoueur = 351; 
+            else if (etape == 3) indexJoueur = 348; 
+        }
+    } 
+    else {
+        //idle
+        int idleTime = SDL_GetTicks() % 2000;
+        
+        // 1. Vers le BAS (Face)
+        if (playerDir == 0) {
+            if (idleTime < 1200) {
+                if ((SDL_GetTicks() % 3000) < 150) {
+                    indexJoueur = 355; 
+                } else {
+                    indexJoueur = 7;   
+                }
+            } 
+            else if (idleTime < 1600) indexJoueur = 358; 
+            else                      indexJoueur = 7;  
+        }
+        // 2. Vers la GAUCHE
+        else if (playerDir == 1) {
+            if (idleTime < 1200)      indexJoueur = 347; 
+            else if (idleTime < 1600) indexJoueur = 361; 
+            else                      indexJoueur = 363; 
+        }
+        // 3. Vers la DROITE
+        else if (playerDir == 2) {
+            if (idleTime < 1200)      indexJoueur = 346; 
+            else if (idleTime < 1600) indexJoueur = 360; 
+            else                      indexJoueur = 362; 
+        }
+        // 4. Vers le HAUT (Dos)
+        else if (playerDir == 3) {
+            if (idleTime < 1200)      indexJoueur = 348; 
+            else if (idleTime < 1600) indexJoueur = 359; 
+            else                      indexJoueur = 348; 
+        }
+    }
+    SDL_Rect srcPlayer = { indexJoueur * 16, 0, 16, 16 };
+    
+    SDL_Rect destPlayer = { (int)roundf(player.x) - 2, (int)roundf(player.y) - 2, 16, 16 };
+    SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
+
+    if (tilesetTexture)
+    {
+        for (int y = 0; y < MAP_HEIGHT; y++)
+        {
+            for (int x = 0; x < MAP_WIDTH; x++)
+            {
+                float intensite = getLuminosite(x, y, rayon);
+
+                // Si c'est totalement noir, on ne dessine rien (opti)
+                if (intensite <= 0.0f)
+                {
+                    continue;
+                }
+
+                // 2. On convertit en valeur 0-255
+                int lum = (int)(intensite * 255);
+
+                // --- A. DESSINER LA TUILE ---
+
+                int type_maps = maps[currentLevel][y][x];
+                if (type_maps == 78 || type_maps == 75 || type_maps == 76)
+                {
+                    DrawTuiles(x, y, type_maps, renderer, lum); // On passe 'lum'
+                    break;
+                }
+            }
+        }
+    }
+
 
     // --- EFFET SOMMEIL / REVEIL PARENTS ---
     if (currentLevel == 10) { 
@@ -2822,88 +2954,7 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
     }
 
     
-    // ANIMATION
-    int indexJoueur = 7; 
-
-    if (isPlayerMoving) {
-        int etape = (SDL_GetTicks() / 120) % 4; 
-        // de face
-        if (playerDir == 0) {
-            if (etape == 0) {
-                indexJoueur = 356; 
-            } 
-            else if (etape == 1 || etape == 3) { 
-                if ((SDL_GetTicks() % 3000) < 150) {
-                    indexJoueur = 355; 
-                } else {
-                    indexJoueur = 7; 
-                }
-            } 
-            else if (etape == 2) {
-                indexJoueur = 357; 
-            }
-        }
-        // 2. Vers la GAUCHE
-        else if (playerDir == 1) {
-            if (etape == 0)      indexJoueur = 345; 
-            else if (etape == 1) indexJoueur = 347; 
-            else if (etape == 2) indexJoueur = 350; 
-            else if (etape == 3) indexJoueur = 347; 
-        }
-        // 3. Vers la DROITE
-        else if (playerDir == 2) {
-            if (etape == 0)      indexJoueur = 344; 
-            else if (etape == 1) indexJoueur = 346; 
-            else if (etape == 2) indexJoueur = 349; 
-            else if (etape == 3) indexJoueur = 346; 
-        }
-        // 4. Vers le HAUT (Dos)
-        else if (playerDir == 3) {
-            if (etape == 0)      indexJoueur = 352; 
-            else if (etape == 1) indexJoueur = 348; 
-            else if (etape == 2) indexJoueur = 351; 
-            else if (etape == 3) indexJoueur = 348; 
-        }
-    } 
-    else {
-        //idle
-        int idleTime = SDL_GetTicks() % 2000;
-        
-        // 1. Vers le BAS (Face)
-        if (playerDir == 0) {
-            if (idleTime < 1200) {
-                if ((SDL_GetTicks() % 3000) < 150) {
-                    indexJoueur = 355; 
-                } else {
-                    indexJoueur = 7;   
-                }
-            } 
-            else if (idleTime < 1600) indexJoueur = 358; 
-            else                      indexJoueur = 7;  
-        }
-        // 2. Vers la GAUCHE
-        else if (playerDir == 1) {
-            if (idleTime < 1200)      indexJoueur = 347; 
-            else if (idleTime < 1600) indexJoueur = 361; 
-            else                      indexJoueur = 363; 
-        }
-        // 3. Vers la DROITE
-        else if (playerDir == 2) {
-            if (idleTime < 1200)      indexJoueur = 346; 
-            else if (idleTime < 1600) indexJoueur = 360; 
-            else                      indexJoueur = 362; 
-        }
-        // 4. Vers le HAUT (Dos)
-        else if (playerDir == 3) {
-            if (idleTime < 1200)      indexJoueur = 348; 
-            else if (idleTime < 1600) indexJoueur = 359; 
-            else                      indexJoueur = 348; 
-        }
-    }
-    SDL_Rect srcPlayer = { indexJoueur * 16, 0, 16, 16 };
     
-    SDL_Rect destPlayer = { (int)roundf(player.x) - 2, (int)roundf(player.y) - 2, 16, 16 };
-    SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
 
     int caseX = (int)(fantome.x / TILE_SIZE);
     int caseY = (int)(fantome.y / TILE_SIZE);
