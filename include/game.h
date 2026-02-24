@@ -62,6 +62,7 @@ void copieTableau (int src[MAP_HEIGHT][MAP_WIDTH], int dest[MAP_HEIGHT][MAP_WIDT
 
 void GestionMemoSalon();
 
+void CleanGame(); // Nettoyage de tous les pointeurs
 
 extern int currentLevel; 
 

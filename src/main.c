@@ -5,6 +5,7 @@
 #include "menu.h"
 #include "game.h"
 #include "sons.h"
+#include "pause.h"
 
 #define WINDOW_WIDTH 960
 #define WINDOW_HEIGHT 720
@@ -16,7 +17,8 @@ typedef enum {
     ETAT_MENU,
     ETAT_INTRO,
     ETAT_CHARGEMENT,
-    ETAT_JEU
+    ETAT_JEU,
+    ETAT_PAUSE
 } GameState;
 
 int main(int argc, char* argv[]) {
@@ -115,9 +117,27 @@ int main(int argc, char* argv[]) {
             else if (etat == ETAT_JEU) {
                 
                 if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
-                    etat = ETAT_MENU;
-                    currentLevel = 0;
+                    etat = ETAT_PAUSE;
                     
+                }
+            }
+            else if (etat == ETAT_PAUSE) {
+                int actionPause = UpdatePause(&event);
+                
+                if (actionPause == 1) { // 1 = Continuer
+                    etat = ETAT_JEU; 
+                }
+                else if (actionPause == 2) { // 2 = Menu Principal
+                    // Note: Plus tard, tu pourras rajouter un "Voulez-vous sauvegarder ?" ici
+                    etat = ETAT_MENU;
+                    currentLevel = 0; // Réinitialise le niveau (comme avant)
+                }
+                else if (actionPause == 3) { // 3 = Sauvegarder
+                    printf("Sauvegarde non implementee pour le moment.\n");
+                    // On reste dans le menu pause, ou tu peux faire un etat = ETAT_JEU;
+                }
+                else if (actionPause == 4) { // 4 = Quitter
+                    running = 0; // Ferme la fenêtre SDL
                 }
             }
         }
@@ -178,6 +198,10 @@ int main(int argc, char* argv[]) {
         else if (etat == ETAT_JEU) {
             DrawGame(renderer,fontPetit, fontMini);
         }
+        else if (etat == ETAT_PAUSE) {
+            DrawGame(renderer, fontPetit, fontMini); 
+            DrawPause(renderer, fontGrand, fontPetit);       
+        }
 
         
     // 4. Bordure
@@ -191,6 +215,9 @@ int main(int argc, char* argv[]) {
             SDL_Delay(frameDelay - frameTime);
         }
     }
+
+    // Fin du jeu : on demande à game.c de nettoyer ses poubelles
+    CleanGame(); 
 
     // Nettoyage sons
     Mix_CloseAudio();
