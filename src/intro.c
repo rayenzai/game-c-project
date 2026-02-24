@@ -23,7 +23,7 @@ static Uint32 dernierAjout = 0;
 static char bufferTexte[256];
 static SDL_Color BLANC_VISUEL = {255, 255, 255, 255};
 
-static void dessinerTexteInterne(SDL_Renderer *renderer, TTF_Font *font, const char *texte, int y) {
+void dessinerTexteInterne(SDL_Renderer *renderer, TTF_Font *font, const char *texte, int y) {
     if (strlen(texte) == 0) return;
     SDL_Surface *surface = TTF_RenderText_Solid(font, texte, BLANC_VISUEL);
     if (!surface) return;

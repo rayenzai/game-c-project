@@ -2,6 +2,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 #include "game.h"
+#include "intro.h"
 #include "sons.h"
 #include "map.h"
 #include "ia.h"
@@ -572,6 +573,7 @@ int interraction_maman_fin =0;
 int dialogue_maman = 0;
 int dialogue_maman_2 = 0;
 int menu_fin = 0;
+int ellipse = 0;
 
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
 
@@ -1133,7 +1135,7 @@ void UpdateGame(void)
                 if (dialogue_maman_2 > 3) 
                 {
                     dialogue_maman_2 = 0; 
-                    //menu_fin = 1;
+                    ellipse = 1;
                 }
             }
         }
@@ -2466,12 +2468,14 @@ void UpdateGame(void)
                 if (sonOpenDoor) //son mathys en attente
                     Mix_PlayChannel(-1, sonOpenDoor, 0);
 
-                maps[11][mamanY ][mamanX]         = 440;
-                maps[11][mamanY -1][mamanX]     = 441;
+                maps[11][mamanY ][mamanX]    = 440;
+                maps[11][mamanY -1][mamanX]  = 441;
                 SDL_Delay (1000);
                 dialogue_maman_2 = 1;
                 //menu_fin = 1;
                 interraction_maman_fin =0;
+                SDL_Delay(2000);
+                ellipse = 1;
             }
         }
     }
@@ -2916,6 +2920,7 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
             }
         }
     }
+        
 
        // ANIMATION
     int indexJoueur = 7; 
@@ -3000,6 +3005,8 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
     SDL_Rect destPlayer = { (int)roundf(player.x) - 2, (int)roundf(player.y) - 2, 16, 16 };
     SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
     
+
+
     //dialogues
     if (dialogue_maman > 0) {
         char *texteAffiche = "Au secours mon fils viens m'aider !";
@@ -3015,6 +3022,11 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
         DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
     }
 
+    //...... DESSINER L'ELLIPSE..........
+    if (ellipse == 1){
+            DrawEllipse(renderer,font);
+    }
+        
     if (dialogueStep > 0) {
         char *texteAffiche = "";
         if (dialogueStep == 1) texteAffiche = "Maman ? Papa ? Il fait tout noir...";

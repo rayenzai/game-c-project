@@ -1,5 +1,6 @@
 #include "fin_jeu.h"
 #include "game.h"
+#include "intro.h"
 
 int choix = 0;
 int nbOptions = 2;
@@ -25,6 +26,13 @@ void lancer_scene_fin(SDL_Event event, int *continuer_menu) { //regarde le choix
                 break;
         }
     }
+}
+
+void DrawEllipse(SDL_Renderer *renderer, TTF_Font *font) {
+    // fond Noir
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    dessinerTexteInterne(renderer, font, "20 ans plus tard...", 110);
 }
 
 // void afficher_menu_fin(SDL_Renderer *renderer, TTF_Font *font) {
