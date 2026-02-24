@@ -36,10 +36,16 @@ extern Joueur player;
 extern Fantome fantome;
 extern int livreOuvert;
 
+// -- VARIABLES AUTRE PART --
+extern SDL_Renderer* renderer;
+extern TTF_Font* font;
 
 extern float FANTOME_SPEED;
 
 extern int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH];
+
+extern int menu_fin;
+extern int dialogue_maman;
 
 int InitGameStepByStep(SDL_Renderer *renderer, int *pourcentage);
 void UpdateGame(void);

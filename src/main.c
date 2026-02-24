@@ -19,8 +19,12 @@ typedef enum {
     ETAT_MENU,
     ETAT_INTRO,
     ETAT_CHARGEMENT,
-    ETAT_JEU
+    ETAT_JEU,
+    ETAT_FIN
 } GameState;
+
+SDL_Renderer* renderer;
+TTF_Font* font;
 
 int main(int argc, char* argv[]) {
     (void)argc; (void)argv;
@@ -51,7 +55,7 @@ int main(int argc, char* argv[]) {
     if (TTF_Init() < 0) return 1;
 
     SDL_Window *window = SDL_CreateWindow("Lights Out", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE); //acceleration materiel : SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE); //acceleration materiel : SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
 
     // Force la SDL à garder des gros carrés de pixels parfaits (sans flou)
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"); 
@@ -65,6 +69,8 @@ int main(int argc, char* argv[]) {
     TTF_Font *fontGrand = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 20);
     TTF_Font *fontPetit = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 12);
     TTF_Font *fontMini = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 11);
+
+    font = fontMini;
 
     if (!fontGrand || !fontPetit || !fontMini) { printf("Erreur Font\n"); return 1; }
 
@@ -123,6 +129,22 @@ int main(int argc, char* argv[]) {
                     
                 }
             }
+            else if(etat == ETAT_FIN){
+                lancer_scene_fin(event, &menu_fin);
+
+                if(menu_fin == 0){
+                    etat = ETAT_JEU;
+                    dialogue_maman=0;
+
+                    if(choix == 0){
+                        printf("ON PART\n"); 
+                        // Faudrait faire la logique où on se tp à la salle dans la vraie vie
+                    }
+                    else if(choix == 1){
+                        printf("ON RESTE\n");
+                    }
+                }
+            }
         }
 
         if (etat == ETAT_INTRO) {
@@ -139,12 +161,17 @@ int main(int argc, char* argv[]) {
         else if (etat == ETAT_JEU)
         {
             UpdateGame();
+            if(menu_fin == 1)etat = ETAT_FIN;
         }
         
 
         // C. DESSIN
         if (etat == ETAT_MENU) {
             DrawMenu(renderer, fontGrand, fontPetit);
+        }
+        else if(etat==ETAT_FIN){
+            DrawGame(renderer, fontPetit, fontMini);
+            afficher_menu_fin(renderer, fontMini);
         }
         else if (etat == ETAT_INTRO) {
             DrawIntro(renderer, fontPetit);
