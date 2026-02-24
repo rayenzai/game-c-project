@@ -277,10 +277,10 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         // carte 1 (chambre) index 0
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 5, 2, 8, 9, 2, 2}, // Trou en haut
         {2, 2, 2, 36, 37, 2, 2, 2, 0, 0, 0, 0, 2, 2, 41, 2, 10, 11, 2, 2},
-        {2, 1, 0, 32, 33, 21, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 2},
+        {2, 20, 0, 32, 33, 21, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 2},
         {2, 1, 0, 34, 35, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2},
         {2, 1, 30, 31, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2},
-        {2, 1, 0, 20, 0, 1, 0, 1, 0, 1, 44, 1, 0, 1, 0, 1, 0, 1, 0, 2},
+        {2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 44, 1, 0, 1, 0, 1, 0, 1, 0, 2},
         {2, 42, 0, 1, 0, 1, 0, 1, 0, 1, 0, 45, 0, 1, 0, 1, 55, 56, 57, 2},
         {2, 43, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 52, 53, 54, 2},
         {2, 1, 0, 1, 0, 3, 44, 1, 0, 1, 0, 1, 0, 1, 0, 58, 0, 59, 60, 2},
@@ -684,6 +684,9 @@ int isWall(float x, float y)
     int caseX = (int)x / TILE_SIZE;
     int caseY = (int)y / TILE_SIZE;
 
+    int localX = (int)x % TILE_SIZE;
+    int localY = (int)y % TILE_SIZE;
+
     // Sécurité bornes map
     if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT)
     {
@@ -691,6 +694,7 @@ int isWall(float x, float y)
     }
 
     int type = maps[currentLevel][caseY][caseX];
+    // int typeBelow = maps[currentLevel][caseY+1][caseX];
     int type_pattern = maps_patern[currentLevel][caseY][caseX];
 
     // --- LOGIQUE SPÉCIALE LABYRINTHE (83) ---
@@ -698,7 +702,6 @@ int isWall(float x, float y)
     {
 
         // 1. TOIT (Perspective : Le haut est toujours solide)
-        int localY = (int)y % TILE_SIZE;
         if (localY < 6)
         {
             return 1;
@@ -829,7 +832,7 @@ int isWall(float x, float y)
             return 1;
         }
 
-        if ((int)y % TILE_SIZE < 4)
+        if (localY < 4)
         {
             return 1;
         }
@@ -838,7 +841,7 @@ int isWall(float x, float y)
 
     if (type == 10 || type == 11 || type == 14 || type == 15 || type == 18 || type == 19)
     {
-        if ((int)y % TILE_SIZE < 4)
+        if (localY < 4)
         {
             return 1;
         }
@@ -847,16 +850,31 @@ int isWall(float x, float y)
 
     if (type == 22 || type == 23)
     {
-        if ((int)y % TILE_SIZE > 2)
+        if (localY > 2)
         {
             return 1;
         }
         return 0;
     }
 
-    if (type == 20 || type == 21)
+    if (type == 21 || type == 20)
     {
         return 1;
+    }
+
+    if (type == 42 || type == 43) {
+        if (localX >= 8) {
+            return 0;
+        }
+        if (type == 42) {
+            return 1; 
+        } 
+        else if (type == 43) {
+            if (localY < 4) {
+                return 1;
+            }
+            return 0;
+        }
     }
 
     return 0;
@@ -934,7 +952,8 @@ void ManageMusic()
 void UpdateGame(void)
 {
     const Uint8 *state = SDL_GetKeyboardState(NULL);
-
+    statue_has_drawing=1;
+    statue_has_water=1;
 
     if (chaudron_anim == 1)
     {
@@ -3461,5 +3480,50 @@ void DrawTexte(char *texteAffiche, SDL_Renderer *renderer, TTF_Font *font, int x
 
         SDL_FreeSurface(surfaceTexte);
         SDL_DestroyTexture(textureTexte);
+    }
+}
+
+// --- NETTOYAGE DE LA MÉMOIRE ---
+void CleanGame() {
+    // 1. Libérer les textures (Images)
+    if (tilesetTexture != NULL) {
+        SDL_DestroyTexture(tilesetTexture);
+        tilesetTexture = NULL;
+    }
+    if (textureScreamer != NULL) {
+        SDL_DestroyTexture(textureScreamer);
+        textureScreamer = NULL;
+    }
+    if (textureLivre != NULL) {
+        SDL_DestroyTexture(textureLivre);
+        textureLivre = NULL;
+    }
+
+    // 2. Libérer les effets sonores (Mix_Chunk)
+    if (sonPickUp != NULL) {
+        Mix_FreeChunk(sonPickUp);
+        sonPickUp = NULL;
+    }
+    if (sonOpenDoor != NULL) {
+        Mix_FreeChunk(sonOpenDoor);
+        sonOpenDoor = NULL;
+    }
+    if (sonCloseDoor != NULL) {
+        Mix_FreeChunk(sonCloseDoor);
+        sonCloseDoor = NULL;
+    }
+    if (sonScreamer != NULL) {
+        Mix_FreeChunk(sonScreamer);
+        sonScreamer = NULL;
+    }
+
+    // 3. Libérer les musiques (Mix_Music)
+    if (MusicInterior != NULL) {
+        Mix_FreeMusic(MusicInterior);
+        MusicInterior = NULL;
+    }
+    if (MusicExterior != NULL) {
+        Mix_FreeMusic(MusicExterior);
+        MusicExterior = NULL;
     }
 }
