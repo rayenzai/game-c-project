@@ -1,11 +1,14 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include "intro.h"
 #include "menu.h"
 #include "game.h"
 #include "sons.h"
 #include "pause.h"
+#include "fin_jeu.h"
 
 #define WINDOW_WIDTH 960
 #define WINDOW_HEIGHT 720
