@@ -2956,15 +2956,33 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
     
     
 
-    int caseX = (int)(fantome.x / TILE_SIZE);
-    int caseY = (int)(fantome.y / TILE_SIZE);
-
-    // On l'affiche s'il est éclairé ET qu'on est dans un niveau de labyrinthe
-    if (estEclaire(caseX, caseY, rayon) && currentLevel >= 5 && currentLevel <= 8)
+    if (currentLevel >= 5 && currentLevel <= 8)
     {
-        SDL_Rect src = {63 * TILE_SIZE, 0, 16, 16};
-        SDL_Rect dest = {(int)fantome.x, (int)fantome.y, 16, 16};
-        SDL_RenderCopy(renderer, tilesetTexture, &src, &dest);
+        int fantomeCenterX = (int)fantome.x + (fantome.w / 2);
+        int fantomeCenterY = (int)fantome.y + (fantome.h / 2);
+        int playerCenterX = (int)player.x + (player.w / 2);
+        int playerCenterY = (int)player.y + (player.h / 2);
+
+        float dx = (float)(fantomeCenterX - playerCenterX);
+        float dy = (float)(fantomeCenterY - playerCenterY);
+        float distPx = sqrtf(dx * dx + dy * dy);
+
+        float intensite = 0.0f;
+        if (distPx < rayon) {
+            intensite = 1.0f - (distPx / (float)rayon);
+        }
+
+        if (intensite > 0.0f) {
+            int lum = (int)(intensite * 255);
+            
+            SDL_SetTextureColorMod(tilesetTexture, lum, lum, lum);
+            
+            SDL_Rect src = {63 * TILE_SIZE, 0, 16, 16};
+            SDL_Rect dest = {(int)fantome.x, (int)fantome.y, 16, 16};
+            SDL_RenderCopy(renderer, tilesetTexture, &src, &dest);
+            
+            SDL_SetTextureColorMod(tilesetTexture, 255, 255, 255);
+        }
     }
 
     if (currentLevel == 3 && plat_pret_a_servir > 0)
