@@ -569,9 +569,13 @@ int statue_has_water = 0;
 int statue_has_drawing = 0;
 
 int interact_porte_fin = 0;
+int fin_du_jeu = 0;
+int interact_mur_fin = 0;
 int interraction_maman_fin =0;
 int dialogue_maman = 0;
 int dialogue_maman_2 = 0;
+int dialogue_Step_fin = 0;
+//int est_vieux = 0; // 0 jeune 1 vieux
 int menu_fin = 0;
 int ellipse = 0;
 
@@ -1068,6 +1072,43 @@ void UpdateGame(void)
         }
     }
 
+    if(ellipse == 1){
+            if (state[SDL_SCANCODE_RETURN] && toucheRelache) 
+                {
+                    player.x = 80;
+                    player.y = 50;
+                    currentLevel = 0;
+
+                    // 2. On change l'état (ex: pour charger le nouveau sprite)
+                    //estAdulte = 1; 
+                    ellipse = 0; 
+                    toucheRelache = 0;
+                    interact_mur_fin = 1;
+                    fin_du_jeu = 1;
+                }
+            else if (!state[SDL_SCANCODE_RETURN]) // Si la touche n'est pas appuyée
+            {
+                toucheRelache = 1; // Alors on autorise le prochain appui
+            }
+            return; //on bloque le jeu et on reste dans l'ellipse
+    }  
+    dialogue_Step_fin = 0;
+    if (dialogue_Step_fin > 0)
+    {
+        if (state[SDL_SCANCODE_RETURN])
+        {
+            if (toucheRelache)
+            {
+                dialogue_Step_fin = 0;
+                toucheRelache = 0;
+            }
+        }
+        else
+        {
+            toucheRelache = 1;
+        }
+        return;
+    }   
     if (dialogueStep > 0)
     {
 
@@ -2120,7 +2161,7 @@ void UpdateGame(void)
     // On vérifie si on est au niveau 0 ET si on dépasse le haut de l'écran (y < 5)
     if (IsLocationUp(8, 13, 0, 5))
     {
-        if (hasDoudou == 1)
+        if (hasDoudou == 1 && fin_du_jeu == 0)
         {
             currentLevel = 1;
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
@@ -2130,9 +2171,10 @@ void UpdateGame(void)
             player.y = 5;
         }
     }
-    if (IsLocationUp(8, 13, 0, 10) && hasDoudou == 0)
+    if (IsLocationUp(8, 13, 0, 10) && (hasDoudou == 0 || fin_du_jeu == 1))
     {
-        dialogueStep_sortie1 = 1;
+        if(hasDoudou == 0) dialogueStep_sortie1 = 1;
+        if(fin_du_jeu == 1) dialogue_Step_fin = 1;
     }
 
     // 2. Quitter le COULOIR (Niveau 1) par le BAS
@@ -2470,32 +2512,18 @@ void UpdateGame(void)
                 maps[11][mamanY -1][mamanX]  = 441;
                 SDL_Delay (1000);
                 dialogue_maman_2 = 1;
-                //menu_fin = 1;
                 interraction_maman_fin =0;
-                if( ellipse == 1){
-                    printf("ca marche ou pas");
-                    if (state[SDL_SCANCODE_RETURN] && toucheRelache) 
-                    {
-                            printf("TOUCHE ENTREE\n");
-                            player.x = 80;
-                            player.y = 50;
-                            currentLevel = 1;
-
-                            // 2. On change l'état (ex: pour charger le nouveau sprite)
-                            //estAdulte = 1; 
-                            ellipse = 0; 
-                            toucheRelache = 0;
-                            printf("debuggg");
-                    }
-                    else if (!state[SDL_SCANCODE_RETURN]) // Si la touche n'est pas appuyée
-                    {
-                        toucheRelache = 1; // Alors on autorise le prochain appui
-                    }
-                    return; //on bloque le jeu et on reste dans l'ellipse
-                }
             }
         }
     }
+
+    if (currentLevel == 0 && interact_mur_fin == 1) {
+            if (state[SDL_SCANCODE_W] || state[SDL_SCANCODE_UP]) { 
+                if (IsLocationUp(8, 13, 0, 20)) {
+                    dialogue_Step_fin = 1; // On active le message
+                } 
+            }
+        }
 
     if (!state[SDL_SCANCODE_E])
         toucheE_Relache_Maman = 1;
@@ -3036,6 +3064,12 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
         if (dialogue_maman_2 == 2) texteAffiche = "Tu aurais du partir";
         if (dialogue_maman_2 == 3) texteAffiche = "Il arrive...";
 
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+
+    if (dialogue_Step_fin > 0) {
+        char *texteAffiche = "";
+        if (dialogue_Step_fin == 1) texteAffiche = "je suis coince ici";
         DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
     }
 
