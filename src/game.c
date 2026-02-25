@@ -1136,15 +1136,13 @@ void UpdateGame(void)
                 {
                     dialogue_maman_2 = 0; 
                     ellipse = 1;
+                    toucheRelache = 0;
                 }
             }
         }
-        else
-        {
-            toucheRelache = 1; // On autorise le prochain appui quand Entrée est relâché
-        }
-        
+        else if (!state[SDL_SCANCODE_RETURN]) { toucheRelache = 1; }
         return;
+
     }
     if (dialogue_statue_haut > 0)
     {
@@ -2474,8 +2472,27 @@ void UpdateGame(void)
                 dialogue_maman_2 = 1;
                 //menu_fin = 1;
                 interraction_maman_fin =0;
-                SDL_Delay(2000);
-                ellipse = 1;
+                if( ellipse == 1){
+                    printf("ca marche ou pas");
+                    if (state[SDL_SCANCODE_RETURN] && toucheRelache) 
+                    {
+                            printf("TOUCHE ENTREE\n");
+                            player.x = 80;
+                            player.y = 50;
+                            currentLevel = 1;
+
+                            // 2. On change l'état (ex: pour charger le nouveau sprite)
+                            //estAdulte = 1; 
+                            ellipse = 0; 
+                            toucheRelache = 0;
+                            printf("debuggg");
+                    }
+                    else if (!state[SDL_SCANCODE_RETURN]) // Si la touche n'est pas appuyée
+                    {
+                        toucheRelache = 1; // Alors on autorise le prochain appui
+                    }
+                    return; //on bloque le jeu et on reste dans l'ellipse
+                }
             }
         }
     }

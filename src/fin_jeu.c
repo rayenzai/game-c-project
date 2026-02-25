@@ -33,6 +33,7 @@ void DrawEllipse(SDL_Renderer *renderer, TTF_Font *font) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
     dessinerTexteInterne(renderer, font, "20 ans plus tard...", 110);
+
 }
 
 // void afficher_menu_fin(SDL_Renderer *renderer, TTF_Font *font) {
