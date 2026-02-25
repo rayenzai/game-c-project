@@ -1004,8 +1004,8 @@ int isWall(float x, float y)
     }
 
     if ((type_pattern == 160 || type_pattern == 163) && currentLevel == 1 ) {
-        if(type_pattern == 163 && (localY>11 || localY<3))return 0;
-        if(localX<3)return 0;
+        if(type_pattern == 163 && (localY>11 ))return 0;
+        if(localX<2)return 0;
         return 1; // Le haut de la table est 100% solide
     }
 
@@ -1063,7 +1063,7 @@ int isWall(float x, float y)
             // if ((type == 380 || type == 381) && localY < 9) return 0;
 
             
-            if ((type == 378 ) && localX < 6) return 0;
+            if ((type == 378 ) && localX < 2) return 0;
 
             if ((type == 379 ) && localX > 2) return 0; 
 
@@ -1227,6 +1227,13 @@ int isWall(float x, float y)
     }
     if(type >= 435 && type <= 438){
         if((type == 435 || type == 437) && localX<4 )return 0;
+        if(isTopCorner)return 0;
+        return 1;
+    }
+    // 156 157 158 159
+    if(type >= 156 && type <= 159){
+        if((type == 156 || type == 158) && localX<7)return 0;
+        if( (type == 157 || type == 159) && localX>10)return 0;
         if(isTopCorner)return 0;
         return 1;
     }
