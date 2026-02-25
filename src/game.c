@@ -29,9 +29,6 @@ static Mix_Music *MusicExterior = NULL;
 // Pour les touches
 static int toucheE_Relache = 1;
 static int toucheEnter_Relache = 1;
-static int toucheE_Relache_Maman = 1;
-
-
 
 // --- VARIABLES GLOBALES ---
 
@@ -39,7 +36,7 @@ static SDL_Texture *tilesetTexture = NULL;
 SDL_Texture *textureScreamer = NULL; 
 // static SDL_Texture *playerTexture = NULL; 
 // static SDL_Texture *playerTexture = NULL;
-
+SDL_Texture *texturePlayerVieux = NULL;
 // livre
 SDL_Texture *textureLivre = NULL;
 int livreOuvert = 0;
@@ -285,7 +282,9 @@ int currentLevel = 0; // 0 = Chambre, 1 = Couloir
 419,420,421 = mid piano
 422 = haut piano
 435,436(bas),437,438(haut) = porte fin fermée
-439 = maman essaie
+439 = maman par terre sang
+440, 441 = maman debout
+442, 443 = perso debout adulte
 ...................
 423,424 (bas), 425,426 (mid), 427,428 = porte
 429,430 (bas), 431,432(mid), 433,434 = porte mur gauche
@@ -575,7 +574,7 @@ int interraction_maman_fin =0;
 int dialogue_maman = 0;
 int dialogue_maman_2 = 0;
 int dialogue_Step_fin = 0;
-//int est_vieux = 0; // 0 jeune 1 vieux
+int estAdulte = 0; // 0 jeune 1 vieux
 int menu_fin = 0;
 int ellipse = 0;
 
@@ -675,6 +674,7 @@ int InitGameStepByStep(SDL_Renderer *renderer, int *pourcentage) {
         player.h = 12;
         dialogueStep = 1; 
         toucheRelache = 0; 
+        estAdulte = 0;
         hasDoudou = 0; 
         screamer = 0;
         *pourcentage = 10;
@@ -1084,6 +1084,7 @@ void UpdateGame(void)
                     ellipse = 0; 
                     toucheRelache = 0;
                     interact_mur_fin = 1;
+                    estAdulte = 1;
                     fin_du_jeu = 1;
                 }
             else if (!state[SDL_SCANCODE_RETURN]) // Si la touche n'est pas appuyée
@@ -3045,11 +3046,26 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
             else                      indexJoueur = 348; 
         }
     }
-    SDL_Rect srcPlayer = { indexJoueur * 16, 0, 16, 16 };
-    
-    SDL_Rect destPlayer = { (int)roundf(player.x) - 2, (int)roundf(player.y) - 2, 16, 16 };
-    SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
-    
+
+    int dx = (int)roundf(player.x) - 2;
+    int dy = (int)roundf(player.y) - 2;
+
+    if (estAdulte) {
+    // bas = corps (441), haut = tête (442)
+    SDL_Rect srcBas = { 442 * 16, 0, 16, 16 };
+    SDL_Rect srcHaut = { 443 * 16, 0, 16, 16 };
+
+    SDL_Rect dstBas  = { dx, dy, 16, 16 };
+    SDL_Rect dstHaut = { dx, dy - 16, 16, 16 }; // 1 tuile au-dessus
+
+    SDL_RenderCopy(renderer, tilesetTexture, &srcHaut, &dstHaut);
+    SDL_RenderCopy(renderer, tilesetTexture, &srcBas,  &dstBas);
+}
+    else {
+        SDL_Rect srcPlayer = { indexJoueur * 16, 0, 16, 16 };
+        SDL_Rect destPlayer = { (int)roundf(player.x) - 2, (int)roundf(player.y) - 2, 16, 16 };
+        SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
+    }
 
 
     //dialogues
