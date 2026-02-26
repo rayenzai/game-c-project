@@ -58,6 +58,8 @@ void DrawTexte(char *texteAffiche, SDL_Renderer *renderer,TTF_Font *font, int x,
 void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText);
 void DrawTuiles(float x, float y, int indexTuile, SDL_Renderer *renderer, int luminosite);
 
+int IsTuileSpecial(int index);
+
 void TrouveCoordonnees(int *nvx, int *nvy, int indexObjet, int CurrLvl);
 int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance, int x, int y);
 void GestionPapa();
