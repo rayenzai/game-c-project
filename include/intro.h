@@ -13,5 +13,6 @@ int HandleIntroInput(SDL_Event *event);
 void UpdateIntroTimer(void);
 
 void DrawIntro(SDL_Renderer *renderer, TTF_Font *font);
+void dessinerTexteInterne(SDL_Renderer *renderer, TTF_Font *font, const char *texte, int y);
 
 #endif

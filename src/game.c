@@ -2,6 +2,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 #include "game.h"
+#include "intro.h"
 #include "sons.h"
 #include "map.h"
 #include "ia.h"
@@ -35,7 +36,7 @@ static SDL_Texture *tilesetTexture = NULL;
 SDL_Texture *textureScreamer = NULL; 
 // static SDL_Texture *playerTexture = NULL; 
 // static SDL_Texture *playerTexture = NULL;
-
+SDL_Texture *texturePlayerVieux = NULL;
 // livre
 SDL_Texture *textureLivre = NULL;
 int livreOuvert = 0;
@@ -281,6 +282,9 @@ int currentLevel = 0; // 0 = Chambre, 1 = Couloir
 419,420,421 = mid piano
 422 = haut piano
 435,436(bas),437,438(haut) = porte fin fermée
+439 = maman par terre sang
+440, 441 = maman debout
+442, 443 = perso debout adulte
 ...................
 423,424 (bas), 425,426 (mid), 427,428 = porte
 429,430 (bas), 431,432(mid), 433,434 = porte mur gauche
@@ -562,7 +566,18 @@ int has_water = 0;
 int has_drawing = 0;
 int statue_has_water = 0;
 int statue_has_drawing = 0;
+
 int interact_porte_fin = 0;
+int fin_du_jeu = 0;
+int interact_mur_fin = 0;
+int interraction_maman_fin =0;
+int dialogue_maman = 0;
+int dialogue_maman_2 = 0;
+int dialogue_Step_fin = 0;
+int estAdulte = 0; // 0 jeune 1 vieux
+int menu_fin = 0;
+int ellipse = 0;
+
 SDL_Rect doudouRect = { 200, 150, 12, 12 };
 
 static int playerDir = 0;       // 0=Bas, 1=Gauche, 2=Droite, 3=Haut
@@ -659,6 +674,7 @@ int InitGameStepByStep(SDL_Renderer *renderer, int *pourcentage) {
         player.h = 14;
         dialogueStep = 1; 
         toucheRelache = 0; 
+        estAdulte = 0;
         hasDoudou = 0; 
         screamer = 0;
         *pourcentage = 10;
@@ -1396,6 +1412,44 @@ void UpdateGame(void)
         }
     }
 
+    if(ellipse == 1){
+            if (state[SDL_SCANCODE_RETURN] && toucheRelache) 
+                {
+                    player.x = 80;
+                    player.y = 50;
+                    currentLevel = 0;
+
+                    // 2. On change l'état (ex: pour charger le nouveau sprite)
+                    //estAdulte = 1; 
+                    ellipse = 0; 
+                    toucheRelache = 0;
+                    interact_mur_fin = 1;
+                    estAdulte = 1;
+                    fin_du_jeu = 1;
+                }
+            else if (!state[SDL_SCANCODE_RETURN]) // Si la touche n'est pas appuyée
+            {
+                toucheRelache = 1; // Alors on autorise le prochain appui
+            }
+            return; //on bloque le jeu et on reste dans l'ellipse
+    }  
+    dialogue_Step_fin = 0;
+    if (dialogue_Step_fin > 0)
+    {
+        if (state[SDL_SCANCODE_RETURN])
+        {
+            if (toucheRelache)
+            {
+                dialogue_Step_fin = 0;
+                toucheRelache = 0;
+            }
+        }
+        else
+        {
+            toucheRelache = 1;
+        }
+        return;
+    }   
     if (dialogueStep > 0)
     {
 
@@ -1433,6 +1487,44 @@ void UpdateGame(void)
             toucheRelache = 1;
         }
         return;
+    }
+    if (dialogue_maman > 0){
+        if (state[SDL_SCANCODE_RETURN])
+        {
+            if (toucheRelache)
+            {
+                toucheRelache = 0;
+                dialogue_maman = 0;
+            }
+        }
+        else
+        {
+            toucheRelache = 1;
+        }
+        return;
+    }
+    if (dialogue_maman_2 > 0)
+    {
+        // on bloque le joueur
+        if (state[SDL_SCANCODE_RETURN])
+        {
+            if (toucheRelache)
+            {
+                dialogue_maman_2++; // on passe au texte suivant
+                toucheRelache = 0;   // eviter que le texte defile
+                
+                // Si + 3eme texte on ferme tout
+                if (dialogue_maman_2 > 3) 
+                {
+                    dialogue_maman_2 = 0; 
+                    ellipse = 1;
+                    toucheRelache = 0;
+                }
+            }
+        }
+        else if (!state[SDL_SCANCODE_RETURN]) { toucheRelache = 1; }
+        return;
+
     }
     if (dialogue_statue_haut > 0)
     {
@@ -2410,7 +2502,7 @@ void UpdateGame(void)
     // On vérifie si on est au niveau 0 ET si on dépasse le haut de l'écran (y < 5)
     if (IsLocationUp(8, 13, 0, 5))
     {
-        if (hasDoudou == 1)
+        if (hasDoudou == 1 && fin_du_jeu == 0)
         {
             currentLevel = 1;
             player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
@@ -2420,9 +2512,10 @@ void UpdateGame(void)
             player.y = 5;
         }
     }
-    if (IsLocationUp(8, 13, 0, 10) && hasDoudou == 0)
+    if (IsLocationUp(8, 13, 0, 10) && (hasDoudou == 0 || fin_du_jeu == 1))
     {
-        dialogueStep_sortie1 = 1;
+        if(hasDoudou == 0) dialogueStep_sortie1 = 1;
+        if(fin_du_jeu == 1) dialogue_Step_fin = 1;
     }
 
     // 2. Quitter le COULOIR (Niveau 1) par le BAS
@@ -2470,7 +2563,7 @@ void UpdateGame(void)
     {
         currentLevel = 5;
         player.x = 5;
-        SpawnFantomeRandom(); // <--- NOUVEAU
+        SpawnFantomeRandom(); 
     }
     if (IsLocationRight(6, 10, 2, 20) && (statue_has_drawing == 0 || statue_has_water == 0))
     {
@@ -2695,17 +2788,21 @@ void UpdateGame(void)
     // printf("lvl: %d \n", currentLevel);
         //------ Fin du jeu------
     interact_porte_fin = 0;
+    interraction_maman_fin =0;
 
     float distance_porte = 9999.0f;
-
+    float distance_maman = 9999.0f;
     // coordonnées bas gauche de la porte
     int porteFinX = -1, porteFinY = -1;
+    //coordonnées maman
+    int mamanX = 12, mamanY = 13;
 
     TrouveCoordonnees(&porteFinX, &porteFinY, 437, 11);
 
     if (IsLocationObjet(20, 11, 437, &distance_porte, -1, -1)) interact_porte_fin = 1;
 
     static int toucheE_Relache = 1; //empeche ouverture en boucle
+    //static int open_door = 0;
 
     if (state[SDL_SCANCODE_E] && toucheE_Relache)
     {
@@ -2722,13 +2819,57 @@ void UpdateGame(void)
                 maps[11][porteFinY + 1 ][porteFinX + 1]     = 329;
                 maps[11][porteFinY][porteFinX]     = 330;
                 maps[11][porteFinY][porteFinX + 1] = 331;
+                //open_door = 1;
+                SDL_Delay (1000);
+                dialogue_maman = 1;
+                maps[11][mamanY][mamanX] = 439;
+                menu_fin = 1;
+                interact_porte_fin=0;
+            }
+        }
+    }
+    if (!state[SDL_SCANCODE_E])
+        toucheE_Relache = 1;
+
+//........... FIN RESTER .................
+    TrouveCoordonnees(&mamanX, &mamanY, 439, 11);
+    if (IsLocationObjet(16, 11, 439, &distance_maman, -1, -1)) interraction_maman_fin = 1;
+    //static int toucheE_Relache = 1;
+    static int toucheE_Relache_Maman = 1;
+
+    if (state[SDL_SCANCODE_E] && toucheE_Relache_Maman)
+    {
+        toucheE_Relache_Maman = 0;
+        // static toucheE_Relache = 0;
+
+        if (interraction_maman_fin && currentLevel == 11)
+        {
+            if (mamanX != -1 && mamanY != -1)
+            {
+                if (sonOpenDoor) //son mathys en attente
+                    Mix_PlayChannel(-1, sonOpenDoor, 0);
+
+                maps[11][mamanY ][mamanX]    = 440;
+                maps[11][mamanY -1][mamanX]  = 441;
+                SDL_Delay (1000);
+                dialogue_maman_2 = 1;
+                interraction_maman_fin =0;
             }
         }
     }
 
-    if (!state[SDL_SCANCODE_E])
-        toucheE_Relache = 1;
+    if (currentLevel == 0 && interact_mur_fin == 1) {
+            if (state[SDL_SCANCODE_W] || state[SDL_SCANCODE_UP]) { 
+                if (IsLocationUp(8, 13, 0, 20)) {
+                    dialogue_Step_fin = 1; // On active le message
+                } 
+            }
+        }
 
+    if (!state[SDL_SCANCODE_E])
+        toucheE_Relache_Maman = 1;
+
+    // currentLevel = 11;
 }
 
 void copieTableau (int src[MAP_HEIGHT][MAP_WIDTH], int dest[MAP_HEIGHT][MAP_WIDTH]){
@@ -2994,7 +3135,6 @@ float getLuminosite(int gridX, int gridY, int rayonPx)
     for (int ly = 0; ly < MAP_HEIGHT; ly++) {
         for (int lx = 0; lx < MAP_WIDTH; lx++) {
             int indexTuile = maps[currentLevel][ly][lx];
-
             // UTILISATION DE LA FONCTION RAPIDE ICI
             if (IsLampe(indexTuile)) { 
                 float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
@@ -3143,6 +3283,7 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
             }
         }
     }
+        
 
     // ANIMATION
     int indexJoueur = 7; 
@@ -3222,10 +3363,107 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
             else                      indexJoueur = 348; 
         }
     }
-    SDL_Rect srcPlayer = { indexJoueur * 16, 0, 16, 16 };
+
+    int dx = (int)roundf(player.x) - 2;
+    int dy = (int)roundf(player.y) - 2;
+
+    if (estAdulte) {
+    // bas = corps (441), haut = tête (442)
+    SDL_Rect srcBas = { 442 * 16, 0, 16, 16 };
+    SDL_Rect srcHaut = { 443 * 16, 0, 16, 16 };
+
+    SDL_Rect dstBas  = { dx, dy, 16, 16 };
+    SDL_Rect dstHaut = { dx, dy - 16, 16, 16 }; // 1 tuile au-dessus
+
+    SDL_RenderCopy(renderer, tilesetTexture, &srcHaut, &dstHaut);
+    SDL_RenderCopy(renderer, tilesetTexture, &srcBas,  &dstBas);
+}
+    else {
+        SDL_Rect srcPlayer = { indexJoueur * 16, 0, 16, 16 };
+        SDL_Rect destPlayer = { (int)roundf(player.x) - 2, (int)roundf(player.y) - 2, 16, 16 };
+        SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
+    }
+
+
+    //dialogues
+    if (dialogue_maman > 0) {
+        char *texteAffiche = "Au secours mon fils viens m'aider !";
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+
+    if (dialogue_maman_2 > 0) {
+        char *texteAffiche = "";
+        if (dialogue_maman_2 == 1) texteAffiche = "Pourquoi tu es encore la...?";
+        if (dialogue_maman_2 == 2) texteAffiche = "Tu aurais du partir";
+        if (dialogue_maman_2 == 3) texteAffiche = "Il arrive...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+
+    if (dialogue_Step_fin > 0) {
+        char *texteAffiche = "";
+        if (dialogue_Step_fin == 1) texteAffiche = "je suis coince ici";
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+
+    //...... DESSINER L'ELLIPSE..........
+    if (ellipse == 1){
+            DrawEllipse(renderer,font);
+    }
+        
+    if (dialogueStep > 0) {
+        char *texteAffiche = "";
+        if (dialogueStep == 1) texteAffiche = "Maman ? Papa ? Il fait tout noir...";
+        if (dialogueStep == 2) texteAffiche = "J'ai peur... Ou est mon Doudou ?";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogueStep_sortie1 > 0) {
+        char *texteAffiche = "";
+        if (dialogueStep_sortie1 == 1) texteAffiche = "je peux pas sortir sans mon doudou...";
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_hasDoudou > 0) {
+        char *texteAffiche = "";
+        if (dialogue_hasDoudou == 1) texteAffiche = "je te tiens";
+        if (dialogue_hasDoudou == 2) texteAffiche = "OH...";
+        if (dialogue_hasDoudou == 3) texteAffiche = "De la lumiere !";
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_statue_haut > 0) {
+        show_interact_prompt_statue_haut = 0;
+        char *texteAffiche = "";
+        if (dialogue_statue_haut == 1) texteAffiche = "Cette statue tient une coupe vide,";
+        if (dialogue_statue_haut == 2) texteAffiche = "elle doit avoir soif...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_statue_bas > 0) {
+        show_interact_prompt_statue_bas = 0;
+        char *texteAffiche = "";
+        if (dialogue_statue_bas == 1) texteAffiche = "Son visage est tordu par la haine.";
+        if (dialogue_statue_bas == 2) texteAffiche = "Un sourir ne ferait pas de mal...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_entree_labyrinthe > 0) {
+        char *texteAffiche = "";
+        if (dialogue_entree_labyrinthe == 1) texteAffiche = "Les statues bloquent le passage...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+    if (dialogue_max_objet > 0) {
+        show_interact_prompt_dessin = 0;
+        show_interact_prompt_eau = 0;
+        char *texteAffiche = "";
+        if (dialogue_max_objet == 1) texteAffiche = "Je n'ai que deux mains...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+
+
     
-    SDL_Rect destPlayer = { (int)roundf(player.x) - 2, (int)roundf(player.y) - 2, 16, 16 };
-    SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
+ 
 
     // --- COUCHE 2 : TUILES PAR-DESSUS LE JOUEUR (Panier, lampes murales...) ---
     if (tilesetTexture) {
@@ -3501,6 +3739,14 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
     {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Ouvrir", cBlanc);
+
+        if (sText)
+            DrawInteractions(renderer, sText);
+    }
+    if (interraction_maman_fin == 1)
+    {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Parler", cBlanc);
 
         if (sText)
             DrawInteractions(renderer, sText);
