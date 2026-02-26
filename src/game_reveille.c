@@ -9,6 +9,10 @@ static int isPlayerMoving = 0;  // 0=Immobile, 1=Marche
 
 static SDL_Texture *tilesetTexture = NULL;
 
+static int toucheE_Relache = 1;
+
+int showInteractPromptTente2 = 0;
+
 int maps_reveille[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
 	{      //carte 1 (chambre)
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, 
@@ -17,8 +21,8 @@ int maps_reveille[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2},
         {2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2},
         {2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2},
-        {2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2},
-        {2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2},
+        {2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 55, 56, 57, 2},
+        {2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 52, 53, 54, 2},
         {2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2},
         {2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2},
         {2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2},
@@ -152,7 +156,29 @@ int maps_reveille[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
     },
+    // TENTE (index 8)
+    {
+        {50, 50, 50, 50, 50,  50,  50,  50,  50,  50,  50,  50,  50,  50, 50, 50, 50, 50, 50, 50}, // Marge Haut
+        {50, 50, 50, 50, 50,  50,  50,  50,  50,  50,  50,  50,  50,  50, 50, 50, 50, 50, 50, 50},
+        {50, 50, 50, 50, 50,  50,  50,  50,  50,  50,  50,  50,  50,  50, 50, 50, 50, 50, 50, 50},
+        {50, 50, 50, 50, 50, 151, 152, 151, 152, 151, 152, 151, 152, 151, 50, 50, 50, 50, 50, 50}, // Début Rectangle
+        {50, 50, 50, 50, 50, 366,   1,   0,   1,   0,  58,  41,   1, 364, 50, 50, 50, 50, 50, 50},
+        {50, 50, 50, 50, 50, 366,  44,   0,   1,   0,   1,   0, 147, 364, 50, 50, 50, 50, 50, 50},
+        {50, 50, 50, 50, 50,   0,   1,   0,   1,   0,   1,   0,   1, 364, 50, 50, 50, 50, 50, 50},
+        {50, 50, 50, 50, 50,   0,   1,   0, 148,  59,  60,   0,   1, 364, 50, 50, 50, 50, 50, 50},
+        {50, 50, 50, 50, 50,   0,   1,   0,   1,   0, 149,  45, 174, 364, 50, 50, 50, 50, 50, 50}, 
+        {50, 50, 50, 50, 50, 366,  58,   0,   1,   0,   1,  40,   1, 364, 50, 50, 50, 50, 50, 50},
+        {50, 50, 50, 50, 50, 366,   1,   0,   1,   0,   1,   0,   1, 364, 50, 50, 50, 50, 50, 50},
+        {50, 50, 50, 50, 50, 365, 365, 365, 365, 365, 365, 365, 365, 364, 50, 50, 50, 50, 50, 50}, // Fin Rectangle
+        {50, 50, 50, 50, 50,  50,  50,  50,  50,  50,  50,  50,  50,  50, 50, 50, 50, 50, 50, 50},          // Marge Bas
+        {50, 50, 50, 50, 50,  50,  50,  50,  50,  50,  50,  50,  50,  50, 50, 50, 50, 50, 50, 50},
+        {50, 50, 50, 50, 50,  50,  50,  50,  50,  50,  50,  50,  50,  50, 50, 50, 50, 50, 50, 50}},
+
 };
+
+// int TuilesNotSpecial[] = {0, 1, 2};
+// int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
+
 
 int InitGameStepByStepReveille(SDL_Renderer *renderer){
 	player.x = 80;
@@ -241,6 +267,34 @@ void UpdateGameReveille(void){
 
     if (!touchWallY)
         player.y = nextY;
+
+    float distance_tente;
+    showInteractPromptTente2 = 0;
+    if (IsLocationObjet(24, 0, 55, &distance_tente, -1, -1))
+    {
+        showInteractPromptTente2 = 1;
+    }
+
+    if(state[SDL_SCANCODE_E]){
+    	if(toucheE_Relache){
+    		if (distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55)
+            {
+                currentLevel = 8;
+                player.x = 7 * TILE_SIZE;
+                player.y = 7 * TILE_SIZE;
+            }
+    		toucheE_Relache = 0;
+    	}else{
+    		toucheE_Relache = 1;
+    	}
+    }
+
+    // Changement tente <->chambre 
+    if (IsLocationLeft(6, 10, 8, 6 * TILE_SIZE - 8))
+    {
+        player.x = 15 * TILE_SIZE;
+        currentLevel = 0;
+    }
 
     // Changement chambre <-> couloir
     if (IsLocationUp(8, 13, 0, 5))
@@ -332,11 +386,7 @@ void UpdateGameReveille(void){
 }
 
 static inline int IsTuileDessus(int index) {
-    return (index == 78 || index == 75 || index == 76 || index == 145 || index == 146 || index == 85 
-        || index == 86 || index == 296 || index == 297 || index == 298 || index == 299 || index == 300
-         || index == 301 || index == 380 || index == 381 || index == 384 || index == 385 || index == 263 
-         || index == 398 || index == 308 || index == 309 || index == 310 || index == 311 || index == 304
-         || index == 305 || index == 402 || index == 403);
+    return (index == 78);
 }
 
 void DrawGameReveille(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
@@ -356,7 +406,7 @@ void DrawGameReveille(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini
                 DrawTuiles(x, y, type_pat, renderer, lum); 
 
                 int type_maps = maps_reveille[currentLevel][y][x];
-                if (!IsTuileDessus(type_maps))
+                if (!IsTuileDessus(type_maps) && IsTuileSpecial(type_maps))
                 {
                     if (type_maps >= 219 && type_maps <= 222) continue; 
                     if (type_maps >= 187 && type_maps <= 190) continue; 
@@ -439,5 +489,14 @@ void DrawGameReveille(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini
                 }
             }
         }
+
+    }
+    if (showInteractPromptTente2 == 1)
+    {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Entrer", cBlanc);
+
+        if (sText)
+            DrawInteractions(renderer, sText);
     }
 }
