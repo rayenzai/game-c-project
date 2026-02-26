@@ -9,11 +9,29 @@ static int isPlayerMoving = 0;  // 0=Immobile, 1=Marche
 
 static SDL_Texture *tilesetTexture = NULL;
 
+/*------- CHAMBRE ---------
+444,445 = sol
+446 = mur en brique 
+447,448 = cubes seuls
+449 = affiche lapin 
+450 = livre 
+451 = lampe 
+452,453,454 = bas du tapis 
+455,456,457 = haut tapis
+458,459 = tapis rond
+460,461 = haut lit 
+462,463 = bas lit
+464 = cars
+465 = batman 
+466,467 = petit train
+
+
+*/
 int maps_reveille[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
 	{      //carte 1 (chambre)
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, 
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2}, 
-        {2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2},
+        {2, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2},
         {2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2},
         {2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2},
         {2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2},
