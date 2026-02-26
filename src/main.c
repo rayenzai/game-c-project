@@ -8,6 +8,7 @@
 #include "game.h"
 #include "sons.h"
 #include "fin_jeu.h"
+#include "game_reveille.h"
 
 #define WINDOW_WIDTH 960
 #define WINDOW_HEIGHT 720
@@ -20,11 +21,14 @@ typedef enum {
     ETAT_INTRO,
     ETAT_CHARGEMENT,
     ETAT_JEU,
-    ETAT_FIN
+    ETAT_FIN,
+    ETAT_JEU_REVEILLE
 } GameState;
 
 SDL_Renderer* renderer;
 TTF_Font* font;
+
+int fin_jeu = 0;
 
 int main(int argc, char* argv[]) {
     (void)argc; (void)argv;
@@ -111,8 +115,12 @@ int main(int argc, char* argv[]) {
             if (etat == ETAT_MENU) {
                 int action = UpdateMenu(&event);
                 if (action == 1) { 
-                    etat = ETAT_CHARGEMENT; 
-                    vraiPourcentage = 0;
+                    if(fin_jeu)etat = ETAT_JEU_REVEILLE;
+                    else{
+                        etat = ETAT_CHARGEMENT; 
+                        vraiPourcentage = 0;   
+                    }
+                    
                 }
                 if (action == 2) running = 0;
             }
@@ -121,7 +129,7 @@ int main(int argc, char* argv[]) {
                     etat = ETAT_CHARGEMENT;
                 }
             }
-            else if (etat == ETAT_JEU) {
+            else if (etat == ETAT_JEU || etat == ETAT_JEU_REVEILLE) {
                 
                 if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                     etat = ETAT_MENU;
@@ -138,6 +146,10 @@ int main(int argc, char* argv[]) {
 
                     if(choix == 0){
                         printf("ON PART\n"); 
+                        InitGameStepByStepReveille(renderer);
+                        etat = ETAT_JEU_REVEILLE;
+                        currentLevel = 0;
+                        fin_jeu=1;
                         // Faudrait faire la logique où on se tp à la salle dans la vraie vie
                     }
                     else if(choix == 1){
@@ -163,7 +175,10 @@ int main(int argc, char* argv[]) {
             UpdateGame();
             if(menu_fin == 1)etat = ETAT_FIN;
         }
-        
+
+        else if(etat == ETAT_JEU_REVEILLE){
+            UpdateGameReveille();
+        }
 
         // C. DESSIN
         if (etat == ETAT_MENU) {
@@ -207,6 +222,9 @@ int main(int argc, char* argv[]) {
         }
         else if (etat == ETAT_JEU) {
             DrawGame(renderer,fontPetit, fontMini);
+        }
+        else if(etat == ETAT_JEU_REVEILLE){
+            DrawGameReveille(renderer, fontPetit, fontMini);
         }
 
         

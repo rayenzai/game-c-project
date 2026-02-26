@@ -36,6 +36,8 @@ extern Joueur player;
 extern Fantome fantome;
 extern int livreOuvert;
 
+// extern SDL_Texture *tilesetTexture;
+
 // -- VARIABLES AUTRE PART --
 extern SDL_Renderer* renderer;
 extern TTF_Font* font;
@@ -54,6 +56,8 @@ void ActionFantome();
 void SpawnFantomeRandom();
 void DrawTexte(char *texteAffiche, SDL_Renderer *renderer,TTF_Font *font, int x, int y, int w, int h);
 void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText);
+void DrawTuiles(float x, float y, int indexTuile, SDL_Renderer *renderer, int luminosite);
+
 void TrouveCoordonnees(int *nvx, int *nvy, int indexObjet, int CurrLvl);
 int IsLocationObjet(int rayon, int CurrLvl, int indexTuile, float *distance, int x, int y);
 void GestionPapa();

@@ -1,6 +1,7 @@
 #include "fin_jeu.h"
 #include "game.h"
 #include "intro.h"
+#include "map_reveille.h"
 
 int choix = 0;
 int nbOptions = 2;
@@ -102,5 +103,3 @@ void afficher_menu_fin(SDL_Renderer *renderer, TTF_Font *font) {
         SDL_DestroyTexture(tFleche);
     }
 }
-
-

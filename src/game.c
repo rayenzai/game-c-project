@@ -2223,7 +2223,7 @@ void UpdateGame(void)
     {
         currentLevel = 5;
         player.x = 5;
-        SpawnFantomeRandom(); // <--- NOUVEAU
+        SpawnFantomeRandom(); 
     }
     if (IsLocationRight(6, 10, 2, 20) && (statue_has_drawing == 0 || statue_has_water == 0))
     {
@@ -2528,6 +2528,8 @@ void UpdateGame(void)
 
     if (!state[SDL_SCANCODE_E])
         toucheE_Relache_Maman = 1;
+
+    currentLevel = 11;
 }
 
 void copieTableau (int src[MAP_HEIGHT][MAP_WIDTH], int dest[MAP_HEIGHT][MAP_WIDTH]){
