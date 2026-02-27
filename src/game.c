@@ -322,7 +322,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2,  1,  0, 32, 33, 21,  0,  1,  0,  1,  0,  0, 0,230,  0,  1,  0,  1,  0, 2},
         {2,  1,  0, 34, 35,  1,  0,  1,  0,  1, 44,  1, 0,  1,  0,  1,  0,373,  0, 2},
         {2,  1, 30, 31,  0,  1,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
-        {2, 20,  0, 1,  0,  1,  0,  1,370,371,372,  1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2,  1,  0, 20,  0,  1,  0,  1,370,371,372,  1, 0,  1,  0,  1,  0,  1,  0, 2},
         {2, 42,  0,  1,  0,  1,  0,  1,367,368,369, 45, 0,  1,  0,  1, 55, 56, 57, 2},
         {2, 43,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1, 52, 53, 54, 2},
         {2,  1,  0,  1,  0,  3, 44,  1,  0,  1,  0,  1, 0,  1,  0, 58,  0, 59, 60, 2}, 
@@ -336,20 +336,21 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
     // CARTE 2 : COULOIR (Niveau 1) index 1
     {
         {2, 2, 2, 2, 2, 2, 2,  2,   0, 69, 70,  0,  2,  2, 2, 2, 2, 2, 2, 2}, // Haut (Suite)
-        {2, 2, 2, 2, 2, 2, 2,  2,   0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2,  2,   0, 67, 68,377,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,   0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},   // Toits cotés
-        {2, 2, 2, 2, 2, 2, 2,  2,   0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},   // Murs cotés
+        {2, 2, 2, 2, 2, 2, 2,  2,   0, 67, 68,376,  2,  2, 2, 2, 2, 2, 2, 2},   // Murs cotés
         {2, 2, 2, 2, 2, 2, 2,  2,   0, 67, 68, 76, 77,  2, 2, 2, 2, 2, 2, 2}, // Vide (Sol)
-        {2, 2, 2, 2, 2, 2, 2, 74,  75, 67, 68,377,  2,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 74,  75, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,   0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2,  2,   0, 67, 68,376,  2,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2,  2,   0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2, 172, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,  71, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,   0, 67, 68, 76, 77,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2, 74,  75, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,   0, 67, 68, 73,  2,  2, 2, 2, 2, 2, 2, 2}, // Bas (Entrée)
         {2, 2, 2, 2, 2, 2, 2,  2,   0, 67, 68,  0,  2,  2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2,  2,   0, 65, 66,  0,  2,  2, 2, 2, 2, 2, 2, 2}},
+        {2, 2, 2, 2, 2, 2, 2,  2,   0, 65, 66,  0,  2,  2, 2, 2, 2, 2, 2, 2}
+    },
     // CARTE 3 : HALL (Niveau 2)
     {         
         {2,  2,  2,    2,  2,    2,    2,  2,    2,  2,  2,   2,    2,    2,    2,   2,     2,  2,  2, 2}, // Trou en haut (tout fermé en 2 ici ?)
@@ -671,7 +672,7 @@ int InitGameStepByStep(SDL_Renderer *renderer, int *pourcentage) {
         player.x = 80;
         player.y = 50; 
         player.w = 12; 
-        player.h = 14;
+        player.h = 12;
         dialogueStep = 1; 
         toucheRelache = 0; 
         estAdulte = 0;
@@ -739,9 +740,6 @@ int isWall(float x, float y)
     int caseX = (int)x / TILE_SIZE;
     int caseY = (int)y / TILE_SIZE;
 
-    int localX = (int)x % TILE_SIZE;
-    int localY = (int)y % TILE_SIZE;
-
     // Sécurité bornes map
     if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT)
     {
@@ -749,7 +747,6 @@ int isWall(float x, float y)
     }
 
     int type = maps[currentLevel][caseY][caseX];
-    // int typeBelow = maps[currentLevel][caseY+1][caseX];
     int type_pattern = maps_patern[currentLevel][caseY][caseX];
 
     // --- LOGIQUE SPÉCIALE LABYRINTHE (83) ---
@@ -757,6 +754,7 @@ int isWall(float x, float y)
     {
 
         // 1. TOIT (Perspective : Le haut est toujours solide)
+        int localY = (int)y % TILE_SIZE;
         if (localY < 6)
         {
             return 1;
@@ -887,7 +885,7 @@ int isWall(float x, float y)
             return 1;
         }
 
-        if (localY < 4)
+        if ((int)y % TILE_SIZE < 4)
         {
             return 1;
         }
@@ -896,7 +894,7 @@ int isWall(float x, float y)
 
     if (type == 10 || type == 11 || type == 14 || type == 15 || type == 18 || type == 19)
     {
-        if (localY < 4)
+        if ((int)y % TILE_SIZE < 4)
         {
             return 1;
         }
@@ -905,355 +903,18 @@ int isWall(float x, float y)
 
     if (type == 22 || type == 23)
     {
-        if (localY > 2)
+        if ((int)y % TILE_SIZE > 2)
         {
             return 1;
         }
         return 0;
     }
 
-    int isTopCorner = (y < player.y + 8) ;
-    if (type == 20) {
-        int localX = (int)x % TILE_SIZE;
-        
-        if (localX >= 11) return 0; // On laisse passer complètement à droite
-        if (isTopCorner) return 0;  // La tête passe (perspective)
-        if(localY<3)return 0;
-        
-        return 1; 
-    }
-
-    // --- COLLISION LAMPE (21) ---
-    if (type == 21) {
-        int localX = (int)x % TILE_SIZE;
-        
-        // Ajuste ce "11" (entre 8 et 15) pour définir jusqu'où on peut rentrer par la droite
-        if (localX >= 12) return 0; 
-        
-        if (isTopCorner && (localY >= 5) ) return 0;  // La tête passe au-dessus du pied de la lampe
-        
-        return 1; // Les pieds bloquent
-    }
-
-    // --- COLLISION COMMODE (42, 43) ---
-    if (type == 42 || type == 43) {
-        int localX = (int)x % TILE_SIZE;
-        
-        if (localX >= 11) return 0; // La moitié droite est libre
-        
-        // Le meuble entier bloque les pieds, mais laisse passer la tête
-        if (isTopCorner) return 0; 
-        
+    if (type == 20 || type == 21)
+    {
         return 1;
     }
 
-    // --- COLLISION LIT (32, 33, 34, 35) ---
-    if (type == 32 || type == 33 || type == 34 || type == 35) {
-        // Le lit entier est géré d'un coup !
-        if (isTopCorner) return 0; // La tête passe par-dessus les draps
-        if( (type == 32 || type == 34 ) && localX<4)return 0;
-        if( (type == 33 || type == 35) && localX >11 )return 0;
-
-        return 1; // Les pieds tapent le matelas
-    }
-    // --- COLLISION TENTE (52 à 57) ---
-    if (type >= 52 && type <= 57) {
-        
-        // 1. Haut Gauche (55) : on laisse passer un peu par la gauche
-        if (type == 55) {
-            int localX = (int)x % TILE_SIZE;
-            // Ajuste ce '8' (ex: 6 ou 10) pour définir jusqu'où tu peux rentrer
-            if (localX < 8) return 0; 
-            return 1;
-        }
-
-        // 2. Haut Milieu et Haut Droite (56, 57) : 100% solide
-        if (type == 56 || type == 57) {
-            return 1;
-        }
-
-        // 3. Bas de la tente (52, 53, 54) : collision basique avec perspective
-        if (type == 52 || type == 53 || type == 54) {
-            if (isTopCorner) return 0; // La tête passe par-dessus
-            return 1; // Les pieds bloquent
-        }
-    }
-
-    if (type == 80 || type == 81) {
-        // La commode est à droite, donc on laisse la moitié GAUCHE libre
-        if (localX < 6) return 0; 
-        
-        // La tête passe par-dessus pour la perspective
-        if (isTopCorner) return 0; 
-        
-        return 1; // Les pieds bloquent
-    }
-
-    if ((type >= 46 && type <= 49) || type == 51) {
-        
-        // 1. CHAISE
-        if (type == 51) {
-            if (localX < 8 || localX > 11) return 0; 
-            if (isTopCorner) return 0;
-            return 1; // Verrouille la chaise
-        }
-        
-        // 2. BUREAU
-        if (type == 46 && localX < 3) return 0;
-        if (type == 49 && localX > 8) return 0;
-
-        static int X_chaise = -1, Y_chaise = -1;
-        if (X_chaise == -1) {
-            TrouveCoordonnees(&X_chaise, &Y_chaise, 51, 0); 
-        }
-
-        if (localY < 2) {
-            if (caseX == X_chaise) {
-                if (localX < 8 || localX > 11) return 0;
-                return 1; 
-            }
-            return 0; 
-        }
-        
-        if (isTopCorner) return 0; 
-        return 1;
-    }
-
-    if ((type_pattern == 160 || type_pattern == 163) && currentLevel == 1 ) {
-        if(type_pattern == 163 && (localY>11 ))return 0;
-        if(localX<2)return 0;
-        return 1; // Le haut de la table est 100% solide
-    }
-
-    // 2. EXTRÉMITÉS GAUCHE (Couche objets : maps)
-    if (type == 71 || type == 72 || type == 172 || type == 173) {
-        // On laisse le joueur glisser sur la droite de l'extrémité
-        if (localX >= 12) return 0;
-        
-        if (isTopCorner) return 0; // Perspective
-        return 1;
-    }
-
-    // 3. EXTRÉMITÉS DROITE (Couche objets : maps)
-    if (type == 377) {
-        // On laisse le joueur glisser sur la gauche de l'extrémité
-        if (localX < 6) return 0; 
-        
-        if (isTopCorner) return 0; // Perspective
-        return 1;
-    }
-
-    // --- PETIT VASE / POT DU COULOIR (73) ---
-    if (type == 73) {
-        if (localX < 4) return 0; // Glisse sur les côtés
-        if(localY<2)return 0;
-        if (isTopCorner) return 0; 
-        return 1;
-    }
-
-    if (type >= 378 && type <= 385) {
-
-        if (type >= 382 && type <= 385) {
-            
-            if ((type == 382 ) && localX < 6) return 0; 
-            
-
-            if ((type == 383 ) && localX > 6) return 0;
-            
-
-            // if (type == 384 || type == 385) {
-            //     if (localY < 9) return 0; 
-            //     return 1; 
-            // }
-            
-           
-            if (type == 382 || type == 383) {
-                if (isTopCorner) return 0;
-                return 1; 
-            }
-        }
-
-        if (type >= 378 && type <= 381) {
-            
-            
-            // if ((type == 380 || type == 381) && localY < 9) return 0;
-
-            
-            if ((type == 378 ) && localX < 2) return 0;
-
-            if ((type == 379 ) && localX > 2) return 0; 
-
-            // if (type == 380 || type == 381) {
-            //     return 1;
-            // }
-            
-            if (type == 378 || type == 379) {
-                if (isTopCorner) return 0; 
-                return 1; 
-            }
-        }
-    }
-    if(type == 143 ){
-        if(localX<9 || isTopCorner)return 0;
-        return 1;
-    }
-    if(type == 144){
-        if(localX>6 || isTopCorner)return 0;
-        return 1;
-    }
-    if(type == 386 || type == 387){
-        if(y < player.y + 10) return 0; 
-        return 1;
-    }
-    if(type == 134)return 1;
-    if(type == 275){
-        if(localX>14)return 0;
-        return 1;
-    }
-
-    if(type == 84){
-        if(isTopCorner)return 0;
-        return 1;
-    }
-    if (type == 134 || type == 135) {
-        return 1; // Le fond est 100% solide
-    }
-
-    if (type == 136 || type == 137 || type == 386 || type == 387) {
-        
-        if (y < player.y + 8) return 0; 
-        
-        return 1; 
-    }
-
-    if(type == 294 || type == 295){
-        if(isTopCorner)return 0;
-        if(type == 294 && localX<4)return 0;
-        if(type == 295 && localX>12)return 0;
-        return 1;
-    }
-    if(type == 296 || type == 297){
-        if(localY<14)return 0;
-        if(type == 296 && localX<4)return 0;
-        if(type == 297 && localX >12)return 0;
-        return 1;
-    }
-    if(type_pattern == 388 || type_pattern == 389 || type_pattern == 374){
-        if(localX<3)return 0;
-        return 1;
-    }
-    if(type == 395 || type == 396){
-        if(isTopCorner)return 0;
-        if(localX<2)return 0;
-        return 1;
-    }
-    if(type == 245 || type == 246 || type == 247){
-        if(isTopCorner)return 0;
-        if(type == 245 && localX<3)return 0;
-        if(type == 247 && localX>12)return 0;
-        return 1;
-    }
-    if(type == 275 || type == 265 || type == 171 || type == 181){
-        if(localX>14)return 0;
-        if(type == 181 && localY>4)return 0;
-        return 1;
-    }
-    if(type == 178 || type == 169 || type == 170 || type == 167 || type == 168 || type == 243 || type == 274){
-        if(isTopCorner)return 0;
-        if(type == 274){
-            if(localY<4)return 0;
-            if(localX>12)return 0;
-            return 1;
-        }
-        return 1;
-    }
-    if(type_pattern == 160 || type_pattern == 161 || type_pattern == 162 || type_pattern == 163 || type_pattern == 164 || type_pattern == 165 || type_pattern == 166){
-        if( (type_pattern == 161 || type_pattern == 163 || type_pattern == 166)){
-            if(localY>13)return 0;
-            if(type_pattern == 163 && localX<2 )return 0;
-            if(type_pattern == 161 && localX>13)return 0;
-        }
-        if((type_pattern == 160 || type_pattern == 162) && localX<2 )return 0;
-        if((type_pattern == 164 || type_pattern == 165 ) && localX>13)return 0;
-        return 1;
-    }
-    if(type == 264){
-        if(localX<3)return 0;
-        if(isTopCorner)return 0;
-        return 1;
-    }
-    if(type == 207 || type == 208 || type == 209){
-        if(type == 207 && localX<13)return 0;
-        if(type == 209 && localX>12)return 0;
-        if(isTopCorner)return 0;
-        return 1;
-    }
-    if ((type >= 187 && type <= 206) || (type >= 219 && type <= 222)) {
-        
-        // Ta logique de collision ici (par exemple :)
-        if (isTopCorner) return 0;
-        return 1;
-    }
-    if(type == 185 || type == 186 || type == 218){
-        if(localX>12)return 0;
-        if(isTopCorner)return 0;
-        return 1;
-    }
-    if(type == 399){
-        if(isTopCorner)return 0;
-        if(localX<4)return 0;
-        return 1;
-    }
-    if(type >= 312 && type <= 315){
-        if(isTopCorner)return 0;
-        return 1;
-    }
-    if (type >= 413 && type <= 415) {
-        if (type == 415) {
-            return 1; 
-        }
-        // On calcule sur quelle case se trouve exactement le milieu du joueur
-        float playerCenterX = player.x + (player.w / 2.0f);
-        int playerCenterTileX = (int)playerCenterX / TILE_SIZE;
-
-        if (playerCenterTileX == caseX) {
-            // Le joueur est de face : on bloque ses pieds, mais la tête passe 
-            if (isTopCorner) return 0;
-            return 1;
-        } 
-        else {
-            // Le joueur frôle l'horloge en marchant sur la case de gauche ou de droite :
-            // On le laisse glisser sur les bords
-            if (localX < 4 || localX > 11) return 0;
-            
-            if (isTopCorner) return 0;
-            return 1;
-        }
-    }
-    if((type >= 302 && type <= 303) || (type == 324 || type == 325) || type == 400 || type == 401){
-        if((type == 302 || type == 324) && localX<1)return 0;
-        if( (type == 303 || type == 325 || type == 401) && localX>14)return 0;
-        if(isTopCorner)return 0;
-        return 1;
-    }
-    if(type >= 404 && type <= 412){
-        if( (type >= 410 && type <= 412) && localY>6)return 0;
-        if(isTopCorner)return 0;
-        return 1;
-    }
-    if(type >= 435 && type <= 438){
-        if((type == 435 || type == 437) && localX<4 )return 0;
-        if(isTopCorner)return 0;
-        return 1;
-    }
-    // 156 157 158 159
-    if(type >= 156 && type <= 159){
-        if((type == 156 || type == 158) && localX<7)return 0;
-        if( (type == 157 || type == 159) && localX>10)return 0;
-        if(isTopCorner)return 0;
-        return 1;
-    }
-    // currentLevel = 11;
     return 0;
 }
 
@@ -2869,7 +2530,7 @@ void UpdateGame(void)
     if (!state[SDL_SCANCODE_E])
         toucheE_Relache_Maman = 1;
 
-    // currentLevel = 11;
+    currentLevel = 11;
 }
 
 void copieTableau (int src[MAP_HEIGHT][MAP_WIDTH], int dest[MAP_HEIGHT][MAP_WIDTH]){
@@ -3091,32 +2752,11 @@ void TrouveCoordonnees(int *nvx, int *nvy, int indexObjet, int CurrLvl)
     }
 }
 
-static inline int IsLampe(int index) {
-    switch (index) {
-        case 21: case 75: case 76: case 85: case 86: 
-        case 148: case 186: case 317: case 319: case 321: 
-        case 323: case 340: case 341: case 342: case 343:
-        case 398: 
-            return 1;
-        default: 
-            return 0;
-    }
-}
-
-// Fonction très rapide pour savoir si la tuile doit s'afficher par-dessus le joueur
-static inline int IsTuileDessus(int index) {
-    return (index == 78 || index == 75 || index == 76 || index == 145 || index == 146 || index == 85 
-        || index == 86 || index == 296 || index == 297 || index == 298 || index == 299 || index == 300
-         || index == 301 || index == 380 || index == 381 || index == 384 || index == 385 || index == 263 
-         || index == 398 || index == 308 || index == 309 || index == 310 || index == 311 || index == 304
-         || index == 305 || index == 402 || index == 403);
-}
-
 float getLuminosite(int gridX, int gridY, int rayonPx)
 {
     float maxIntensite = 0.0f;
 
-    // --- 1. Lumière du JOUEUR ---
+    // --- 1. Lumière du JOUEUR (Calcul en pixels) ---
     int tileCenterX = (gridX * TILE_SIZE) + (TILE_SIZE / 2);
     int tileCenterY = (gridY * TILE_SIZE) + (TILE_SIZE / 2);
     int playerCenterX = (int)player.x + (player.w / 2);
@@ -3126,28 +2766,47 @@ float getLuminosite(int gridX, int gridY, int rayonPx)
     float dy = (float)(tileCenterY - playerCenterY);
     float distPx = sqrtf(dx * dx + dy * dy);
 
-    if (distPx < rayonPx) {
+    // Formule : Plus on est proche, plus c'est fort (1.0). Plus on s'éloigne, plus ça baisse.
+
+    if (distPx < rayonPx)
+    {
         float i = 1.0f - (distPx / (float)rayonPx);
+        if (i > maxIntensite)
+            maxIntensite = i;
+    }
+    /*
+    // formule expo:
+    if (distPx < rayonPx) {
+        float ratio = distPx / (float)rayonPx; // 0.0 (proche) à 1.0 (loin)
+
+        // Formule "Carrée" : La lumière reste forte près du joueur et tombe vite à la fin
+        float i = 1.0f - (ratio * ratio);
+
         if (i > maxIntensite) maxIntensite = i;
     }
-
-    // --- 2. Lumière des LAMPES ---
+    */
+    // --- 2. Lumière des LAMPES (Calcul en cases) ---
     for (int ly = 0; ly < MAP_HEIGHT; ly++) {
         for (int lx = 0; lx < MAP_WIDTH; lx++) {
             int indexTuile = maps[currentLevel][ly][lx];
-            // UTILISATION DE LA FONCTION RAPIDE ICI
-            if (IsLampe(indexTuile)) { 
-                float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
-                float rayonLampe = (indexTuile == 186) ? 3.5f : 2.5f; 
-                
-                if (distGrid < rayonLampe) {
-                    float i = 1.0f - (distGrid / rayonLampe);
-                    if (i > maxIntensite) maxIntensite = i;
+            int tabTuilesEclairees[] = {21, 75, 76, 85, 86, 148, 186, 317, 319, 321, 323, 340, 341, 342, 343, 439};
+            int tailleTabTuilesEclairees = sizeof(tabTuilesEclairees) / sizeof(tabTuilesEclairees[0]);
+
+             if (IsDansTab(tabTuilesEclairees, tailleTabTuilesEclairees, indexTuile) ) { // Si c'est une lampe
+                 float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
+                 float rayonLampe = 2.5f; // Rayon d'une lampe (2.5 cases)
+                 if (indexTuile == 186) {
+                    rayonLampe = 3.5f; 
                 }
-            }
+                 if (distGrid < rayonLampe) {
+                     float i = 1.0f - (distGrid / rayonLampe);
+                     if (i > maxIntensite) maxIntensite = i;
+                 }
+             }
         }
     }
-    return maxIntensite;
+
+    return maxIntensite; // Retourne la lumière la plus forte trouvée
 }
 
 // Retourne 1 si la case est dans la lumière sinon 0.
@@ -3208,8 +2867,6 @@ int IsTuileSpecial(int index)
     return 1;
 }
 
-
-
 // --- DESSIN ---
 void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
 {
@@ -3217,44 +2874,71 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    rayon = (hasDoudou == 1) ? 60 : 30;
-
-    // --- PRÉCALCUL DE LA LUMIÈRE (Le grand secret de l'optimisation) ---
-    // On calcule la lumière 1 seule fois par frame et on la sauvegarde.
-    int tileLuminosite[MAP_HEIGHT][MAP_WIDTH] = {0};
-    
-    for (int y = 0; y < MAP_HEIGHT; y++) {
-        for (int x = 0; x < MAP_WIDTH; x++) {
-            float intensite = getLuminosite(x, y, rayon);
-            if (intensite > 0.0f) {
-                tileLuminosite[y][x] = (int)(intensite * 255);
-            }
+    // 2. Dessiner la CARTE avec le tileset
+    if (tilesetTexture)
+    {
+        // int rayonLumiere = 0;
+        if (hasDoudou == 1)
+        {
+            // rayonLumiere = 60;
+            rayon = 60;
         }
-    }
+        else
+        {
+            // rayonLumiere = 30;
+            rayon = 30;
+        }
 
-    // --- COUCHE 1 : SOL ET MURS DU DESSOUS ---
-    if (tilesetTexture) {
-        for (int y = 0; y < MAP_HEIGHT; y++) {
-            for (int x = 0; x < MAP_WIDTH; x++) {
-                int lum = tileLuminosite[y][x];
-                if (lum == 0) continue; // On passe si c'est dans le noir total
+        for (int y = 0; y < MAP_HEIGHT; y++)
+        {
+            for (int x = 0; x < MAP_WIDTH; x++)
+            {
+                float intensite = getLuminosite(x, y, rayon);
 
-                // A. Dessiner le sol (Pattern)
-                int type = maps_patern[currentLevel][y][x];
-                DrawTuiles(x, y, type, renderer, lum);
-
-                // B. Dessiner les objets normaux (Sauf ceux qui vont par-dessus)
-                int type_maps = maps[currentLevel][y][x];
-                if (!IsTuileDessus(type_maps) && IsTuileSpecial(type_maps)) {
-                    DrawTuiles(x, y, type_maps, renderer, lum);
+                // Si c'est totalement noir, on ne dessine rien (opti)
+                if (intensite <= 0.0f)
+                {
+                    continue;
                 }
+
+                // 2. On convertit en valeur 0-255
+                int lum = (int)(intensite * 255);
+
+                // --- A. DESSINER LA TUILE ---
+                int type = maps_patern[currentLevel][y][x];
+                DrawTuiles(x, y, type, renderer, lum); // On passe 'lum'
+
+                int type_maps = maps[currentLevel][y][x];
+                if (IsTuileSpecial(type_maps))
+                {
+                    DrawTuiles(x, y, type_maps, renderer, lum); // On passe 'lum'
+                }
+
+                // --- B. DESSINER LE CONTOUR (Lignes) ---
+                // On utilise aussi 'lum' pour que les lignes blanches s'assombrissent
+                /*SDL_SetRenderDrawColor(renderer, lum, lum, lum, 255);
+
+                int px = x * TILE_SIZE;
+                int py = y * TILE_SIZE;
+                int ts = TILE_SIZE;
+
+                // On garde estVisible juste pour savoir si le voisin est NOIR ou pas
+                // (Si le voisin a une intensité <= 0, on dessine le trait)
+
+                if (getLuminosite(x, y - 1, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px, py, px + ts, py);       // Haut
+                if (getLuminosite(x, y + 1, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px, py + ts, px + ts, py + ts); // Bas
+                if (getLuminosite(x - 1, y, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px, py, px, py + ts);       // Gauche
+                if (getLuminosite(x + 1, y, rayon) <= 0.0f) SDL_RenderDrawLine(renderer, px + ts, py, px + ts, py + ts); // Droite
+                */
             }
         }
     }
 
     // --- EFFET SOMMEIL / REVEIL PARENTS ---
     if (currentLevel == 10) { 
-        static int litX = -1, litY = -1;
+        
+        static int litX = -1;
+        static int litY = -1;
         TrouveCoordonnees(&litX, &litY, 219, 10);
         int pixelLitX = litX * TILE_SIZE;
         int pixelLitY = litY * TILE_SIZE;
@@ -3270,11 +2954,13 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
                 SDL_DestroyTexture(tBang);
             }
         } 
-        else {
+        else{
             int offsetAnim = (SDL_GetTicks() / 200) % 10; 
+
             SDL_Color cBlanc = {200, 200, 255, 255}; 
             SDL_Surface *sZzz = TTF_RenderText_Solid(fontMini, "Zzz...", cBlanc);
-            if (sZzz) {
+            if (sZzz)
+            {
                 SDL_Texture *tZzz = SDL_CreateTextureFromSurface(renderer, sZzz);
                 SDL_Rect rZzz = { pixelLitX, pixelLitY - 10 - offsetAnim, sZzz->w, sZzz->h }; 
                 SDL_RenderCopy(renderer, tZzz, NULL, &rZzz);
@@ -3285,7 +2971,7 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
     }
         
 
-    // ANIMATION
+       // ANIMATION
     int indexJoueur = 7; 
 
     if (isPlayerMoving) {
@@ -3465,91 +3151,15 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
     
  
 
-    // --- COUCHE 2 : TUILES PAR-DESSUS LE JOUEUR (Panier, lampes murales...) ---
-    if (tilesetTexture) {
-        for (int y = 0; y < MAP_HEIGHT; y++) {
-            for (int x = 0; x < MAP_WIDTH; x++) {
-                int lum = tileLuminosite[y][x];
-                if (lum == 0) continue; 
+    int caseX = (int)(fantome.x / TILE_SIZE);
+    int caseY = (int)(fantome.y / TILE_SIZE);
 
-                int type_maps = maps[currentLevel][y][x];
-                if (IsTuileDessus(type_maps)) {
-                    DrawTuiles(x, y, type_maps, renderer, lum); 
-                }
-            }
-        }
-    }
-
-    // --- DESSIN FANTOME ---
-    if (currentLevel >= 5 && currentLevel <= 8) {
-        int caseFantomeX = (int)(fantome.x / TILE_SIZE);
-        int caseFantomeY = (int)(fantome.y / TILE_SIZE);
-
-        // Sécurité pour ne pas déborder du tableau
-        if (caseFantomeX >= 0 && caseFantomeX < MAP_WIDTH && caseFantomeY >= 0 && caseFantomeY < MAP_HEIGHT) {
-            int lumFantome = tileLuminosite[caseFantomeY][caseFantomeX];
-            
-            if (lumFantome > 0) {
-                SDL_SetTextureColorMod(tilesetTexture, lumFantome, lumFantome, lumFantome);
-                SDL_Rect src = {63 * TILE_SIZE, 0, 16, 16};
-                SDL_Rect dest = {(int)fantome.x, (int)fantome.y, 16, 16};
-                SDL_RenderCopy(renderer, tilesetTexture, &src, &dest);
-                SDL_SetTextureColorMod(tilesetTexture, 255, 255, 255);
-            }
-        }
-    }
-
-
-    
-    //dialogues
-    if (dialogueStep > 0) {
-        char *texteAffiche = "";
-        if (dialogueStep == 1) texteAffiche = "Maman ? Papa ? Il fait tout noir...";
-        if (dialogueStep == 2) texteAffiche = "J'ai peur... Ou est mon Doudou ?";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogueStep_sortie1 > 0) {
-        char *texteAffiche = "";
-        if (dialogueStep_sortie1 == 1) texteAffiche = "je peux pas sortir sans mon doudou...";
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_hasDoudou > 0) {
-        char *texteAffiche = "";
-        if (dialogue_hasDoudou == 1) texteAffiche = "je te tiens";
-        if (dialogue_hasDoudou == 2) texteAffiche = "OH...";
-        if (dialogue_hasDoudou == 3) texteAffiche = "De la lumiere !";
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_statue_haut > 0) {
-        show_interact_prompt_statue_haut = 0;
-        char *texteAffiche = "";
-        if (dialogue_statue_haut == 1) texteAffiche = "Cette statue tient une coupe vide,";
-        if (dialogue_statue_haut == 2) texteAffiche = "elle doit avoir soif...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_statue_bas > 0) {
-        show_interact_prompt_statue_bas = 0;
-        char *texteAffiche = "";
-        if (dialogue_statue_bas == 1) texteAffiche = "Son visage est tordu par la haine.";
-        if (dialogue_statue_bas == 2) texteAffiche = "Un sourir ne ferait pas de mal...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_entree_labyrinthe > 0) {
-        char *texteAffiche = "";
-        if (dialogue_entree_labyrinthe == 1) texteAffiche = "Les statues bloquent le passage...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_max_objet > 0) {
-        show_interact_prompt_dessin = 0;
-        show_interact_prompt_eau = 0;
-        char *texteAffiche = "";
-        if (dialogue_max_objet == 1) texteAffiche = "Je n'ai que deux mains...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    // On l'affiche s'il est éclairé ET qu'on est dans un niveau de labyrinthe
+    if (estEclaire(caseX, caseY, rayon) && currentLevel >= 5 && currentLevel <= 8)
+    {
+        SDL_Rect src = {63 * TILE_SIZE, 0, 16, 16};
+        SDL_Rect dest = {(int)fantome.x, (int)fantome.y, 16, 16};
+        SDL_RenderCopy(renderer, tilesetTexture, &src, &dest);
     }
 
     if (currentLevel == 3 && plat_pret_a_servir > 0)
@@ -4116,48 +3726,4 @@ void DrawTexte(char *texteAffiche, SDL_Renderer *renderer, TTF_Font *font, int x
         SDL_DestroyTexture(textureTexte);
     }
 }
-
-// --- NETTOYAGE DE LA MÉMOIRE ---
-void CleanGame() {
-    // 1. Libérer les textures (Images)
-    if (tilesetTexture != NULL) {
-        SDL_DestroyTexture(tilesetTexture);
-        tilesetTexture = NULL;
-    }
-    if (textureScreamer != NULL) {
-        SDL_DestroyTexture(textureScreamer);
-        textureScreamer = NULL;
-    }
-    if (textureLivre != NULL) {
-        SDL_DestroyTexture(textureLivre);
-        textureLivre = NULL;
-    }
-
-    // 2. Libérer les effets sonores (Mix_Chunk)
-    if (sonPickUp != NULL) {
-        Mix_FreeChunk(sonPickUp);
-        sonPickUp = NULL;
-    }
-    if (sonOpenDoor != NULL) {
-        Mix_FreeChunk(sonOpenDoor);
-        sonOpenDoor = NULL;
-    }
-    if (sonCloseDoor != NULL) {
-        Mix_FreeChunk(sonCloseDoor);
-        sonCloseDoor = NULL;
-    }
-    if (sonScreamer != NULL) {
-        Mix_FreeChunk(sonScreamer);
-        sonScreamer = NULL;
-    }
-
-    // 3. Libérer les musiques (Mix_Music)
-    if (MusicInterior != NULL) {
-        Mix_FreeMusic(MusicInterior);
-        MusicInterior = NULL;
-    }
-    if (MusicExterior != NULL) {
-        Mix_FreeMusic(MusicExterior);
-        MusicExterior = NULL;
-    }
-}
+//........... fin du jeu ................
