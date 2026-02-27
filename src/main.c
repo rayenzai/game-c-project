@@ -162,6 +162,7 @@ int main(int argc, char* argv[]) {
                 }
                 else if (actionPause == 2) { // 2 = Menu Principal
                     etat = ETAT_MENU;
+                    ResetGame();
                     currentLevel = 0; 
                 }
                 else if (actionPause == 3){

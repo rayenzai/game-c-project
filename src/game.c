@@ -668,6 +668,7 @@ int aFiniSalon = 0;
 
 int showInteractPendule = 0;
 Uint32 debutPendule = 0;
+int penduleEnCours = 0;
 
 // --- INITIALISATION ---
 int etapeChargement = 0;
@@ -1215,7 +1216,7 @@ int isWall(float x, float y)
         if(isTopCorner)return 0;
         return 1;
     }
-    if (type >= 413 && type <= 415) {
+    if ((type >= 413 && type <= 415) || (type >= 652 && type <= 654) ) {
         if (type == 415) {
             return 1; 
         }
@@ -2097,14 +2098,23 @@ void UpdateGame(void)
     }
 
     // Easter egg pendule
-    showInteractPendule=0;
-    int penduleX = -1; int penduleY=-1;
-    TrouveCoordonnees(&penduleX, &penduleY, 414, 11);
-    float distance_pendule;
-    if(IsLocationObjet(20, 11, 414, &distance_pendule, -1, -1)){
-        showInteractPendule = 1;
+    showInteractPendule = 0;
+    static int penduleX = -1; 
+    static int penduleY = -1;
+    
+    if (penduleX == -1 || penduleY == -1 || currentLevel != 11) {
+        TrouveCoordonnees(&penduleX, &penduleY, 414, 11);
+        if (penduleX == -1) { 
+            TrouveCoordonnees(&penduleX, &penduleY, 653, 11);
+        }
     }
-    static int penduleEnCours = 0;
+
+    float distance_pendule = 9999.0f;
+    if (penduleX != -1) {
+        if (IsLocationObjet(20, 11, 414, &distance_pendule, penduleX, penduleY)) {
+            showInteractPendule = 1;
+        }
+    }
 
 
     if (state[SDL_SCANCODE_E]) {
@@ -2530,10 +2540,30 @@ void UpdateGame(void)
             }
         }
     }
-    if (tempsActuel - debutPendule > 18000) { 
-        penduleEnCours = (penduleEnCours) ? 0:1;
+    if (penduleEnCours == 1 && currentLevel == 11 && penduleX != -1 && penduleY != -1) {
+        if (tempsActuel - debutPendule >= 19000) {
+            // Fin du temps : Retour à la normale
+            maps[11][penduleY-1][penduleX] = 415;
+            maps[11][penduleY][penduleX]   = 414; 
+            maps[11][penduleY+1][penduleX] = 413;
+            penduleEnCours = 0;
+        }
+        else {
+            // Animation : Alternance toutes les 300ms
+            int frame = (tempsActuel / 1100) % 2;
+            if(frame == 0){
+                maps[11][penduleY-1][penduleX] = 415;
+                maps[11][penduleY][penduleX]   = 414; 
+                maps[11][penduleY+1][penduleX] = 413;
+            }
+            else{
+                maps[11][penduleY-1][penduleX] = 654;
+                maps[11][penduleY][penduleX]   = 653; 
+                maps[11][penduleY+1][penduleX] = 652;
+            }
+        }
     }
-
+    currentLevel=11;
 
     // 1. Quitter la CHAMBRE (Niveau 0) par le HAUT
     // On vérifie si on est au niveau 0 ET si on dépasse le haut de l'écran (y < 5)
@@ -3128,7 +3158,8 @@ static inline int IsTuileDessus(int index) {
         || index == 86 || index == 296 || index == 297 || index == 298 || index == 299 || index == 300
          || index == 301 || index == 380 || index == 381 || index == 384 || index == 385 || index == 263 
          || index == 398 || index == 308 || index == 309 || index == 310 || index == 311 || index == 304
-         || index == 305 || index == 402 || index == 403);
+         || index == 305 || index == 402 || index == 403 || index == 639 || index == 640 || index == 653 
+         || index == 654);
 }
 
 float getLuminosite(int gridX, int gridY, int rayonPx)
@@ -4190,7 +4221,10 @@ void CleanGame() {
 }
 
 void ResetGame(void) {
-    // 1. Restaure TOUTE la map instantanément
+    Mix_HaltChannel(-1); // Coupe tous les bruitages (screamer, pendule, portes...) sur tous les canaux
+    Mix_HaltMusic();  
+
+    // 1. Restaure TOUTE la map 
     memcpy(maps, maps_origine, sizeof(maps_origine));
 
     // 2. Restaure les positions et l'état du joueur
@@ -4229,4 +4263,10 @@ void ResetGame(void) {
     max_objets = 0;
     bouche_has_soupe = 0;
     bouche_has_pain = 0;
+
+    screamer = 0;
+    forceSleep = 0;
+    papaReveil = 0;
+    affichePapaReveil = 0;
+    penduleEnCours = 0; 
 }

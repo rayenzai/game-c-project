@@ -4,6 +4,11 @@
 int globalVolumeMusique = 32;
 int globalVolumeBruitages = 32;
 
+int isMusicMuted = 0;       // 0 = Son activé, 1 = Son coupé
+int isSfxMuted = 0;
+int prevVolumeMusique = 32; // Pour restaurer le volume quand on unmute
+int prevVolumeSfx = 32;
+
 static int optionSelection = 0; // 0 = Musique, 1 = SFX, 2 = Retour
 
 void InitOptions(void) {
@@ -24,11 +29,11 @@ int UpdateOptions(SDL_Event *event) {
                 break;
             
             case SDLK_LEFT: 
-                if (optionSelection == 0) { // Musique
+                if (optionSelection == 0 && !isMusicMuted) { 
                     globalVolumeMusique -= 8;
                     if (globalVolumeMusique < 0) globalVolumeMusique = 0;
                     Mix_VolumeMusic(globalVolumeMusique); 
-                } else if (optionSelection == 1) { // Bruitages
+                } else if (optionSelection == 1 && !isSfxMuted) { 
                     globalVolumeBruitages -= 8;
                     if (globalVolumeBruitages < 0) globalVolumeBruitages = 0;
                     Mix_Volume(-1, globalVolumeBruitages); 
@@ -36,11 +41,11 @@ int UpdateOptions(SDL_Event *event) {
                 break;
                 
             case SDLK_RIGHT: 
-                if (optionSelection == 0) {
+                if (optionSelection == 0 && !isMusicMuted) {
                     globalVolumeMusique += 8;
                     if (globalVolumeMusique > 128) globalVolumeMusique = 128; 
                     Mix_VolumeMusic(globalVolumeMusique);
-                } else if (optionSelection == 1) {
+                } else if (optionSelection == 1 && !isSfxMuted) { 
                     globalVolumeBruitages += 8;
                     if (globalVolumeBruitages > 128) globalVolumeBruitages = 128;
                     Mix_Volume(-1, globalVolumeBruitages);
@@ -49,6 +54,26 @@ int UpdateOptions(SDL_Event *event) {
                 
             case SDLK_RETURN:
             case SDLK_KP_ENTER: 
+                if (optionSelection == 0) { // Mute Musique
+                    isMusicMuted = !isMusicMuted;
+                    if (isMusicMuted) {
+                        prevVolumeMusique = globalVolumeMusique; // On sauvegarde
+                        globalVolumeMusique = 0;                 // On coupe
+                    } else {
+                        globalVolumeMusique = prevVolumeMusique; // On restaure
+                    }
+                    Mix_VolumeMusic(globalVolumeMusique);
+                } 
+                else if (optionSelection == 1) { // Mute Bruitages
+                    isSfxMuted = !isSfxMuted;
+                    if (isSfxMuted) {
+                        prevVolumeSfx = globalVolumeBruitages;
+                        globalVolumeBruitages = 0;
+                    } else {
+                        globalVolumeBruitages = prevVolumeSfx;
+                    }
+                    Mix_Volume(-1, globalVolumeBruitages);
+                }
                 if (optionSelection == 2) {
                     return 1; 
                 }
@@ -78,7 +103,7 @@ static void DrawVolumeBar(SDL_Renderer *renderer, int x, int y, int volume) {
     SDL_RenderFillRect(renderer, &bgRect);
 
     // Barre blanche (remplissage)
-    SDL_Rect fgRect = {x, y, volume, 12}; // Pratique : le volume va de 0 à 128 !
+    SDL_Rect fgRect = {x, y, volume, 12}; 
     SDL_SetRenderDrawColor(renderer, 220, 220, 220, 255);
     SDL_RenderFillRect(renderer, &fgRect);
 
@@ -102,18 +127,44 @@ void DrawOptions(SDL_Renderer *renderer, TTF_Font *fontGrand, TTF_Font *fontPeti
     // 1. Musique
     SDL_Color cMusique = (optionSelection == 0) ? cDore : cGris;
     DrawTextOptions(renderer, fontPetit, "Musique", 30, 90, cMusique);
-    if (optionSelection == 0) DrawTextOptions(renderer, fontPetit, "<", 115, 90, cDore);
-    DrawVolumeBar(renderer, 130, 91, globalVolumeMusique);
-    if (optionSelection == 0) DrawTextOptions(renderer, fontPetit, ">", 265, 90, cDore);
+    
+    // Si ce n'est pas muté, on dessine les flèches et la jauge normalement
+    if (!isMusicMuted) {
+        if (optionSelection == 0) DrawTextOptions(renderer, fontPetit, "<", 115, 90, cDore);
+        DrawVolumeBar(renderer, 130, 91, globalVolumeMusique);
+        if (optionSelection == 0) DrawTextOptions(renderer, fontPetit, ">", 265, 90, cDore);
+    } else {
+        // Si c'est muté, on dessine une barre vide et grise pour montrer que c'est désactivé
+        DrawVolumeBar(renderer, 130, 91, 0); 
+    }
 
+    // Dessin de la Checkbox Mute (à droite)
+    if (isMusicMuted) {
+        DrawTextOptions(renderer, fontPetit, "[X]", 285, 90, (optionSelection == 0) ? cDore : cGris);
+    } else {
+        DrawTextOptions(renderer, fontPetit, "[ ]", 285, 90, (optionSelection == 0) ? cDore : cGris);
+    }
+
+
+    
     // 2. Bruitages (SFX)
     SDL_Color cSFX = (optionSelection == 1) ? cDore : cGris;
     DrawTextOptions(renderer, fontPetit, "Bruitages", 30, 130, cSFX);
-    if (optionSelection == 1) DrawTextOptions(renderer, fontPetit, "<", 115, 130, cDore);
-    DrawVolumeBar(renderer, 130, 131, globalVolumeBruitages);
-    if (optionSelection == 1) DrawTextOptions(renderer, fontPetit, ">", 265, 130, cDore);
+    
+    if (!isSfxMuted) {
+        if (optionSelection == 1) DrawTextOptions(renderer, fontPetit, "<", 115, 130, cDore);
+        DrawVolumeBar(renderer, 130, 131, globalVolumeBruitages);
+        if (optionSelection == 1) DrawTextOptions(renderer, fontPetit, ">", 265, 130, cDore);
+    } else {
+        DrawVolumeBar(renderer, 130, 131, 0);
+    }
 
-    // 3. Retour
+    // Dessin de la Checkbox Mute (à droite)
+    if (isSfxMuted) {
+        DrawTextOptions(renderer, fontPetit, "[X]", 285, 130, (optionSelection == 1) ? cDore : cGris);
+    } else {
+        DrawTextOptions(renderer, fontPetit, "[ ]", 285, 130, (optionSelection == 1) ? cDore : cGris);
+    }
     SDL_Color cRetour = (optionSelection == 2) ? cDore : cGris;
     if (optionSelection == 2) DrawTextOptions(renderer, fontPetit, ">", 115, 190, cDore);
     DrawTextOptions(renderer, fontPetit, "Retour", 135, 190, cRetour);
