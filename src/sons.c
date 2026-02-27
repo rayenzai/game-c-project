@@ -26,7 +26,11 @@ Mix_Music *chargement_son_exterieur(){
 	return bgm;
 }
 
-
+Mix_Chunk *chargement_son_pendule(){
+	Mix_Chunk *sonPendule = Mix_LoadWAV("assets/sound/videoplayback.wav");
+	if(!sonPendule) printf("Erreur chargement WAV: %s \n", Mix_GetError());
+	return sonPendule;
+}
 
 Mix_Chunk *chargement_son_pas(){
 	Mix_Chunk *sonPas = Mix_LoadWAV("assets/sound/foot-step.wav");

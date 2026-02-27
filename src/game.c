@@ -22,6 +22,7 @@ static Mix_Chunk *sonPickUp = NULL;
 static Mix_Chunk *sonOpenDoor = NULL;
 static Mix_Chunk *sonCloseDoor = NULL;
 static Mix_Chunk *sonScreamer = NULL;
+static Mix_Chunk *sonPendule = NULL;
 
 // Musiques D'ambiance
 static Mix_Music *MusicInterior = NULL;
@@ -665,6 +666,9 @@ int salonPattern[MAP_HEIGHT][MAP_WIDTH] = {0};
 Uint32 tempsTeleOn = 10000;
 int aFiniSalon = 0;
 
+int showInteractPendule = 0;
+Uint32 debutPendule = 0;
+
 // --- INITIALISATION ---
 int etapeChargement = 0;
 
@@ -719,6 +723,7 @@ int InitGameStepByStep(SDL_Renderer *renderer, int *pourcentage) {
         sonOpenDoor = chargement_son_door_open();
         sonCloseDoor = chargement_son_door_close();
         sonScreamer = chargement_son_screamer();
+        sonPendule = chargement_son_pendule();
         *pourcentage = 90;
     }
     else if (etapeChargement == 6) {
@@ -2091,6 +2096,17 @@ void UpdateGame(void)
         showInteractTelecommande = 1;
     }
 
+    // Easter egg pendule
+    showInteractPendule=0;
+    int penduleX = -1; int penduleY=-1;
+    TrouveCoordonnees(&penduleX, &penduleY, 414, 11);
+    float distance_pendule;
+    if(IsLocationObjet(20, 11, 414, &distance_pendule, -1, -1)){
+        showInteractPendule = 1;
+    }
+    static int penduleEnCours = 0;
+
+
     if (state[SDL_SCANCODE_E]) {
         if (toucheE_Relache) {
             // Si le joueur est à moins de 16 pixel (une tuile)
@@ -2397,6 +2413,20 @@ void UpdateGame(void)
                 interactTelecommandeTurnOn = 0;
                 GestionMemoSalon();
             }
+            if(distance_pendule <= 20 && currentLevel == 11 && maps[11][penduleY][penduleX] == 414){
+                if (showInteractPendule) {
+                    debutPendule = SDL_GetTicks();
+                    
+                    // Si le son n'est pas déjà en train de jouer, on le lance
+                    if (!penduleEnCours) {
+                        if (sonPendule) {
+                            Mix_Volume(3, 128); // On utilise le canal 3 pour ne pas couper le screamer
+                            Mix_PlayChannel(3, sonPendule, 0); 
+                        }
+                    }
+                    penduleEnCours = 1;
+                }
+            }
             toucheE_Relache = 0; // On verrouille tant qu'on n'a pas lâché E
         }
     }
@@ -2500,6 +2530,10 @@ void UpdateGame(void)
             }
         }
     }
+    if (tempsActuel - debutPendule > 18000) { 
+        penduleEnCours = (penduleEnCours) ? 0:1;
+    }
+
 
     // 1. Quitter la CHAMBRE (Niveau 0) par le HAUT
     // On vérifie si on est au niveau 0 ET si on dépasse le haut de l'écran (y < 5)
@@ -3789,6 +3823,13 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
     {
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Recuperer", cBlanc);
+
+        if (sText)
+            DrawInteractions(renderer, sText);
+    }
+    if(showInteractPendule){
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] ???", cBlanc);
 
         if (sText)
             DrawInteractions(renderer, sText);
