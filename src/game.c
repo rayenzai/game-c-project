@@ -649,7 +649,7 @@ int whichTableauPiece = 0;
 
 int cpt_piece_tableau = 0;
 
-int TuilesNotSpecial[] = {0, 1, 2};
+int TuilesNotSpecial[] = {0, 1, 2, 446};
 int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
 
 int papaReveil = 0;
@@ -1261,7 +1261,6 @@ int isWall(float x, float y)
         if(isTopCorner)return 0;
         return 1;
     }
-    // currentLevel = 11;
     return 0;
 }
 
@@ -1296,6 +1295,7 @@ void ManageMusic()
     static int currentZoneState = -1;
     int newZoneState = 0;
     Mix_Volume(-1, globalVolumeBruitages);
+    currentLevel = 11;
     // if(screamer){
     //     Mix_Volume(2, 64); // On commence volume à 0
     // }
@@ -2916,8 +2916,6 @@ void UpdateGame(void)
 
     if (!state[SDL_SCANCODE_E])
         toucheE_Relache_Maman = 1;
-
-    // currentLevel = 11;
 }
 
 void copieTableau (int src[MAP_HEIGHT][MAP_WIDTH], int dest[MAP_HEIGHT][MAP_WIDTH]){

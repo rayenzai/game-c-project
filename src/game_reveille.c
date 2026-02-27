@@ -75,6 +75,7 @@
 555,556 = haut de la plante
 608(gauche), 609(droite) 610(haut g), 611 = fauteuil de coté
 612(bas), 613,614(haut g),615  = fauteuil de face
+657,658 = bas de meuble sans le chat
 
 ------ CUISINE -------
 561 = sol 
@@ -138,7 +139,7 @@ int maps_reveille[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2,  1,  0,460,461,451,  0,  1,  0,  1,  0,  0, 0,230,  0,  1,  0,  1,  0, 2},
         {2,  1,  0,462,463,  1,  0,  1,  0,  1, 447,  1, 0,  1,  0,  1,  0,603,  0, 2},
         {2,  1,458,459,  0,  1,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
-        {2,  1,  0,450,  0,  1,  0,  1,600,601,602,  1, 0,  1,  0,  1,  0,  1,  0, 2},
+        {2,450,  0,  1,  0,  1,  0,  1,600,601,602,  1, 0,  1,  0,  1,  0,  1,  0, 2},
         {2,470,  0,  1,  0,  1,  0,  1,597,598,599, 448, 0,  1,  0,  1,482,483,484, 2},
         {2,471,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1,479,480,481, 2},
         {2,  1,  0,  1,  0,472,473,  1,  0,  1,  0,  1, 0,  1,  0,485,  0,486,487, 2}, 
@@ -158,8 +159,8 @@ int maps_reveille[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2, 2, 2, 2, 2, 2, 2,  2,   0,490,491,607,  2,  2, 2, 2, 2, 2, 2, 2}, // Vide (Sol)
         {2, 2, 2, 2, 2, 2, 2,  2,   0,490,491,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,   0,490,491,376,  2,  2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2,  2,   0,490,491,  0,  2,  2, 2, 2, 2, 2, 2, 2},
-        {2, 2, 2, 2, 2, 2, 2,  2, 495,490,491,  0,  2,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 50,  2,   0,490,491,  0,  2,  2, 2, 2, 2, 2, 2, 2},
+        {2, 2, 2, 2, 2, 2, 50,  2, 495,490,491,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2, 494,490,491,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,   0,490,491,  0,  2,  2, 2, 2, 2, 2, 2, 2},
         {2, 2, 2, 2, 2, 2, 2,  2,   0,490,491,  0,  2,  2, 2, 2, 2, 2, 2, 2},
@@ -172,7 +173,7 @@ int maps_reveille[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2,  2,  2,  2,  2,  2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2, 2}, // Trou en haut (tout fermé en 2 ici ?)
         {2,  2,  2,  2,  2,  527, 528, 2,   0,   0,   0,   0,   2,   2,   541, 2,   551, 552, 2, 2},
         {2,  2,  2,  2,  2,  525, 526, 544, 545, 0,   0,   0,   2,   544, 545, 2,   549, 550, 2, 2},
-        {2,  2,  2,  556, 555, 0,   0,   546, 547, 0,   0,   0,   0,   546, 547, 0,   0,   0,   2, 2},
+        {2,  2,  2,  555, 556, 0,   0, 657, 658, 0,   0,   0,   0,   546, 547, 0,   0,   0,   2, 2},
         {2,  2,  2,  553, 554, 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2, 2},
         {2,  2,  2,  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2, 2},
         {2,  2,  2,  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   2, 2},
@@ -200,20 +201,20 @@ int maps_reveille[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
         {2,   2,   0,   0, 580, 576, 577, 577, 577, 578,   0, 0,257,258, 258, 259,   0,   0, 2, 2},
         {2,   2, 181,   0,   0,   0,   0,   0,   0,   0,   0, 0,254,255, 255, 256,   0, 619, 2, 2},
         {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0, 0, 0,   0,   0,   0,   0, 618, 2, 2}, // Bas fermé
-        {2,   2,   0, 569, 570, 571, 572,   0, 588,   0,   0, 0, 0,   0,   0,   0,   0,   0, 2, 2},
+        {2,   2,   0, 569, 570, 571, 572,   0, 588,   0,   0, 0, 0,   0,   0,   0, 589,   0, 2, 2},
         {2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2, 2, 2,   2,   2,   2,   2,   2, 2, 2}
     },
     // CARTE 5 SALLE A MANGER (Niveau 4 - dernière du bloc précédent)
     {    
         {2, 2, 2, 2, 2, 2, 2, 2,  2,425,426,  2,  2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
         {2, 2, 2, 2, 2, 2, 2, 2,  2,423,424,  2,  2, 2, 2, 2, 2, 8, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  0, 0, 0, 0, 0, 0, 2, 2},
-        {2, 2, 0, 0, 0, 0, 0, 0,  0,  0,  0,239,285, 0, 0, 0, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0,589, 0,  0,  0,  0,  0,  0, 0, 0,589, 0, 0, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  0, 0, 0, 0,555,556, 2, 2},
+        {2, 2, 0, 0, 0, 0, 0, 0,  0,  0,  0,239,285, 0, 0, 0,553,554, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0,283,239,  0,  0,286, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0,284,  0,288,239,285, 0, 0, 0, 0, 0, 0, 0},
-        {2, 2, 0, 0, 0, 0, 0, 0,283,239,239,  0,286, 0, 0, 0, 0, 0, 0, 0},
-        {2, 2, 0, 0, 0, 0, 0, 0,284,  0,655,239,285, 0, 0, 0, 0, 0, 0, 0},
+        {2, 2, 0, 0, 0, 0, 0, 0,283,239,656,  0,286, 0, 0,455,456,457, 0, 0},
+        {2, 2, 0, 0, 0, 0, 0, 0,284,  0,655,239,285, 0, 0,452,453,454, 0, 0},
         {2, 2, 0, 0, 0, 0, 0, 0,283,239,287,  0,286, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0,284,  0,  0,  0,  0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  0, 0, 0, 0, 0, 0, 2, 2},
@@ -258,20 +259,20 @@ int maps_reveille[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
     },
     // Salon (index 7)
     {    
-        {2, 2, 2,338,339, 2,  2,  2,334, 335,  2,  2, 2, 2,   2,   2,415,  2, 2}, // Trou en haut
-        {2, 2, 2,336,337, 2,  2,  2,332, 333,  2,  2, 2, 2,   2,   2,414,  0,  2, 2},
-        {2, 2, 0,  0,  0, 0,  0,   0,  0,  0,  0,  0, 0, 0,   0,   0,413,  0,  2, 2},
-        {2, 2, 0,  0,  0, 0,398, 308,309,310,311,398, 0, 0, 304, 305,  0,  0,  2, 2},
-        {2, 2, 0,  0,  0, 0,399, 312,313,314,315,399, 0, 0, 302, 303,  0,  0,  2, 2},
-        {2, 2, 0,  0,  0, 0,  0,   0,  0,  0,  0,  0, 0, 0, 324, 325,  0,  0,  2, 2},
-        {0, 0, 0,  0,  0, 0,  0,   0,  0,  0,  0,  0, 0, 0,   0,   0,  0,  0,  2, 2},
-        {0, 0, 0,  0,  0, 0,  0,   0,  0,  0,  0,  0, 0, 0,   0,   0,  0,437,438, 2},
-        {0, 0, 0,  0,  0, 0,  0,   0,  0,  0,  0,  0, 0, 0,   0,   0,  0,435,436, 2},
-        {2, 2,402,403, 0, 0,  0,   0,  0,  0,  0,  0, 0, 0,   0,   0,  0,  0,  2, 2},
-        {2, 2,400,401, 0, 0,  0,   0,  0,  0,  0,  0, 0, 0,   0,   0,384,385,  2, 2},
-        {2, 2,324,325, 0,404,405,406,  0,  0,  0,  0, 0, 0, 380, 381,382,383,  2, 2},
-        {2, 2, 0,  0,  0,407,408,409,  0,  0,  0,  0, 0, 0, 378, 379,  0,  0,  2, 2}, // Bas fermé
-        {2, 2, 0,  0,  0,410,411,412,  0,  0,  0,  0, 0, 0,   0,   0,  0,  0,  2, 2},
+        {2, 2, 2,594,595, 2,  2,  2,590, 591,  2,605, 2, 2,   2,   2,640,  2, 2}, // Trou en haut
+        {2, 2, 2,592,593, 2,  2,  2,332, 333,  2,  2, 2, 2,   2,   2,639,  0,  2, 2},
+        {2, 2, 0,  0,  0, 0,  0,   0,  0,  0,  0,  0, 0, 0,   0,   0,638,  0,  2, 2},
+        {2, 2, 0,  0,  0, 0,623, 308,309,310,311,623, 0, 0, 304, 305,  0,  0,  2, 2},
+        {2, 2,555,556,  0, 0,624, 312,313,314,315,624, 0, 0, 302, 303,  0,  0,  2, 2},
+        {2, 2,553,554,  0, 0,  0, 520,521,522,523,524, 0, 0, 324, 325,  0,  0,  2, 2},
+        {0, 0, 0,  0,  0, 0,  0, 515,516,517,518,519, 0, 0,   0,   0,555,556,  2, 2},
+        {0, 0, 0,  0,  0, 0,  0, 510,511,512,513,514, 0, 0,   0,   0,553,554,  2, 2},
+        {0, 0, 0,  0,  0, 0,  0, 515,516,517,518,519, 0, 0,   0,   0,  0,  0,  2, 2},
+        {2, 2,627,628, 0, 0,  0, 510,511,512,513,514, 0, 0,   0,   0,  0,  0,  2, 2},
+        {2, 2,625,626, 0, 0,  0, 505,506,507,508,509, 0, 0,   0,   0,614,615,  2, 2},
+        {2, 2,324,325, 0,629,630,631,  0,  0,  0,  0, 0, 0, 610,611, 612,613,  2, 2},
+        {2, 2, 0,  0,  0,632,633,634,  0,  0,  0,  0, 0,589,608,609,  0,  0,  2, 2}, // Bas fermé
+        {2, 2, 0,  0,  0,635,636,637,  0,  0,  0,  0, 0, 0,   0,   0,  0,  0,  2, 2},
         {2, 2, 2,  2,  2, 2,  2,   2,  2,  2,  2,  2, 2, 2,   2,   2,  2,  2,  2, 2}
     },
     // TENTE (index 8)
@@ -297,12 +298,13 @@ int maps_reveille[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
 // int TuilesNotSpecial[] = {0, 1, 2};
 // int tailleTuilesNotSpecial = (int)sizeof(TuilesNotSpecial) / (int)sizeof(TuilesNotSpecial[0]);
 
+int dialogueImpossibleChambreParents = 0;
 
 int InitGameStepByStepReveille(SDL_Renderer *renderer){
 	player.x = 80;
     player.y = 50; 
     player.w = 12; 
-    player.h = 12;
+    player.h = 14;
 
     SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");
     if (surface) {
@@ -313,19 +315,431 @@ int InitGameStepByStepReveille(SDL_Renderer *renderer){
     return 0;
 }
 
-int IsWallReveille(float x, float y){
-	int caseX = (int)x / TILE_SIZE;
+int IsWallReveille(float x, float y)
+{
+    int caseX = (int)x / TILE_SIZE;
     int caseY = (int)y / TILE_SIZE;
 
-	// int type = maps_reveille[currentLevel][caseY][caseX];
+    int localX = (int)x % TILE_SIZE;
+    int localY = (int)y % TILE_SIZE;
+
+    // Sécurité bornes map
+    if (caseX < 0 || caseX >= MAP_WIDTH || caseY < 0 || caseY >= MAP_HEIGHT)
+    {
+        return 1;
+    }
+
+    int type = maps_reveille[currentLevel][caseY][caseX];
     int type_pattern = maps_patern_reveille[currentLevel][caseY][caseX];
 
-    if(type_pattern == 2 || type_pattern == 83)return 1;
+    // =========================================================
+    // --- 1. GESTION DES MURS GLOBAUX (Couche Pattern) ---
+    // =========================================================
+    // 446 = Mur brique | 2 = Mur normal (parents) | 560 = Mur Tente | 642 = Buissons jardin
+    if (type_pattern == 446 || type_pattern == 2 || type_pattern == 560 || type_pattern == 642)
+    {
+        int caseY_Below = caseY + 1;
+        if (caseY_Below < MAP_HEIGHT)
+        {
+            int typeBelow_pattern = maps_patern_reveille[currentLevel][caseY_Below][caseX];
+            if (typeBelow_pattern == 446 || typeBelow_pattern == 2 || typeBelow_pattern == 560 || typeBelow_pattern == 642)
+            {
+                return 1;
+            }
+        }
+        else
+        {
+            return 1;
+        }
+
+        // Si la case en dessous est praticable, on laisse le joueur "dépasser" de 4 pixels pour la perspective
+        if (localY < 4)
+        {
+            return 1;
+        }
+        return 0;
+    }
+
+    // =========================================================
+    // --- 2. GESTION DES MEUBLES SPÉCIFIQUES (Couche Pattern) ---
+    // =========================================================
+    
+    // Le "604" a deux utilités différentes selon le niveau !
+    if (type_pattern == 604) {
+        
+        // A. Table du couloir (Niveau 1)
+        if (currentLevel == 1) {
+            if (localX < 2) return 0; // On laisse glisser un peu sur la gauche
+            
+            // Si on est sur le 604 du BAS (vérifié par la présence d'un 604 au-dessus)
+            if (caseY > 0 && maps_patern_reveille[currentLevel][caseY - 1][caseX] == 604) {
+                if (localY > 11) return 0; // Laisse passer le bas des pieds
+                return 1; 
+            } 
+            else {
+                // On est sur le 604 du HAUT
+                return 1; // 100% solide
+            }
+        }
+        // B. Meuble mural droit de la cuisine (Niveau 3) -> Remplaçant de 388, 389, 374
+        else if (currentLevel == 3) {
+            if (localX < 3) return 0;
+            return 1;
+        }
+    }
+
+    // Grande table cuisine (160..166 -> 562..568)
+    if(type_pattern >= 562 && type_pattern <= 568){
+        if( (type_pattern == 563 || type_pattern == 565 || type_pattern == 568)){
+            if(localY > 13) return 0;
+            if(type_pattern == 565 && localX < 2 ) return 0;
+            if(type_pattern == 563 && localX > 13) return 0;
+        }
+        if((type_pattern == 562 || type_pattern == 564) && localX < 2 ) return 0;
+        if((type_pattern == 566 || type_pattern == 567 ) && localX > 13) return 0;
+        return 1;
+    }
+
+    // Tiroirs / Blocs seuls cuisine (181, 171 -> 575, 573) - Peuvent être en pattern ou en map !
+    if(type == 573 || type == 575 || type_pattern == 573 || type_pattern == 575){
+        if(localX > 14) return 0;
+        if((type == 575 || type_pattern == 575) && localY > 4) return 0;
+        return 1;
+    }
+
+    // =========================================================
+    // --- 3. GESTION DES OBJETS (Couche Maps) ---
+    // =========================================================
+
+    // Armoires (inchangées : 10, 11, 14, 15, 18, 19)
+    if (type == 10 || type == 11 || type == 14 || type == 15 || type == 18 || type == 19) {
+        if (localY < 4) return 1;
+        return 0;
+    }
+    if (type == 22 || type == 23) {
+        if (localY > 2) return 1;
+        return 0;
+    }
+
+    int isTopCorner = (y < player.y + 8);
+
+    // Livre (20 -> 450)
+    if (type == 450) {
+        if (localX >= 11) return 0; 
+        if (isTopCorner) return 0;  
+        if (localY < 3) return 0;
+        return 1; 
+    }
+
+    // Lampe chambre (21 -> 451)
+    if (type == 451) {
+        if (localX >= 12) return 0; 
+        if (isTopCorner && (localY >= 5) ) return 0;  
+        return 1; 
+    }
+
+    // Commode chambre (42, 43 -> 470, 471)
+    if (type == 470 || type == 471) {
+        if (localX >= 11) return 0; 
+        if (isTopCorner) return 0; 
+        return 1;
+    }
+
+    // Lit (32..35 -> 460..463)
+    if (type == 460 || type == 461 || type == 462 || type == 463) {
+        if (isTopCorner) return 0; 
+        if ( (type == 460 || type == 462 ) && localX < 4) return 0;
+        if ( (type == 461 || type == 463) && localX > 11 ) return 0;
+        return 1; 
+    }
+
+    // Tente bas (52..57 -> 479..484)
+    if (type >= 479 && type <= 484) {
+        if (type == 482) { // Haut gauche
+            if (localX < 8) return 0; 
+            return 1;
+        }
+        if (type == 483 || type == 484) return 1; // Haut milieu/droit
+        if (type == 479 || type == 480 || type == 481) {
+            if (isTopCorner) return 0; 
+            return 1; 
+        }
+    }
+
+    // Commode mur droit (80, 81 -> 503, 504)
+    if (type == 503 || type == 504) {
+        if (localX < 6) return 0; 
+        if (isTopCorner) return 0; 
+        return 1; 
+    }
+
+    // Bureau et chaise (46..49 -> 474..477 | 51 -> 478)
+    if ((type >= 474 && type <= 477) || type == 478) {
+        if (type == 478) { // Chaise
+            if (localX < 8 || localX > 11) return 0; 
+            if (isTopCorner) return 0;
+            return 1; 
+        }
+        if (type == 474 && localX < 3) return 0;
+        if (type == 477 && localX > 8) return 0;
+
+        static int X_chaise = -1, Y_chaise = -1;
+        if (X_chaise == -1) {
+            TrouveCoordonnees(&X_chaise, &Y_chaise, 478, 0); 
+        }
+
+        if (localY < 2) {
+            if (caseX == X_chaise) {
+                if (localX < 8 || localX > 11) return 0;
+                return 1; 
+            }
+            return 0; 
+        }
+        if (isTopCorner) return 0; 
+        return 1;
+    }
+
+    // Extrémités gauche Couloir (71, 72, 172, 173 -> 494, 495)
+    if (type == 494 || type == 495 || type == 172 || type == 173) {
+        if (localX >= 12) return 0;
+        if (isTopCorner) return 0; 
+        return 1;
+    }
+
+    // Extrémités droite Couloir (377)
+    if (type == 377) {
+        if (localX < 6) return 0; 
+        if (isTopCorner) return 0; 
+        return 1;
+    }
+
+    // Petit vase / Bougie (73 -> 496)
+    if (type == 496) {
+        if (localX < 4) return 0; 
+        if (localY < 2) return 0;
+        if (isTopCorner) return 0; 
+        return 1;
+    }
+
+    // Fauteuils Hall (378..385 -> 608..615)
+    if (type >= 608 && type <= 615) {
+        if (type >= 612 && type <= 615) {
+            if ((type == 612 ) && localX < 6) return 0; 
+            if ((type == 613 ) && localX > 6) return 0;
+            if (type == 612 || type == 613) {
+                if (isTopCorner) return 0;
+                return 1; 
+            }
+        }
+        if (type >= 608 && type <= 611) {
+            if ((type == 608 ) && localX < 2) return 0;
+            if ((type == 609 ) && localX > 2) return 0; 
+            if (type == 608 || type == 609) {
+                if (isTopCorner) return 0; 
+                return 1; 
+            }
+        }
+    }
+    
+    // Pot de fleur (143, 144 -> 553, 554)
+    if(type == 553 ){
+        if(localX < 9 || isTopCorner) return 0;
+        return 1;
+    }
+    if(type == 554){
+        if(localX > 6 || isTopCorner) return 0;
+        return 1;
+    }
+    
+    // Pieds table sans chat (386, 387 -> 657, 658)
+    if(type == 657 || type == 658){
+        if(y < player.y + 10) return 0; 
+        return 1;
+    }
+    
+    // Haut table hall (134, 135 -> 544, 545)
+    if (type == 544 || type == 545) {
+        return 1; 
+    }
+
+    // Grosse plante (275 -> 589)
+    if(type == 589){
+        if(localX > 14) return 0;
+        return 1;
+    }
+
+    // Statue mur gauche (84 -> Gardé si présent dans ta map finale)
+    if(type == 84){
+        if(isTopCorner) return 0;
+        return 1;
+    }
+
+    // Pieds table hall (136, 137 -> 546, 547)
+    if (type == 546 || type == 547) {
+        if (y < player.y + 8) return 0; 
+        return 1; 
+    }
+
+    // Chaudron (294 à 297) -> S'il ne reste pas dans ta map, ça n'affecte rien de le laisser
+    if(type == 294 || type == 295){
+        if(isTopCorner) return 0;
+        if(type == 294 && localX < 4) return 0;
+        if(type == 295 && localX > 12) return 0;
+        return 1;
+    }
+    if(type == 296 || type == 297){
+        if(localY < 14) return 0;
+        if(type == 296 && localX < 4) return 0;
+        if(type == 297 && localX > 12) return 0;
+        return 1;
+    }
+    
+    // Meuble mur de droite cuisine MAPS (388, 389, 374 -> 618, 619) 
+    if(type == 618 || type == 619){
+        if(localX < 3) return 0;
+        return 1;
+    }
+    
+    // Sacs cuisine (395, 396 -> 620, 621)
+    if(type == 620 || type == 621){
+        if(isTopCorner) return 0;
+        if(localX < 2) return 0;
+        return 1;
+    }
+    
+    // Bas armoire cuisine (245..247 -> 643..645)
+    if(type == 643 || type == 644 || type == 645){
+        if(isTopCorner) return 0;
+        if(type == 643 && localX < 3) return 0;
+        if(type == 645 && localX > 12) return 0;
+        return 1;
+    }
+    
+    // Poêle, plaques, lavabo etc. (178, 169, 170, 167, 168, 243, 274 -> 571, 572, 569, 570, 588)
+    if(type == 178 || type == 571 || type == 572 || type == 569 || type == 570 || type == 243 || type == 588){
+        if(isTopCorner) return 0;
+        if(type == 588){
+            if(localY < 4) return 0;
+            if(localX > 12) return 0;
+            return 1;
+        }
+        return 1;
+    }
+    
+    // Chaise cuisine (264 -> 580)
+    if(type == 580){
+        if(localX < 3) return 0;
+        if(isTopCorner) return 0;
+        return 1;
+    }
+    
+    // Bas commode parents (207, 208, 209)
+    if(type == 207 || type == 208 || type == 209){
+        if(type == 207 && localX < 13) return 0;
+        if(type == 209 && localX > 12) return 0;
+        if(isTopCorner) return 0;
+        return 1;
+    }
+    
+    // Lit parents (187..206 & 219..222)
+    if ((type >= 187 && type <= 206) || (type >= 219 && type <= 222)) {
+        if (isTopCorner) return 0;
+        return 1;
+    }
+    
+    // Commode parents (185, 186, 218)
+    if(type == 185 || type == 186 || type == 218){
+        if(localX > 12) return 0;
+        if(isTopCorner) return 0;
+        return 1;
+    }
+    
+    // Petite commode salon (399)
+    if(type == 399){
+        if(isTopCorner) return 0;
+        if(localX < 4) return 0;
+        return 1;
+    }
+    
+    // Bas canapé salon (312 à 315)
+    if(type >= 312 && type <= 315){
+        if(isTopCorner) return 0;
+        return 1;
+    }
+    
+    // Horloges (413..415 -> 638..640 et 652..654)
+    if ((type >= 638 && type <= 640) || (type >= 652 && type <= 654) ) {
+        if (type == 640 || type == 654) {
+            return 1; 
+        }
+        
+        float playerCenterX = player.x + (player.w / 2.0f);
+        int playerCenterTileX = (int)playerCenterX / TILE_SIZE;
+
+        if (playerCenterTileX == caseX) {
+            if (isTopCorner) return 0;
+            return 1;
+        } 
+        else {
+            if (localX < 4 || localX > 11) return 0;
+            if (isTopCorner) return 0;
+            return 1;
+        }
+    }
+    
+    // Télé/Radio sur meuble (302, 303, 324, 325, 625, 626)
+    if((type >= 302 && type <= 303) || (type == 324 || type == 325) || type == 625 || type == 626){
+        if((type == 302 || type == 324) && localX < 1) return 0;
+        if( (type == 303 || type == 325 || type == 626) && localX > 14) return 0;
+        if(isTopCorner) return 0;
+        return 1;
+    }
+    
+    // Bas billard (404..412 -> 629..637)
+    if(type >= 629 && type <= 637){
+        if( (type >= 635 && type <= 637) && localY > 6) return 0; // Pieds du billard
+        if(isTopCorner) return 0;
+        return 1;
+    }
+    
+    // Porte fin (435 à 438)
+    if(type >= 435 && type <= 438){
+        if((type == 435 || type == 437) && localX < 4 ) return 0;
+        if(isTopCorner) return 0;
+        return 1;
+    }
+    
+    // Bouche (156..159)
+    if(type >= 156 && type <= 159){
+        if((type == 156 || type == 158) && localX < 7) return 0;
+        if( (type == 157 || type == 159) && localX > 10) return 0;
+        if(isTopCorner) return 0;
+        return 1;
+    }
+
     return 0;
 }
 
 void UpdateGameReveille(void){
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
+
+    dialogueImpossibleChambreParents = 0;
+    if (dialogueImpossibleChambreParents > 0)
+    {
+        if (state[SDL_SCANCODE_RETURN])
+        {
+            if (toucheE_Relache)
+            {
+                dialogueImpossibleChambreParents = 0; // On ferme le dialogue
+                toucheE_Relache = 0;
+            }
+        }
+        else
+        {
+            toucheE_Relache = 1;
+        }
+        return;
+    }
 
 	float dirX = 0;
     float dirY = 0;
@@ -479,9 +893,14 @@ void UpdateGameReveille(void){
     // Changement salle à manger <-> chambre des parents
     if (IsLocationUp(8, 13, 4, 10))
     {
-        currentLevel = 6;
-        player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
+        dialogueImpossibleChambreParents = 1;
     }
+
+    if (IsLocationUp(8, 13, 4, 5))
+    {
+        player.y = 5; 
+    }
+
     else if (IsLocationDown(8, 13, 6, 20))
     {
         currentLevel = 4;
@@ -503,8 +922,13 @@ void UpdateGameReveille(void){
 
 }
 
-static inline int IsTuileDessus(int index) {
-    return (index == 78);
+static inline int IsTuileDessusReveille(int index) {
+    return (index == 501 || index == 607 || index == 555 || index == 556 
+         || index == 610 || index == 611 || index == 614 || index == 615 
+         || index == 579 || index == 623 || index == 308 || index == 309 
+         || index == 310 || index == 311 || index == 304 || index == 305 
+         || index == 627 || index == 628 || index == 639 || index == 640 
+         || index == 653 || index == 654);
 }
 
 void DrawGameReveille(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
@@ -524,7 +948,7 @@ void DrawGameReveille(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini
                 DrawTuiles(x, y, type_pat, renderer, lum); 
 
                 int type_maps = maps_reveille[currentLevel][y][x];
-                if (!IsTuileDessus(type_maps) && IsTuileSpecial(type_maps))
+                if (!IsTuileDessusReveille(type_maps) && IsTuileSpecial(type_maps))
                 {
                     if (type_maps >= 219 && type_maps <= 222) continue; 
                     if (type_maps >= 187 && type_maps <= 190) continue; 
@@ -601,7 +1025,7 @@ void DrawGameReveille(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini
             for (int x = 0; x < MAP_WIDTH; x++)
             {
                 int type_maps = maps_reveille[currentLevel][y][x];
-                if (IsTuileDessus(type_maps))
+                if (IsTuileDessusReveille(type_maps))
                 {
                     DrawTuiles(x, y, type_maps, renderer, 255); 
                 }
@@ -617,4 +1041,9 @@ void DrawGameReveille(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini
         if (sText)
             DrawInteractions(renderer, sText);
     }
+    if(dialogueImpossibleChambreParents == 1){
+        char *texteAffiche = "Mon papa est entrain de dormir !";
+        DrawTexte(texteAffiche, renderer, font, 20, 180, 280, 50);
+    }
+
 }
