@@ -76,6 +76,8 @@ void GestionMemoSalon();
 
 void CleanGame(); // Nettoyage de tous les pointeurs
 
+void ResetGame(void);
+
 extern int currentLevel; 
 
 #endif

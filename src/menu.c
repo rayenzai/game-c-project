@@ -69,7 +69,8 @@ int UpdateMenu(SDL_Event *event) {
                 break;
             case SDLK_RETURN:
                 if (selection == 0) return 1; // Lancer JEU
-                if (selection == 2) return 2; // QUITTER
+                if (selection == 1) return 2;
+                if (selection == 2) return 3; // QUITTER
                 break;
         }
     }

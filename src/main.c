@@ -10,6 +10,7 @@
 #include "pause.h"
 #include "fin_jeu.h"
 #include "game_reveille.h"
+#include "options.h"
 
 #define WINDOW_WIDTH 960
 #define WINDOW_HEIGHT 720
@@ -22,6 +23,7 @@ typedef enum {
     ETAT_INTRO,
     ETAT_CHARGEMENT,
     ETAT_JEU,
+    ETAT_OPTIONS,
     ETAT_PAUSE,
     ETAT_FIN,
     ETAT_JEU_REVEILLE
@@ -79,8 +81,8 @@ int main(int argc, char* argv[]) {
 
     GameState etat = ETAT_MENU;
     
-    // NOUVEAU : On mémorise l'état avant de faire pause
     GameState etat_avant_pause = ETAT_JEU;
+    GameState etat_avant_options = ETAT_MENU;
 
     InitIntro();
     InitMenu(renderer);
@@ -120,11 +122,23 @@ int main(int argc, char* argv[]) {
                 if (action == 1) { 
                     if(fin_jeu) etat = ETAT_JEU_REVEILLE;
                     else {
+                        ResetGame();
                         etat = ETAT_CHARGEMENT; 
                         vraiPourcentage = 0;   
                     }
                 }
-                if (action == 2) running = 0;
+                if (action == 2) {
+                    etat = ETAT_OPTIONS;
+                    InitOptions();
+                }
+                if (action == 3) running = 0;
+                
+            }
+            else if (etat == ETAT_OPTIONS) {
+                int actionOptions = UpdateOptions(&event);
+                if (actionOptions == 1) { // Si UpdateOptions renvoie 1 (Bouton Retour)
+                    etat = etat_avant_options;     // On retourne au menu principal !
+                }
             }
             else if (etat == ETAT_INTRO) {
                 if (HandleIntroInput(&event) == 1) {
@@ -150,10 +164,15 @@ int main(int argc, char* argv[]) {
                     etat = ETAT_MENU;
                     currentLevel = 0; 
                 }
-                else if (actionPause == 3) { // 3 = Sauvegarder
+                else if (actionPause == 3){
+                    etat_avant_options = ETAT_PAUSE;
+                    etat = ETAT_OPTIONS;
+                    InitOptions();
+                }
+                else if (actionPause == 4) { // 3 = Sauvegarder
                     printf("Sauvegarde non implementee pour le moment.\n");
                 }
-                else if (actionPause == 4) { // 4 = Quitter
+                else if (actionPause == 5) { // 4 = Quitter
                     running = 0; 
                 }
             }
@@ -203,6 +222,9 @@ int main(int argc, char* argv[]) {
         // C. DESSIN
         if (etat == ETAT_MENU) {
             DrawMenu(renderer, fontGrand, fontPetit);
+        }
+        else if (etat == ETAT_OPTIONS) {
+            DrawOptions(renderer, fontGrand, fontPetit);
         }
         else if(etat==ETAT_FIN){
             DrawGame(renderer, fontPetit, fontMini);

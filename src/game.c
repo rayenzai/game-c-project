@@ -7,11 +7,12 @@
 #include "map.h"
 #include "ia.h"
 #include "fin_jeu.h"
+#include "options.h"
 #include <stdio.h>
 #include <math.h>
 
-#define VOLUME_MUSIQUE 32
-#define VOLUME_BRUITAGES 32
+// #define VOLUME_MUSIQUE 32
+// #define VOLUME_BRUITAGES 32
 
 // -- Pour les sons --
 
@@ -314,7 +315,7 @@ personnage
 */
 
 // --- LA CARTE DU NIVEAU ---
-int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
+const int maps_origine[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
     {
         // carte 1 (chambre) index 0 
         {2,  2,  2,  2,  2,  2,  2,  2,  0,  0,  0,  0, 2,  2,  5,  2,  8,  9,  2, 2}, // Trou en haut
@@ -532,6 +533,7 @@ int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
     },
 };
 
+int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH];
 
 int dialogueStep = 0;
 int dialogueStep_sortie1 = 0;
@@ -660,7 +662,7 @@ int interactTelecommandeTurnOn = 0;
 int teleOn = 0;
 Uint32 debutTeleOn = 0;
 int salonPattern[MAP_HEIGHT][MAP_WIDTH] = {0};
-Uint32 tempsTeleOn = 1000;
+Uint32 tempsTeleOn = 10000;
 int aFiniSalon = 0;
 
 // --- INITIALISATION ---
@@ -1287,8 +1289,7 @@ void ManageMusic()
 {
     static int currentZoneState = -1;
     int newZoneState = 0;
-    Mix_Volume(-1, VOLUME_BRUITAGES);
-
+    Mix_Volume(-1, globalVolumeBruitages);
     // if(screamer){
     //     Mix_Volume(2, 64); // On commence volume à 0
     // }
@@ -1309,7 +1310,7 @@ void ManageMusic()
     // Si la zone a changé (ex: on passe de 4 à 5, ou au démarrage du jeu)
     if (newZoneState != currentZoneState)
     {
-        Mix_VolumeMusic(VOLUME_MUSIQUE);
+        Mix_VolumeMusic(globalVolumeMusique);
         if (newZoneState == 1)
         {
             if (MusicExterior)
@@ -1317,7 +1318,7 @@ void ManageMusic()
         }
         else
         {
-            Mix_VolumeMusic(16);
+            Mix_VolumeMusic(globalVolumeMusique);
             if (MusicInterior)
                 Mix_FadeInMusic(MusicInterior, -1, 1000);
         }
@@ -1332,6 +1333,8 @@ void UpdateGame(void)
     bouche_has_pain = 1;
     bouche_has_soupe = 1;
     hasTelecommande = 1;
+    cpt_piece_tableau = 4;
+
 
     if (chaudron_anim == 1)
     {
@@ -2392,7 +2395,7 @@ void UpdateGame(void)
                 teleOn = 1;
                 debutTeleOn = SDL_GetTicks();
                 interactTelecommandeTurnOn = 0;
-                //GestionMemoSalon();
+                GestionMemoSalon();
             }
             toucheE_Relache = 0; // On verrouille tant qu'on n'a pas lâché E
         }
@@ -2597,14 +2600,14 @@ void UpdateGame(void)
     {
         currentLevel = 6;
         player.x = 5;
-        SpawnFantomeRandom(); // <--- NOUVEAU
+        SpawnFantomeRandom(); 
     }
     // Retour 6 -> 5
     else if (IsLocationLeft(11, 14, 6, 5))
     {
         currentLevel = 5;
         player.x = (MAP_WIDTH * TILE_SIZE) - 20;
-        SpawnFantomeRandom(); // <--- NOUVEAU (Le fantôme change de place quand on revient !)
+        SpawnFantomeRandom(); 
     }
 
     // 4. Passage 6 -> 7
@@ -2612,14 +2615,14 @@ void UpdateGame(void)
     {
         currentLevel = 7;
         player.y = 10;
-        SpawnFantomeRandom(); // <--- NOUVEAU
+        SpawnFantomeRandom(); 
     }
     // Retour 7 -> 6
     else if (IsLocationUp(10, 13, 7, 5))
     {
         currentLevel = 6;
         player.y = (MAP_HEIGHT * TILE_SIZE) - 20;
-        SpawnFantomeRandom(); // <--- NOUVEAU
+        SpawnFantomeRandom(); 
     }
 
     // 5. Passage 7 -> 8 (Dernier niveau)
@@ -2627,14 +2630,14 @@ void UpdateGame(void)
     {
         currentLevel = 8;
         player.x = (MAP_WIDTH * TILE_SIZE) - 20;
-        SpawnFantomeRandom(); // <--- NOUVEAU
+        SpawnFantomeRandom(); 
     }
     // Retour 8 -> 7
     else if (IsLocationRight(11, 14, 8, 20))
     {
         currentLevel = 7;
         player.x = 5;
-        SpawnFantomeRandom(); // <--- NOUVEAU
+        SpawnFantomeRandom(); 
     }
 
     // Changement de son d'ambiance
@@ -2644,7 +2647,6 @@ void UpdateGame(void)
     {
         ActionFantome(200);
     }
-    // currentLevel = 10;
     // --- GESTION COLLISION JOUEUR / FANTOME (GAME OVER / RESET) ---
     if (currentLevel >= 5 && currentLevel <= 8)
     {
@@ -2702,9 +2704,7 @@ void UpdateGame(void)
         currentLevel = 4;
         player.y = 10;
     }
-    hasDoudou = 1;
     if(currentLevel == 10)GestionPapa();
-    // currentLevel = 10; 
 
     if(IsLocationRight(5, 10, 4, 20)){
         currentLevel = 11;
@@ -2715,8 +2715,6 @@ void UpdateGame(void)
         player.x = (MAP_WIDTH * TILE_SIZE) - 20;
     }
 
-    // currentLevel = 11;
-    // hasTelecommande = 1;
     // --- ANIMATION TV (GRESILLEMENT) ---
     tempsActuel = SDL_GetTicks();
     if (currentLevel == 11 && teleOn) {
@@ -2752,30 +2750,18 @@ void UpdateGame(void)
     if(currentLevel == 11 && player.x >= 15*TILE_SIZE)aFiniSalon = 1;
 
     // // Gestion de réussite ou non du joueur pour le chemin à mémoriser
-    // if(currentLevel == 11 && !teleOn && premiereFoisAllumeeTele != 0 && !aFiniSalon){
-    //     int caseX = (player.x + player.w / 2) / TILE_SIZE;
-    //     int caseY = (player.y + player.h) / TILE_SIZE;
-    //     int indexTuile = salonPattern[caseY][caseX];
+    if(currentLevel == 11 && !teleOn && premiereFoisAllumeeTele != 0 && !aFiniSalon){
+        int caseX = (player.x + player.w / 2) / TILE_SIZE;
+        int caseY = (player.y + player.h) / TILE_SIZE;
+        int indexTuile = salonPattern[caseY][caseX];
 
-    //     if(indexTuile != 340 && indexTuile != 341 && indexTuile != 342 && player.x >= 2*TILE_SIZE && player.x <= 14*TILE_SIZE){
-    //         printf("mauvais chemin\n");
-    //         player.y = 7*TILE_SIZE;
-    //         player.x = 1 * TILE_SIZE;
-    //         premiereFoisAllumeeTele = 0;
-    //     }
-    // }
-    // if(currentLevel == 11 && !teleOn && premiereFoisAllumeeTele != 0){
-    //     int caseX = (player.x + player.w / 2) / TILE_SIZE;
-    //     int caseY = (player.y + player.h) / TILE_SIZE;
-    //     int indexTuile = salonPattern[caseY][caseX];
-
-    //     if(indexTuile != 82 && player.x >= 2*TILE_SIZE){
-    //         printf("mauvais chemin\n");
-    //         player.y = 7*TILE_SIZE;
-    //         player.x = 1 * TILE_SIZE;
-    //         premiereFoisAllumeeTele = 0;
-    //     }
-    // }
+        if(indexTuile != 340 && indexTuile != 341 && indexTuile != 342 && player.x >= 2*TILE_SIZE && player.x <= 14*TILE_SIZE){
+            printf("mauvais chemin\n");
+            player.y = 7*TILE_SIZE;
+            player.x = 1 * TILE_SIZE;
+            premiereFoisAllumeeTele = 0;
+        }
+    }
 
     // 302(g), 303(d) = bas télé sur commode 
     // 304,305 = haut télé
@@ -2785,7 +2771,6 @@ void UpdateGame(void)
     // 322,323 = haut télé (effet bug v2)
     
 
-    // printf("lvl: %d \n", currentLevel);
         //------ Fin du jeu------
     interact_porte_fin = 0;
     interraction_maman_fin =0;
@@ -3096,7 +3081,7 @@ static inline int IsLampe(int index) {
         case 21: case 75: case 76: case 85: case 86: 
         case 148: case 186: case 317: case 319: case 321: 
         case 323: case 340: case 341: case 342: case 343:
-        case 398: 
+        case 398: case 439 :case 440: case 441: 
             return 1;
         default: 
             return 0;
@@ -3377,7 +3362,7 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
 
     SDL_RenderCopy(renderer, tilesetTexture, &srcHaut, &dstHaut);
     SDL_RenderCopy(renderer, tilesetTexture, &srcBas,  &dstBas);
-}
+    }
     else {
         SDL_Rect srcPlayer = { indexJoueur * 16, 0, 16, 16 };
         SDL_Rect destPlayer = { (int)roundf(player.x) - 2, (int)roundf(player.y) - 2, 16, 16 };
@@ -3404,11 +3389,6 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
         char *texteAffiche = "";
         if (dialogue_Step_fin == 1) texteAffiche = "je suis coince ici";
         DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-
-    //...... DESSINER L'ELLIPSE..........
-    if (ellipse == 1){
-            DrawEllipse(renderer,font);
     }
         
     if (dialogueStep > 0) {
@@ -3965,6 +3945,10 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
             }
         }
     }
+    //...... DESSINER L'ELLIPSE..........
+    if (ellipse == 1){
+            DrawEllipse(renderer,font);
+    }
     if (livreOuvert == 1 && textureLivre != NULL)
     {
 
@@ -4056,6 +4040,8 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
         SDL_RenderCopy(renderer, textureScreamer, NULL, &posScreamer);
         }
     }
+
+
 
 void DrawInteractions(SDL_Renderer *renderer, SDL_Surface *sText)
 {
@@ -4160,4 +4146,46 @@ void CleanGame() {
         Mix_FreeMusic(MusicExterior);
         MusicExterior = NULL;
     }
+}
+
+void ResetGame(void) {
+    // 1. Restaure TOUTE la map instantanément
+    memcpy(maps, maps_origine, sizeof(maps_origine));
+
+    // 2. Restaure les positions et l'état du joueur
+    currentLevel = 0;
+    player.x = 80;
+    player.y = 50;
+    player.w = 12;
+    player.h = 12;
+    estAdulte = 0;
+    hasDoudou = 0;
+    
+    // 3. Restaure la progression du jeu
+    fin_du_jeu = 0;
+    menu_fin = 0;
+    ellipse = 0;
+    dialogueStep = 0;
+    dialogueStep_sortie1 = 0;
+    dialogue_maman = 0;
+    dialogue_maman_2 = 0;
+    
+    // 4. Restaure les objets et les puzzles
+    hasTelecommande = 0;
+    teleOn = 0;
+    cpt_piece_tableau = 0;
+    whichTableauPiece = 0;
+    has_water = 0;
+    has_drawing = 0;
+    statue_has_water = 0;
+    statue_has_drawing = 0;
+    
+    // 5. Restaure la cuisine
+    plat_pret_a_servir = 0;
+    has_truc_vert = 0; has_spider = 0; has_pain = 0; 
+    has_heart = 0; has_eye = 0; has_os = 0; has_coeur_rouge = 0;
+    chaudron_anim = 0;
+    max_objets = 0;
+    bouche_has_soupe = 0;
+    bouche_has_pain = 0;
 }
