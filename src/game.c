@@ -2563,7 +2563,6 @@ void UpdateGame(void)
             }
         }
     }
-    currentLevel=11;
 
     // 1. Quitter la CHAMBRE (Niveau 0) par le HAUT
     // On vérifie si on est au niveau 0 ET si on dépasse le haut de l'écran (y < 5)
