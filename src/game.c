@@ -373,9 +373,9 @@ const int maps_origine[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
     },  
     // CARTE 4 : CUISINE (Niveau 3) index 3
     {
-        {2,   2,   2,   2,   2,   2,   2,   2,   0, 427, 428, 0, 2, 251, 252, 253,   2,   2, 2, 2}, // Trou en haut
-        {2,   2, 270, 268, 269,   2, 273,   2,   0, 425, 426, 0, 2, 248, 250, 249,   2, 184, 2, 2},
-        {2,   2, 242, 266, 267, 271, 272,   0,   0, 423, 424, 0, 0, 245, 246, 247, 244,   0, 2, 2},
+        {2,   2,   2,   2,   2,   2,   2,   2,   0,   0,   0, 0, 2, 251, 252, 253,   2,   2, 2, 2}, // Trou en haut
+        {2,   2, 270, 268, 269,   2, 273,   2,   0,   0,   0, 0, 2, 248, 250, 249,   2, 184, 2, 2},
+        {2,   2, 242, 266, 267, 271, 272,   0,   0,   0,   0, 0, 0, 245, 246, 247, 244,   0, 2, 2},
         {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0, 0, 0,   0,   0,   0,   0, 395, 2, 2},
         {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0, 0, 0, 158, 159,   0,   0, 396, 2, 2},
         {2,   2,   0,   0,   0,   0,   0,   0,   0,   0,   0, 0, 0, 156, 157,   0,   0,   0, 2, 2},  
@@ -391,8 +391,8 @@ const int maps_origine[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
     },
     // CARTE 5 : SALLE A MANGER (Niveau 4 - dernière du bloc précédent) index 4
     {
-        {2, 2, 2, 2, 2, 2, 2, 2,  2,425,426,  2,  2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
-        {2, 2, 2, 2, 2, 2, 2, 2,  2,423,424,  2,  2, 2, 2, 2, 2, 8, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2,  2,  0,  0,  2,  2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
+        {2, 2, 2, 2, 2, 2, 2, 2,  2,  0,  0,  2,  2, 2, 2, 2, 2, 8, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0,283,281,277,292,  0, 0, 0, 0, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0,284,  0,291,239,285, 0, 0, 0, 0, 0, 2, 2},
@@ -1335,12 +1335,12 @@ void ManageMusic()
 void UpdateGame(void)
 {
     const Uint8 *state = SDL_GetKeyboardState(NULL);
-    bouche_has_pain = 1;
-    bouche_has_soupe = 1;
-    hasTelecommande = 1;
-    cpt_piece_tableau = 4;
-    hasDoudou = 1;
-    currentLevel = 11;
+    // bouche_has_pain = 1;
+    // bouche_has_soupe = 1;
+    // hasTelecommande = 1;
+    // cpt_piece_tableau = 4;
+    // hasDoudou = 1;
+    // currentLevel = 11;
 
     if (chaudron_anim == 1)
     {
