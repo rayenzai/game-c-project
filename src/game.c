@@ -3430,82 +3430,6 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
         SDL_RenderCopy(renderer, tilesetTexture, &srcPlayer, &destPlayer);
     }
 
-
-    //dialogues
-    if (dialogue_maman > 0) {
-        char *texteAffiche = "Au secours mon fils viens m'aider !";
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-
-    if (dialogue_maman_2 > 0) {
-        char *texteAffiche = "";
-        if (dialogue_maman_2 == 1) texteAffiche = "Pourquoi tu es encore la...?";
-        if (dialogue_maman_2 == 2) texteAffiche = "Tu aurais du partir";
-        if (dialogue_maman_2 == 3) texteAffiche = "Il arrive...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-
-    if (dialogue_Step_fin > 0) {
-        char *texteAffiche = "";
-        if (dialogue_Step_fin == 1) texteAffiche = "je suis coince ici";
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-        
-    if (dialogueStep > 0) {
-        char *texteAffiche = "";
-        if (dialogueStep == 1) texteAffiche = "Maman ? Papa ? Il fait tout noir...";
-        if (dialogueStep == 2) texteAffiche = "J'ai peur... Ou est mon Doudou ?";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogueStep_sortie1 > 0) {
-        char *texteAffiche = "";
-        if (dialogueStep_sortie1 == 1) texteAffiche = "je peux pas sortir sans mon doudou...";
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_hasDoudou > 0) {
-        char *texteAffiche = "";
-        if (dialogue_hasDoudou == 1) texteAffiche = "je te tiens";
-        if (dialogue_hasDoudou == 2) texteAffiche = "OH...";
-        if (dialogue_hasDoudou == 3) texteAffiche = "De la lumiere !";
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_statue_haut > 0) {
-        show_interact_prompt_statue_haut = 0;
-        char *texteAffiche = "";
-        if (dialogue_statue_haut == 1) texteAffiche = "Cette statue tient une coupe vide,";
-        if (dialogue_statue_haut == 2) texteAffiche = "elle doit avoir soif...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_statue_bas > 0) {
-        show_interact_prompt_statue_bas = 0;
-        char *texteAffiche = "";
-        if (dialogue_statue_bas == 1) texteAffiche = "Son visage est tordu par la haine.";
-        if (dialogue_statue_bas == 2) texteAffiche = "Un sourir ne ferait pas de mal...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_entree_labyrinthe > 0) {
-        char *texteAffiche = "";
-        if (dialogue_entree_labyrinthe == 1) texteAffiche = "Les statues bloquent le passage...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_max_objet > 0) {
-        show_interact_prompt_dessin = 0;
-        show_interact_prompt_eau = 0;
-        char *texteAffiche = "";
-        if (dialogue_max_objet == 1) texteAffiche = "Je n'ai que deux mains...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-
-
-    
- 
-
     // --- COUCHE 2 : TUILES PAR-DESSUS LE JOUEUR (Panier, lampes murales...) ---
     if (tilesetTexture) {
         for (int y = 0; y < MAP_HEIGHT; y++) {
@@ -3540,59 +3464,6 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
         }
     }
 
-
-    
-    //dialogues
-    if (dialogueStep > 0) {
-        char *texteAffiche = "";
-        if (dialogueStep == 1) texteAffiche = "Maman ? Papa ? Il fait tout noir...";
-        if (dialogueStep == 2) texteAffiche = "J'ai peur... Ou est mon Doudou ?";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogueStep_sortie1 > 0) {
-        char *texteAffiche = "";
-        if (dialogueStep_sortie1 == 1) texteAffiche = "je peux pas sortir sans mon doudou...";
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_hasDoudou > 0) {
-        char *texteAffiche = "";
-        if (dialogue_hasDoudou == 1) texteAffiche = "je te tiens";
-        if (dialogue_hasDoudou == 2) texteAffiche = "OH...";
-        if (dialogue_hasDoudou == 3) texteAffiche = "De la lumiere !";
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_statue_haut > 0) {
-        show_interact_prompt_statue_haut = 0;
-        char *texteAffiche = "";
-        if (dialogue_statue_haut == 1) texteAffiche = "Cette statue tient une coupe vide,";
-        if (dialogue_statue_haut == 2) texteAffiche = "elle doit avoir soif...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_statue_bas > 0) {
-        show_interact_prompt_statue_bas = 0;
-        char *texteAffiche = "";
-        if (dialogue_statue_bas == 1) texteAffiche = "Son visage est tordu par la haine.";
-        if (dialogue_statue_bas == 2) texteAffiche = "Un sourir ne ferait pas de mal...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_entree_labyrinthe > 0) {
-        char *texteAffiche = "";
-        if (dialogue_entree_labyrinthe == 1) texteAffiche = "Les statues bloquent le passage...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-    if (dialogue_max_objet > 0) {
-        show_interact_prompt_dessin = 0;
-        show_interact_prompt_eau = 0;
-        char *texteAffiche = "";
-        if (dialogue_max_objet == 1) texteAffiche = "Je n'ai que deux mains...";
-
-        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
-    }
-
     if (currentLevel == 3 && plat_pret_a_servir > 0)
     {
         int idPlat = 0;
@@ -3623,8 +3494,28 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
             SDL_RenderCopy(renderer, tilesetTexture, &src, &dest);
         }
     }
+    
+    //dialogues
+    if (dialogue_maman > 0) {
+        char *texteAffiche = "Au secours mon fils viens m'aider !";
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
 
-    // dialogues
+    if (dialogue_maman_2 > 0) {
+        char *texteAffiche = "";
+        if (dialogue_maman_2 == 1) texteAffiche = "Pourquoi tu es encore la...?";
+        if (dialogue_maman_2 == 2) texteAffiche = "Tu aurais du partir";
+        if (dialogue_maman_2 == 3) texteAffiche = "Il arrive...";
+
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+
+    if (dialogue_Step_fin > 0) {
+        char *texteAffiche = "";
+        if (dialogue_Step_fin == 1) texteAffiche = "je suis coince ici";
+        DrawTexte(texteAffiche, renderer, font, 20, 180 ,280, 50);
+    }
+
     if (dialogueStep > 0)
     {
         char *texteAffiche = "";
