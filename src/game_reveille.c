@@ -139,6 +139,7 @@
 
 // Sons
 static Mix_Music *MusicInterior_Reveil = NULL;
+static Mix_Music *MusicInterior_Reveil_Maison = NULL;
 
 // Variables pour la maman
 
@@ -338,6 +339,7 @@ int InitGameStepByStepReveille(SDL_Renderer *renderer){
     player.h = 14;
 
     MusicInterior_Reveil = chargement_son_maison_reveil();
+    MusicInterior_Reveil_Maison = chargement_son_maison_reveil_interieur();
 
     SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");
     if (surface) {
@@ -350,27 +352,32 @@ int InitGameStepByStepReveille(SDL_Renderer *renderer){
 
 void ManageMusicReveille()
 {
-    // 1. On applique le volume en continu pour qu'il s'adapte direct si le joueur change les options
+    // 1. Appliquer le volume global défini dans les options (en continu)
     Mix_VolumeMusic(globalVolumeMusique);
     
-    // 2. Définition de la zone : 1 si on est dans le jardin (niveau 5), 0 sinon (maison)
+    // 2. Définition de la zone : 
+    // 1 = Jardin (niveau 5)
+    // 0 = Maison (tous les autres niveaux)
     int newZoneState = (currentLevel == 5) ? 1 : 0;
 
-    // 3. Si le joueur change de zone (ou s'il vient de se réveiller et passe de -1 à 0)
+    // 3. Si le joueur change de zone 
     if (newZoneState != currentZoneStateReveil)
     {
-        // On coupe net toute musique en cours (celle du cauchemar, ou celle du jardin si on rentre)
         Mix_HaltMusic();
         
-        // Si on vient d'entrer dans le jardin (état 1)
+        // Si on entre dans le jardin
         if (newZoneState == 1) {
             if (MusicInterior_Reveil) {
-                Mix_FadeInMusic(MusicInterior_Reveil, -1, 1000); // Fondu d'une seconde
+                Mix_FadeInMusic(MusicInterior_Reveil, -1, 1000); 
             }
         }
-        // (Si newZoneState == 0, on a juste coupé la musique plus haut, la maison reste silencieuse)
+        // Si on entre ou qu'on est dans la maison
+        // else if (newZoneState == 0) {
+        //     if (MusicInterior_Reveil_Maison) {
+        //         Mix_FadeInMusic(MusicInterior_Reveil_Maison, -1, 1000); 
+        //     }
+        // }
         
-        // On enregistre dans quelle zone on est maintenant pour ne pas relancer la boucle
         currentZoneStateReveil = newZoneState; 
     }
 }

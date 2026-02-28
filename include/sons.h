@@ -7,6 +7,7 @@
 Mix_Music *chargement_son_ambiance();
 Mix_Music *chargement_son_exterieur();
 Mix_Music *chargement_son_maison_reveil();
+Mix_Music *chargement_son_maison_reveil_interieur();
 
 Mix_Chunk *chargement_son_pas();
 Mix_Chunk *chargement_son_transition();

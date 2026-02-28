@@ -32,6 +32,12 @@ Mix_Music *chargement_son_maison_reveil(){
 	return bgm_reveil;
 }
 
+Mix_Music *chargement_son_maison_reveil_interieur(){
+	Mix_Music *bgm_reveil_maison = Mix_LoadMUS("assets/sound/Musique_fond_pokemon.ogg");
+	if(!bgm_reveil_maison)printf("Erreur chargement musique : %s\n", Mix_GetError());
+	return bgm_reveil_maison;
+}
+
 Mix_Chunk *chargement_son_pendule(){
 	Mix_Chunk *sonPendule = Mix_LoadWAV("assets/sound/videoplayback.wav");
 	if(!sonPendule) printf("Erreur chargement WAV: %s \n", Mix_GetError());
