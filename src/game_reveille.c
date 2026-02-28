@@ -137,6 +137,18 @@
 
 */
 
+// Sons
+static Mix_Music *MusicInterior_Reveil = NULL;
+
+// Variables pour la maman
+
+static float mamanX = 8.0f * 16.0f; 
+static float mamanY = 3.0f * 16.0f; 
+static int mamanAction = 0;         
+static Uint32 mamanTimer = 0;
+
+// Autres variables
+
 static int playerDir = 0;       // 0=Bas, 1=Gauche, 2=Droite, 3=Haut
 static int isPlayerMoving = 0;  // 0=Immobile, 1=Marche
 
@@ -150,8 +162,8 @@ int maps_reveille[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
 	{      //carte 1 (chambre)
         {2,  2,  2,  2,  2,  2,  2,  2,  0,  0,  0,  0, 2,  2,449,  2,  8,  9,  2, 2}, // Trou en haut
         {2,  2,  2,464,465,  2,  2,  2,  0,  0,  0,  0, 2,  2,469,  2, 10, 11,  2, 2},
-        {2,  1,  0,460,461,451,  0,  1,672,  1,  0,  0, 0,230,  0,  1,  0,  1,  0, 2},
-        {2,  1,  0,462,463,  1,  0,  1,671,  1, 447,  1, 0,  1,  0,  1,  0,603,  0, 2},
+        {2,  1,  0,460,461,451,  0,  1,  0,  1,  0,  0, 0,230,  0,  1,  0,  1,  0, 2},
+        {2,  1,  0,462,463,  1,  0,  1,  0,  1, 447,  1, 0,  1,  0,  1,  0,603,  0, 2},
         {2,  1,458,459,  0,  1,  0,  1,  0,  1,  0,  1, 0,  1,  0,  1,  0,  1,  0, 2},
         {2,450,  0,  1,  0,  1,  0,  1,600,601,602,  1, 0,  1,  0,  1,  0,  1,  0, 2},
         {2,470,  0,  1,  0,  1,  0,  1,597,598,599, 448, 0,  1,  0,  1,482,483,484, 2},
@@ -221,7 +233,7 @@ int maps_reveille[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
     // CARTE 5 SALLE A MANGER (Niveau 4 - dernière du bloc précédent)
     {    
         {2, 2, 2, 2, 2, 2, 2, 2,  2,425,426,  2,  2, 2, 2, 2, 2, 2, 2, 2}, // Trou en haut
-        {2, 2, 2, 2, 2, 2, 2, 2,  2,423,424,  2,  2, 2, 2, 2, 2, 8, 2, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2,  2,423,424,  2,  2, 2, 2, 2, 2, 2, 2, 2},
         {2, 2, 0, 0, 0, 0,589, 0,  0,  0,  0,  0,  0, 0, 0,589, 0, 0, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  0, 0, 0, 0,555,556, 2, 2},
         {2, 2, 0, 0, 0, 0, 0, 0,  0,  0,  0,239,285, 0, 0, 0,553,554, 2, 2},
@@ -314,11 +326,18 @@ int maps_reveille[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH] = {
 
 int dialogueImpossibleChambreParents = 0;
 
+int showInteractPromptMaman = 0;
+int dialogueMamanReveil = 0;
+
+int currentZoneStateReveil = -1;
+
 int InitGameStepByStepReveille(SDL_Renderer *renderer){
 	player.x = 80;
     player.y = 50; 
     player.w = 12; 
     player.h = 14;
+
+    MusicInterior_Reveil = chargement_son_maison_reveil();
 
     SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");
     if (surface) {
@@ -327,6 +346,68 @@ int InitGameStepByStepReveille(SDL_Renderer *renderer){
         SDL_FreeSurface(surface);
     }	
     return 0;
+}
+
+void ManageMusicReveille()
+{
+    // 1. On applique le volume en continu pour qu'il s'adapte direct si le joueur change les options
+    Mix_VolumeMusic(globalVolumeMusique);
+    
+    // 2. Définition de la zone : 1 si on est dans le jardin (niveau 5), 0 sinon (maison)
+    int newZoneState = (currentLevel == 5) ? 1 : 0;
+
+    // 3. Si le joueur change de zone (ou s'il vient de se réveiller et passe de -1 à 0)
+    if (newZoneState != currentZoneStateReveil)
+    {
+        // On coupe net toute musique en cours (celle du cauchemar, ou celle du jardin si on rentre)
+        Mix_HaltMusic();
+        
+        // Si on vient d'entrer dans le jardin (état 1)
+        if (newZoneState == 1) {
+            if (MusicInterior_Reveil) {
+                Mix_FadeInMusic(MusicInterior_Reveil, -1, 1000); // Fondu d'une seconde
+            }
+        }
+        // (Si newZoneState == 0, on a juste coupé la musique plus haut, la maison reste silencieuse)
+        
+        // On enregistre dans quelle zone on est maintenant pour ne pas relancer la boucle
+        currentZoneStateReveil = newZoneState; 
+    }
+}
+
+int IsWallMaman(float x, float y) {
+    int caseX = (int)x / TILE_SIZE; 
+    int caseY = (int)y / TILE_SIZE;
+
+    if (caseX < 0 || caseX >= 20 || caseY < 0 || caseY >= 15) return 1;
+
+    // On bloque la maman dans la zone centrale de la chambre 
+    if (caseX < 5 || caseX > 15 || caseY < 2 || caseY > 10) {
+        return 1; 
+    }
+
+    int type = maps_reveille[0][caseY][caseX];
+    
+    switch (type) {
+        case 0: case 1:               // Sol en bois normal
+        case 452: case 453: case 454: // Bas du grand tapis
+        case 455: case 456: case 457: // Haut du grand tapis
+        case 458: case 459:           // Petit tapis rond
+        case 464: case 465:           // Voitures, Batman
+        case 466: case 467:           // Petit train
+        case 468: case 469:           // Avion, Dinosaure
+        case 447: case 448:           // Cubes
+        case 472: case 473:           // Autres cubes
+        case 603: case 217:           // Legos (jaunes, rouges, verts)
+        case 230:                     // Chaussette
+        case 502:                     // Ballon de basket
+        case 485: case 486: case 487: // Coussins
+        case 600:case 601:case 602:case 597: case 598: case 599:// Le grand tapis
+            return 0; 
+            
+        default:
+            return 1; 
+    }
 }
 
 int IsWallReveille(float x, float y)
@@ -778,6 +859,23 @@ void UpdateGameReveille(void){
         return;
     }
 
+    if (dialogueMamanReveil > 0)
+    {
+        if (state[SDL_SCANCODE_RETURN])
+        {
+            if (toucheE_Relache)
+            {
+                dialogueMamanReveil = 0; 
+                toucheE_Relache = 0;
+            }
+        }
+        else
+        {
+            toucheE_Relache = 1;
+        }
+        return; 
+    }
+
 	float dirX = 0;
     float dirY = 0;
 
@@ -844,8 +942,23 @@ void UpdateGameReveille(void){
         showInteractPromptTente2 = 1;
     }
 
+    showInteractPromptMaman = 0;
+    float distMaman = 9999.0f;
+    if (currentLevel == 0) {
+        float dxM = (player.x + player.w / 2.0f) - (mamanX + 8.0f);
+        float dyM = (player.y + player.h / 2.0f) - (mamanY + 8.0f);
+        distMaman = sqrtf(dxM * dxM + dyM * dyM);
+        
+        if (distMaman <= 24.0f) {
+            showInteractPromptMaman = 1;
+        }
+    }
+
     if(state[SDL_SCANCODE_E]){
     	if(toucheE_Relache){
+            if (showInteractPromptMaman) {
+                dialogueMamanReveil = 1; // Ouvre le dialogue
+            }
     		if (distance_tente <= 24 && currentLevel == 0 && maps[0][6][16] == 55)
             {
                 currentLevel = 8;
@@ -857,6 +970,9 @@ void UpdateGameReveille(void){
     		toucheE_Relache = 1;
     	}
     }
+
+    // --- GESTION DE LA MUSIQUE DU RÉVEIL ---
+    ManageMusicReveille();
 
     // Changement tente <->chambre 
     if (IsLocationLeft(6, 10, 8, 6 * TILE_SIZE - 8))
@@ -954,6 +1070,44 @@ void UpdateGameReveille(void){
     {
         currentLevel = 4;
         player.x = (MAP_WIDTH * TILE_SIZE) - 20;
+    }
+
+    if (currentLevel == 0) { 
+        Uint32 currentTime = SDL_GetTicks();
+        
+        // Toutes les X secondes, elle décide d'une nouvelle action
+        if (currentTime > mamanTimer) {
+            mamanAction = rand() % 5; // Donne un chiffre entre 0 (pause) et 4 (droite)
+            
+            // Elle garde cette action entre 1 et 2.5 secondes
+            mamanTimer = currentTime + 1000 + (rand() % 1500); 
+        }
+
+        float mDX = 0;
+        float mDY = 0;
+        float mSpeed = 0.5f; 
+
+        if (mamanAction == 1) mDY = -mSpeed; // Haut
+        if (mamanAction == 2) mDY = mSpeed;  // Bas
+        if (mamanAction == 3) mDX = -mSpeed; // Gauche
+        if (mamanAction == 4) mDX = mSpeed;  // Droite
+
+        if (mDX != 0 || mDY != 0) {
+            float nextMX = mamanX + mDX;
+            float nextMY = mamanY + mDY;
+
+            int touchMX = IsWallMaman(nextMX + 2, mamanY + 2) || 
+                          IsWallMaman(nextMX + 14, mamanY + 2) || 
+                          IsWallMaman(nextMX + 2, mamanY + 15) || 
+                          IsWallMaman(nextMX + 14, mamanY + 15);
+            if (!touchMX) mamanX = nextMX;
+
+            int touchMY = IsWallMaman(mamanX + 2, nextMY + 2) || 
+                          IsWallMaman(mamanX + 14, nextMY + 2) || 
+                          IsWallMaman(mamanX + 2, nextMY + 15) || 
+                          IsWallMaman(mamanX + 14, nextMY + 15);
+            if (!touchMY) mamanY = nextMY;
+        }
     }
 
 
@@ -1080,6 +1234,29 @@ void DrawGameReveille(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini
     }
     if(dialogueImpossibleChambreParents == 1){
         char *texteAffiche = "Mon papa est entrain de dormir !";
+        DrawTexte(texteAffiche, renderer, font, 20, 180, 280, 50);
+    }
+
+    if (currentLevel == 0) {
+            // Dessin du Haut de la Maman (Tête)
+            SDL_Rect srcMamanHaut = { 672 * 16, 0, 16, 16 };
+            SDL_Rect dstMamanHaut = { (int)mamanX - 2, (int)mamanY - 18, 16, 16 };
+            SDL_RenderCopy(renderer, tilesetTexture, &srcMamanHaut, &dstMamanHaut);
+
+            // Dessin du Bas de la Maman (Corps)
+            SDL_Rect srcMamanBas = { 671 * 16, 0, 16, 16 };
+            SDL_Rect dstMamanBas = { (int)mamanX - 2, (int)mamanY - 2, 16, 16 };
+            SDL_RenderCopy(renderer, tilesetTexture, &srcMamanBas, &dstMamanBas);
+    }
+
+    if (showInteractPromptMaman == 1 && dialogueMamanReveil == 0)
+    {
+        SDL_Color cBlanc = {255, 255, 255, 255};
+        SDL_Surface *sText = TTF_RenderText_Solid(fontMini, "[E] Parler", cBlanc);
+        if (sText) DrawInteractions(renderer, sText);
+    }
+    if (dialogueMamanReveil == 1) {
+        char *texteAffiche = "Bonjour mon tresor ! Tu as bien dormi ?";
         DrawTexte(texteAffiche, renderer, font, 20, 180, 280, 50);
     }
 

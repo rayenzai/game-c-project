@@ -1339,7 +1339,8 @@ void UpdateGame(void)
     bouche_has_soupe = 1;
     hasTelecommande = 1;
     cpt_piece_tableau = 4;
-
+    hasDoudou = 1;
+    currentLevel = 11;
 
     if (chaudron_anim == 1)
     {

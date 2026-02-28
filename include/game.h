@@ -1,9 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <time.h>
+
 
  
 // --- DEFINE ---
@@ -31,6 +29,20 @@ typedef struct{
     int direction; // 0: Haut, 1: Bas, 2: Gauche, 3: Droite
     int timer;     // Nombre de frames restantes avant de changer de direction
 } Fantome;
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
+#include <time.h>
+#include "game.h"
+#include "intro.h"
+#include "sons.h"
+#include "map.h"
+#include "ia.h"
+#include "fin_jeu.h"
+#include "options.h"
+#include <stdio.h>
+#include <math.h>
 
 extern Joueur player;
 extern Fantome fantome;
