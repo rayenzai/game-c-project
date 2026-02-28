@@ -162,6 +162,8 @@ int main(int argc, char* argv[]) {
                 }
                 else if (actionPause == 2) { // 2 = Menu Principal
                     etat = ETAT_MENU;
+                    Mix_HaltMusic(); 
+                    Mix_HaltChannel(-1);
                     ResetGame();
                     currentLevel = 0; 
                 }

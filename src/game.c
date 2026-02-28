@@ -27,6 +27,7 @@ static Mix_Chunk *sonPendule = NULL;
 // Musiques D'ambiance
 static Mix_Music *MusicInterior = NULL;
 static Mix_Music *MusicExterior = NULL;
+static int currentZoneState = -1;
 
 // Pour les touches
 static int toucheE_Relache = 1;
@@ -1292,7 +1293,6 @@ int IsLocationLeft(int yDebut, int yFin, int CurrLvl, int xDiff)
 
 void ManageMusic()
 {
-    static int currentZoneState = -1;
     int newZoneState = 0;
     Mix_Volume(-1, globalVolumeBruitages);
     // if(screamer){
@@ -4220,6 +4220,8 @@ void ResetGame(void) {
     Mix_HaltChannel(-1); // Coupe tous les bruitages (screamer, pendule, portes...) sur tous les canaux
     Mix_HaltMusic();  
 
+    currentZoneState = -1;
+    
     // 1. Restaure TOUTE la map 
     memcpy(maps, maps_origine, sizeof(maps_origine));
 
