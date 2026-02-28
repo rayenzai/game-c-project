@@ -403,7 +403,7 @@ int IsWallReveille(float x, float y)
     // Tiroirs / Blocs seuls cuisine (181, 171 -> 575, 573) - Peuvent être en pattern ou en map !
     if(type == 573 || type == 575 || type_pattern == 573 || type_pattern == 575){
         if(localX > 14) return 0;
-        if((type == 575 || type_pattern == 575) && localY > 4) return 0;
+        if((type == 575 || type_pattern == 573) && localY > 4) return 0;
         return 1;
     }
 
@@ -475,27 +475,33 @@ int IsWallReveille(float x, float y)
 
     // Bureau et chaise (46..49 -> 474..477 | 51 -> 478)
     if ((type >= 474 && type <= 477) || type == 478) {
-        if (type == 478) { // Chaise
+        
+        // 1. CHAISE (Le dossier de la chaise)
+        if (type == 478) {
             if (localX < 8 || localX > 11) return 0; 
             if (isTopCorner) return 0;
             return 1; 
         }
-        if (type == 474 && localX < 3) return 0;
-        if (type == 477 && localX > 8) return 0;
-
-        static int X_chaise = -1, Y_chaise = -1;
-        if (X_chaise == -1) {
-            TrouveCoordonnees(&X_chaise, &Y_chaise, 478, 0); 
-        }
+        
+        // 2. BUREAU
+        if (type == 474 && localX < 3) return 0; 
+        if (type == 477 && localX > 8) return 0; 
 
         if (localY < 2) {
-            if (caseX == X_chaise) {
-                if (localX < 8 || localX > 11) return 0;
+            if (caseY > 0 && maps_reveille[currentLevel][caseY - 1][caseX] == 478) {
+                if (localX < 8 || localX > 11) return 0; 
                 return 1; 
             }
             return 0; 
         }
+        
         if (isTopCorner) return 0; 
+        return 1;
+    }
+
+    if(type == 624){
+        if(isTopCorner)return 0;
+        if(localX<4)return 0;
         return 1;
     }
 
@@ -561,11 +567,28 @@ int IsWallReveille(float x, float y)
     if (type == 544 || type == 545) {
         return 1; 
     }
-
     // Grosse plante (275 -> 589)
-    if(type == 589){
-        if(localX > 14) return 0;
-        return 1;
+    if (type == 589) {
+        
+        // Augmente ce chiffre (13, 14 ou 15) pour bloquer le joueur plus vite vers le bas
+        if (localY > 15) return 0;
+
+        // L'astuce de la pendule : on regarde où est le centre du joueur
+        float playerCenterX = player.x + (player.w / 2.0f);
+        int playerCenterTileX = (int)playerCenterX / TILE_SIZE;
+
+        if (playerCenterTileX == caseX) {
+            // --- Le joueur est vraiment FACE à la plante ---
+            if (isTopCorner) return 0; // La tête passe au-dessus
+            return 1; // Le corps bloque
+        } 
+        else {
+            // --- Le joueur FRÔLE la plante sur les côtés ---
+            if (localX < 4 || localX > 11) return 0; // Laisse glisser sur les côtés
+            
+            if (isTopCorner) return 0; // La tête passe au-dessus
+            return 1; // Le reste bloque
+        }
     }
 
     // Statue mur gauche (84 -> Gardé si présent dans ta map finale)

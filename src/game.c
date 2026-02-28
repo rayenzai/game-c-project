@@ -1295,7 +1295,6 @@ void ManageMusic()
     static int currentZoneState = -1;
     int newZoneState = 0;
     Mix_Volume(-1, globalVolumeBruitages);
-    currentLevel = 11;
     // if(screamer){
     //     Mix_Volume(2, 64); // On commence volume à 0
     // }
