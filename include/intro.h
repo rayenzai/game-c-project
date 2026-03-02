@@ -8,5 +8,5 @@ void SkipIntro(void);
 void StartIntro(SDL_Renderer *renderer);
 int UpdateIntroTimer(void);
 void DrawIntro(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini);
-
+void dessinerTexteInterne(SDL_Renderer *renderer, TTF_Font *font, const char *texte, int y);
 #endif

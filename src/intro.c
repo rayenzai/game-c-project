@@ -65,6 +65,20 @@ int UpdateIntroTimer(void) {
     }
     return 0;
 }
+void dessinerTexteInterne(SDL_Renderer *renderer, TTF_Font *font, const char *texte, int y) {
+    SDL_Color colorBlanc = {255, 255, 255, 255};
+    SDL_Surface *sSurface = TTF_RenderText_Solid(font, texte, colorBlanc);
+    if (sSurface) {
+        SDL_Texture *tTexture = SDL_CreateTextureFromSurface(renderer, sSurface);
+        int textWidth = sSurface->w;
+        int screenWidth = 320;
+        int x = (screenWidth - textWidth) / 2;
+        SDL_Rect rText = {x, y, sSurface->w, sSurface->h};
+        SDL_RenderCopy(renderer, tTexture, NULL, &rText);
+        SDL_FreeSurface(sSurface);
+        SDL_DestroyTexture(tTexture);
+    }
+}
 
 void DrawIntro(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini) {
     Uint32 temps = SDL_GetTicks() - debutIntro;
