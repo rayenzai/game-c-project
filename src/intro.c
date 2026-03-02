@@ -1,9 +1,11 @@
 #include "intro.h"
-#include "game.h" 
+#include "game.h"
+#include "game_reveille.h" 
 #include <stdio.h>
 #include <stdlib.h>
 
 extern int dialogueStep;
+extern int fin_jeu;
 
 int isColorMode = 0; 
 static Uint32 debutIntro = 0;
@@ -116,9 +118,9 @@ void DrawIntro(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini) {
         };
 
         SDL_SetRenderTarget(renderer, renderTarget);
-        
-        DrawGame(renderer, font, fontMini);
-        
+
+        DrawGameReveille(renderer, font, fontMini);
+
         if (temps > 3000 && temps < 10000) {
             SDL_Color cBlanc = {200, 200, 255, 255};
             int offsetAnim = (SDL_GetTicks() / 200) % 5;

@@ -153,7 +153,7 @@ static Uint32 mamanTimer = 0;
 static int playerDir = 0;       // 0=Bas, 1=Gauche, 2=Droite, 3=Haut
 static int isPlayerMoving = 0;  // 0=Immobile, 1=Marche
 
-static SDL_Texture *tilesetTexture = NULL;
+extern SDL_Texture *tilesetTexture;
 
 static int toucheE_Relache = 1;
 
@@ -341,12 +341,6 @@ int InitGameStepByStepReveille(SDL_Renderer *renderer){
     MusicInterior_Reveil = chargement_son_maison_reveil();
     MusicInterior_Reveil_Maison = chargement_son_maison_reveil_interieur();
 
-    SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");
-    if (surface) {
-        SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 255, 0, 255));
-        tilesetTexture = SDL_CreateTextureFromSurface(renderer, surface);
-        SDL_FreeSurface(surface);
-    }	
     return 0;
 }
 

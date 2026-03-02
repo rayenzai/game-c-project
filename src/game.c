@@ -35,7 +35,7 @@ static int toucheEnter_Relache = 1;
 
 // --- VARIABLES GLOBALES ---
 
-static SDL_Texture *tilesetTexture = NULL;
+SDL_Texture *tilesetTexture = NULL;
 SDL_Texture *textureScreamer = NULL; 
 // static SDL_Texture *playerTexture = NULL; 
 // static SDL_Texture *playerTexture = NULL;
