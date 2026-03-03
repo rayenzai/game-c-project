@@ -141,8 +141,9 @@ int main(int argc, char* argv[]) {
                 }
             }
             else if (etat == ETAT_INTRO) {
-                if (HandleIntroInput(&event) == 1) {
-                    etat = ETAT_CHARGEMENT;
+                if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN) {
+                    SkipIntro();
+                    etat = ETAT_JEU; 
                 }
             }
             // --- GESTION DE LA TOUCHE ECHAP ---
@@ -203,14 +204,17 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        if (etat == ETAT_INTRO) {
-            UpdateIntroTimer();
+       if (etat == ETAT_INTRO) {
+            if (UpdateIntroTimer() == 1) {
+                etat = ETAT_JEU;
+            }
         }
         else if (etat == ETAT_CHARGEMENT) {
             int fini = InitGameStepByStep(renderer, &vraiPourcentage);
             
             if (fini == 1) {
-                etat = ETAT_JEU;
+                etat = ETAT_INTRO;
+                StartIntro(renderer);
             }
         }
         else if (etat == ETAT_JEU)
@@ -234,7 +238,7 @@ int main(int argc, char* argv[]) {
             afficher_menu_fin(renderer, fontMini);
         }
         else if (etat == ETAT_INTRO) {
-            DrawIntro(renderer, fontPetit);
+            DrawIntro(renderer, fontPetit, fontMini);
         }
         else if (etat == ETAT_CHARGEMENT) {
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

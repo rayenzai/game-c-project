@@ -153,7 +153,7 @@ static Uint32 mamanTimer = 0;
 static int playerDir = 0;       // 0=Bas, 1=Gauche, 2=Droite, 3=Haut
 static int isPlayerMoving = 0;  // 0=Immobile, 1=Marche
 
-static SDL_Texture *tilesetTexture = NULL;
+extern SDL_Texture *tilesetTexture;
 
 static int toucheE_Relache = 1;
 
@@ -341,12 +341,6 @@ int InitGameStepByStepReveille(SDL_Renderer *renderer){
     MusicInterior_Reveil = chargement_son_maison_reveil();
     MusicInterior_Reveil_Maison = chargement_son_maison_reveil_interieur();
 
-    SDL_Surface *surface = SDL_LoadBMP("assets/tuille_into.bmp");
-    if (surface) {
-        SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 255, 0, 255));
-        tilesetTexture = SDL_CreateTextureFromSurface(renderer, surface);
-        SDL_FreeSurface(surface);
-    }	
     return 0;
 }
 
@@ -1243,8 +1237,8 @@ void DrawGameReveille(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini
         char *texteAffiche = "Mon papa est entrain de dormir !";
         DrawTexte(texteAffiche, renderer, font, 20, 180, 280, 50);
     }
-
-    if (currentLevel == 0) {
+extern int isColorMode;
+    if (currentLevel == 0 && isColorMode == 0) { 
             // Dessin du Haut de la Maman (Tête)
             SDL_Rect srcMamanHaut = { 672 * 16, 0, 16, 16 };
             SDL_Rect dstMamanHaut = { (int)mamanX - 2, (int)mamanY - 18, 16, 16 };
@@ -1255,7 +1249,6 @@ void DrawGameReveille(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini
             SDL_Rect dstMamanBas = { (int)mamanX - 2, (int)mamanY - 2, 16, 16 };
             SDL_RenderCopy(renderer, tilesetTexture, &srcMamanBas, &dstMamanBas);
     }
-
     if (showInteractPromptMaman == 1 && dialogueMamanReveil == 0)
     {
         SDL_Color cBlanc = {255, 255, 255, 255};

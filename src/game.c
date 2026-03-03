@@ -35,7 +35,7 @@ static int toucheEnter_Relache = 1;
 
 // --- VARIABLES GLOBALES ---
 
-static SDL_Texture *tilesetTexture = NULL;
+SDL_Texture *tilesetTexture = NULL;
 SDL_Texture *textureScreamer = NULL; 
 // static SDL_Texture *playerTexture = NULL; 
 // static SDL_Texture *playerTexture = NULL;
@@ -3236,12 +3236,17 @@ int estVisible(int x, int y, int rayonJoueur)
 
 void DrawTuiles(float x, float y, int indexTuile, SDL_Renderer *renderer, int luminosite)
 {
-    SDL_SetTextureColorMod(tilesetTexture, luminosite, luminosite, luminosite);
+    extern int isColorMode;
+    
+    if (isColorMode == 1) {
+        luminosite = 255; 
+        indexTuile = indexTuile ; 
+    }
 
+    SDL_SetTextureColorMod(tilesetTexture, luminosite, luminosite, luminosite);
     SDL_Rect srcTuile = {TILE_SIZE * indexTuile, 0, TILE_SIZE, TILE_SIZE};
     SDL_Rect destTuile = {(int)x * TILE_SIZE, (int)y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
     SDL_RenderCopy(renderer, tilesetTexture, &srcTuile, &destTuile);
-
     SDL_SetTextureColorMod(tilesetTexture, 255, 255, 255);
 }
 
@@ -3271,6 +3276,7 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
     // --- PRÉCALCUL DE LA LUMIÈRE (Le grand secret de l'optimisation) ---
     // On calcule la lumière 1 seule fois par frame et on la sauvegarde.
     int tileLuminosite[MAP_HEIGHT][MAP_WIDTH] = {0};
+    extern int isColorMode;
     
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
@@ -3286,9 +3292,19 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
         for (int y = 0; y < MAP_HEIGHT; y++) {
             for (int x = 0; x < MAP_WIDTH; x++) {
                 int lum = tileLuminosite[y][x];
-                if (lum == 0) continue; // On passe si c'est dans le noir total
+                
+                if (isColorMode == 1) {
+                    lum = 255;
+                } else {
+                    if (lum == 0) continue; // On passe si c'est dans le noir total
+                }
 
-                // A. Dessiner le sol (Pattern)
+                if (lum <= 0)
+                {
+                    continue;
+                }
+
+                // --- A. DESSINER LA TUILE ---
                 int type = maps_patern[currentLevel][y][x];
                 DrawTuiles(x, y, type, renderer, lum);
 
@@ -3438,7 +3454,11 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
         for (int y = 0; y < MAP_HEIGHT; y++) {
             for (int x = 0; x < MAP_WIDTH; x++) {
                 int lum = tileLuminosite[y][x];
-                if (lum == 0) continue; 
+                if (isColorMode == 1) {
+                    lum = 255;
+                } else {
+                    if (lum == 0) continue;
+                } 
 
                 int type_maps = maps[currentLevel][y][x];
                 if (IsTuileDessus(type_maps)) {
@@ -3456,6 +3476,9 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
         // Sécurité pour ne pas déborder du tableau
         if (caseFantomeX >= 0 && caseFantomeX < MAP_WIDTH && caseFantomeY >= 0 && caseFantomeY < MAP_HEIGHT) {
             int lumFantome = tileLuminosite[caseFantomeY][caseFantomeX];
+            if (isColorMode == 1) {
+                lumFantome = 255;
+            }
             
             if (lumFantome > 0) {
                 SDL_SetTextureColorMod(tilesetTexture, lumFantome, lumFantome, lumFantome);
