@@ -39,6 +39,22 @@ int main(int argc, char* argv[]) {
 
     srand(time(NULL));
 
+    
+  // --- 1. CONFIGURATION ANTI-FLOU (À faire AVANT la fenêtre) ---
+    SDL_SetHint(SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitorv2"); // Empêche Windows d'étirer le jeu
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");             // Force les pixels carrés (Nearest)
+
+    // --- 2. CREATION DE LA FENETRE ---
+    SDL_Window *window = SDL_CreateWindow("Lights Out", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    
+    // --- 3. CREATION DU RENDU (Remis en mode carte graphique pour de meilleures perfs) ---
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); 
+
+    // --- 4. MISE A L'ECHELLE INTERNE DU JEU ---
+    SDL_RenderSetIntegerScale(renderer, SDL_TRUE); // je suis obligé de faire ça pour eviter le petit decalage meme si ça peut rendre moins bien sous windows
+    SDL_RenderSetLogicalSize(renderer, LOGICAL_WIDTH, LOGICAL_HEIGHT); // Résolution interne 320x240
+
+
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
     // --- AJOUT IMPORTANT ---
@@ -59,21 +75,13 @@ int main(int argc, char* argv[]) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) return 1;
     if (TTF_Init() < 0) return 1;
 
-    SDL_Window *window = SDL_CreateWindow("Lights Out", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE); //acceleration materiel : SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
-
-    // Force la SDL à garder des gros carrés de pixels parfaits (sans flou)
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"); 
-
-    // Force la SDL à utiliser un ratio parfait (x2, x3, etc.) sans jamais déformer l'image
-    SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
 
     SDL_RenderSetLogicalSize(renderer, LOGICAL_WIDTH, LOGICAL_HEIGHT);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest"); //nearest pour une sorte de Vsync 
 
-    TTF_Font *fontGrand = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 20);
-    TTF_Font *fontPetit = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 12);
-    TTF_Font *fontMini = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 11);
+    TTF_Font *fontGrand = TTF_OpenFont("assets/font.ttf", 20);
+    TTF_Font *fontPetit = TTF_OpenFont("assets/font.ttf", 12);
+    TTF_Font *fontMini = TTF_OpenFont("assets/font.ttf", 11);
 
     font = fontMini;
 

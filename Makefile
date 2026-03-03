@@ -33,3 +33,17 @@ clean:
 
 run: all
 	./$(TARGET)
+
+CC_WIN = x86_64-w64-mingw32-gcc
+CFLAGS_WIN = -Wall -Wextra -std=c99 -Iinclude -Imingw_dev/include -Imingw_dev/include/SDL2
+LDFLAGS_WIN = -Lmingw_dev/lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_mixer -lm -mwindows
+
+windows:
+	@echo "Compilation pour Windows en cours..."
+	mkdir -p executable
+	$(CC_WIN) $(CFLAGS_WIN) src/*.c -o executable/Light_out.exe $(LDFLAGS_WIN)
+	@echo "Terminé ! Le fichier est 'executable/Light_out.exe'."
+
+clean:
+	rm -rf bin/game executable/Light_out.exe bin_win/
+	@echo "Fichiers compilés supprimés."

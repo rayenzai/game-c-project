@@ -3355,7 +3355,6 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
 
     if (isPlayerMoving) {
         int etape = (SDL_GetTicks() / 120) % 4; 
-        // de face
         if (playerDir == 0) {
             if (etape == 0) {
                 indexJoueur = 356; 
