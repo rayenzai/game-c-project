@@ -1237,8 +1237,8 @@ void DrawGameReveille(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini
         char *texteAffiche = "Mon papa est entrain de dormir !";
         DrawTexte(texteAffiche, renderer, font, 20, 180, 280, 50);
     }
-
-    if (currentLevel == 0) {
+extern int isColorMode;
+    if (currentLevel == 0 && isColorMode == 0) { 
             // Dessin du Haut de la Maman (Tête)
             SDL_Rect srcMamanHaut = { 672 * 16, 0, 16, 16 };
             SDL_Rect dstMamanHaut = { (int)mamanX - 2, (int)mamanY - 18, 16, 16 };
@@ -1249,7 +1249,6 @@ void DrawGameReveille(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini
             SDL_Rect dstMamanBas = { (int)mamanX - 2, (int)mamanY - 2, 16, 16 };
             SDL_RenderCopy(renderer, tilesetTexture, &srcMamanBas, &dstMamanBas);
     }
-
     if (showInteractPromptMaman == 1 && dialogueMamanReveil == 0)
     {
         SDL_Color cBlanc = {255, 255, 255, 255};
