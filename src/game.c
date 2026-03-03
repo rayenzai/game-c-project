@@ -1339,10 +1339,10 @@ void UpdateGame(void)
     // bouche_has_soupe = 1;
     // hasTelecommande = 1;
     // cpt_piece_tableau = 4;
-    hasDoudou = 1;
+    // hasDoudou = 1;
     // statue_has_water=1;
     // statue_has_drawing=1;
-    currentLevel = 11;
+    // currentLevel = 11;
 
     if (chaudron_anim == 1)
     {
@@ -3185,7 +3185,7 @@ float getLuminosite(int gridX, int gridY, int rayonPx)
         for (int lx = 0; lx < MAP_WIDTH; lx++) {
             int indexTuile = maps[currentLevel][ly][lx];
             // UTILISATION DE LA FONCTION RAPIDE ICI
-            if (IsLampe(indexTuile)) { 
+            if (IsLampe(indexTuile) || (indexTuile >= 107 && indexTuile <= 114 && statue_has_water && statue_has_drawing)) { 
                 float distGrid = sqrtf(powf(gridX - lx, 2) + powf(gridY - ly, 2));
                 float rayonLampe = (indexTuile == 186) ? 3.5f : 2.5f; 
                 
