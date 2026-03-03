@@ -43,7 +43,9 @@ int main(int argc, char* argv[]) {
 
     
   // --- 1. CONFIGURATION ANTI-FLOU (À faire AVANT la fenêtre) ---
-    SDL_SetHint(SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitorv2"); // Empêche Windows d'étirer le jeu
+    #ifdef SDL_HINT_WINDOWS_DPI_AWARENESS
+    SDL_SetHint(SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitorv2"); 
+#endif
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");             // Force les pixels carrés (Nearest)
 
     // --- 2. CREATION DE LA FENETRE ---
