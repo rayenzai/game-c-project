@@ -4619,7 +4619,6 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
     }
     if (screamer ==  1 && textureScreamer != NULL) {
-        SDL_Delay(400);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 180);
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
         SDL_RenderFillRect(renderer, NULL);
