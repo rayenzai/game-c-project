@@ -1383,9 +1383,9 @@ void UpdateGame(void)
     const Uint8 *state = SDL_GetKeyboardState(NULL);
     //  bouche_has_pain = 1;
     //  bouche_has_soupe = 1;
-    hasTelecommande = 1;
-    cpt_piece_tableau = 4;
-     hasDoudou = 1;
+    // hasTelecommande = 1;
+    // cpt_piece_tableau = 4;
+    //  hasDoudou = 1;
     // statue_has_water=1;
     // statue_has_drawing=1;
     //currentLevel = 11;
@@ -2958,17 +2958,25 @@ void UpdateGame(void)
         currentLevel = 2;
         player.x = 5;
     }
-    if (IsLocationUp(8, 13, 3, 5)) {
+    // --- TRANSITION CUISINE -> SALLE A MANGER ---
+    // 1. Affiche le dialogue si on n'a pas tout donné
+    if (IsLocationUp(8, 13, 3, 20) && (bouche_has_soupe == 0 || bouche_has_pain == 0)) {
+        dialogue_entree_SAM = 1;
+    }
+    // 2. Bloque le joueur physiquement s'il essaie de passer en force
+    else if (IsLocationUp(8, 13, 3, 5) && (bouche_has_soupe == 0 || bouche_has_pain == 0)) {
+        player.y = 5;
+    }
+    // 3. Autorise le passage (et initie les projectiles) SEULEMENT si c'est nourri
+    else if (IsLocationUp(8, 13, 3, 5) && bouche_has_soupe == 1 && bouche_has_pain == 1) {
         currentLevel = 4;  // Salle à manger cauchemar
         InitProjectiles();
         onTable = 0;  // Pas encore sur la table
         currentLane = 1;
-        hitCount = 0;  // Reset des tentatives à chaque nouvelle entrée
-        // Première entrée : positionner le joueur juste devant la table, prêt à sauter
+        hitCount = 0;  // Reset des tentatives
         player.x = 9 * TILE_SIZE + (TILE_SIZE / 2);  // Centré sur la table
         player.y = 13 * TILE_SIZE; // Rangée 13 = juste sous la table
     }
-
     else if (IsLocationDown(8, 13, 4, 20))
     {
         
@@ -3060,11 +3068,6 @@ void UpdateGame(void)
 
     // Changement de son d'ambiance
     ManageMusic();
-
-    if (currentLevel >= 5)
-    {
-        ActionFantome(200);
-    }
     // === MISE À JOUR DES PROJECTILES (SALLE À MANGER) ===
     UpdateProjectiles();
     
@@ -4165,16 +4168,6 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
     // === DESSINER LES PROJECTILES (SALLE À MANGER) ===
     DrawProjectiles(renderer);
 
-
-    int caseX = (int)(fantome.x / TILE_SIZE);
-    int caseY = (int)(fantome.y / TILE_SIZE);
-
-    // On l'affiche s'il est éclairé ET qu'on est dans un niveau de labyrinthe
-    if (estEclaire(caseX, caseY, rayon) && currentLevel >= 5 && currentLevel <= 8) {
-        SDL_Rect src = { 63 * TILE_SIZE, 0, 16, 16 }; 
-        SDL_Rect dest = { (int)fantome.x, (int)fantome.y, 16, 16 }; 
-        SDL_RenderCopy(renderer, tilesetTexture, &src, &dest);
-    }
 
     if (showInteractPrompt == 1) {
         SDL_Color cBlanc = {255, 255, 255, 255};
