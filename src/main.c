@@ -26,7 +26,8 @@ typedef enum {
     ETAT_OPTIONS,
     ETAT_PAUSE,
     ETAT_FIN,
-    ETAT_JEU_REVEILLE
+    ETAT_JEU_REVEILLE,
+    ETAT_CONFIRM_QUIT
 } GameState;
 
 SDL_Renderer* renderer;
@@ -50,9 +51,29 @@ int main(int argc, char* argv[]) {
 
     // --- 2. CREATION DE LA FENETRE ---
     SDL_Window *window = SDL_CreateWindow("Lights Out", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+
+    // --- 3. CREATION DU RENDU (Avec Mode Sans Echec) ---
+    FILE *safemode = fopen("safe_mode.txt", "r");
     
-    // --- 3. CREATION DU RENDU (Remis en mode carte graphique pour de meilleures perfs) ---
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); 
+    if (safemode != NULL) {
+        fclose(safemode);
+        printf("Mode Sans Echec active (Software Rendering).\n");
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+    } else {
+
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); 
+        
+        if (renderer == NULL) {
+            printf("Erreur carte graphique, passage en mode processeur (Software)...\n");
+            renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+        }
+    }
+    
+    // Si la carte graphique refuse complètement, on force le mode logiciel (Software)
+    if (renderer == NULL) {
+        printf("Erreur carte graphique, passage en mode processeur (Software)...\n");
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+    }
 
     // --- 4. MISE A L'ECHELLE INTERNE DU JEU ---
     SDL_RenderSetIntegerScale(renderer, SDL_TRUE); // je suis obligé de faire ça pour eviter le petit decalage meme si ça peut rendre moins bien sous windows
@@ -96,6 +117,10 @@ int main(int argc, char* argv[]) {
     GameState etat_avant_pause = ETAT_JEU;
     GameState etat_avant_options = ETAT_MENU;
 
+    int selectionQuit = 0; 
+    GameState etat_avant_quit = ETAT_MENU;
+    int destination_quit = 0;
+
     InitIntro();
     InitMenu(renderer);
     int vraiPourcentage = 0;
@@ -114,12 +139,15 @@ int main(int argc, char* argv[]) {
         // A. GESTION DES EVENEMENTS (Clavier / Souris)
         while (SDL_PollEvent(&event)) {
 
-            if (event.type == SDL_QUIT) {
-                // auto save
+           if (event.type == SDL_QUIT) {
                 if (etat == ETAT_JEU || etat == ETAT_JEU_REVEILLE || etat == ETAT_PAUSE) {
-                    SauvegarderPartie(1);
+                    etat_avant_quit = etat;
+                    etat = ETAT_CONFIRM_QUIT;
+                    selectionQuit = 0;
+                    destination_quit = 0;
+                } else if (etat != ETAT_CONFIRM_QUIT) {
+                    running = 0;
                 }
-                running = 0;
             }
 
             if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_F11) {
@@ -189,12 +217,10 @@ int main(int argc, char* argv[]) {
                     etat = etat_avant_pause; // Restaure ETAT_JEU ou ETAT_JEU_REVEILLE
                 }
                 else if (actionPause == 2) { // 2 = Menu Principal
-                    SauvegarderPartie(1);
-                    etat = ETAT_MENU;
-                    Mix_HaltMusic(); 
-                    Mix_HaltChannel(-1);
-                    ResetGame();
-                    currentLevel = 0; 
+                    etat_avant_quit = ETAT_PAUSE;
+                    etat = ETAT_CONFIRM_QUIT;
+                    selectionQuit = 0;
+                    destination_quit = 1; // 1 = Retourner au Menu
                 }
                 else if (actionPause == 3){
                     etat_avant_options = ETAT_PAUSE;
@@ -205,9 +231,11 @@ int main(int argc, char* argv[]) {
                     SauvegarderPartie(0);
                     etat = etat_avant_pause;
                 }
-                else if (actionPause == 5) { // 4 = Quitter
-                    SauvegarderPartie(1);
-                    running = 0; 
+                else if (actionPause == 5) { // 5 = Quitter
+                    etat_avant_quit = ETAT_PAUSE;
+                    etat = ETAT_CONFIRM_QUIT;
+                    selectionQuit = 0;
+                    destination_quit = 0; // 0 = Fermer le jeu
                 }
             }
             // --- GESTION DE LA FIN DE JEU ---
@@ -232,6 +260,47 @@ int main(int argc, char* argv[]) {
                     }
                 }
             }
+            else if (etat == ETAT_CONFIRM_QUIT) {
+                if (event.type == SDL_KEYDOWN) {
+                    switch (event.key.keysym.sym) {
+                        case SDLK_UP:
+                            selectionQuit--;
+                            if (selectionQuit < 0) selectionQuit = 2;
+                            break;
+                        case SDLK_DOWN:
+                            selectionQuit++;
+                            if (selectionQuit > 2) selectionQuit = 0;
+                            break;
+                        case SDLK_RETURN:
+                        case SDLK_KP_ENTER:
+                            if (selectionQuit == 0) { // OUI (Sauvegarder)
+                                SauvegarderPartie(1); 
+                                if (destination_quit == 0) {
+                                    running = 0; // Quitter le jeu
+                                } else {
+                                    // Retour au menu principal
+                                    etat = ETAT_MENU;
+                                    Mix_HaltMusic(); 
+                                    Mix_HaltChannel(-1);
+                                    ResetGame();
+                                }
+                            } else if (selectionQuit == 1) { // NON (Ne pas sauver)
+                                if (destination_quit == 0) {
+                                    running = 0; // Quitter le jeu
+                                } else {
+                                    // Retour au menu principal
+                                    etat = ETAT_MENU;
+                                    Mix_HaltMusic(); 
+                                    Mix_HaltChannel(-1);
+                                    ResetGame();
+                                }
+                            } else if (selectionQuit == 2) { // ANNULER
+                                etat = etat_avant_quit;
+                            }
+                            break;
+                    }
+                }
+            }
         }
 
        if (etat == ETAT_INTRO) {
@@ -243,10 +312,20 @@ int main(int argc, char* argv[]) {
             int fini = InitGameStepByStep(renderer, &vraiPourcentage);
             if (fini == 1) {
             if (game_is_loading) {
+                    // On nettoie d'abord tout par sécurité
+                    ResetGame(); 
+                    
                     if (ChargerPartie(save_type_to_load)) {
-                        etat = ETAT_JEU; // Passe l'intro si on charge
+                        if (fin_jeu == 1) {
+                            InitGameStepByStepReveille(renderer); 
+                            etat = ETAT_JEU_REVEILLE;
+                        } else {
+                            etat = ETAT_JEU; 
+                        }
                     } else {
-                        printf("Aucune sauvegarde trouvee !\n");
+                        // SI AUCUNE SAUVEGARDE : on force l'intro proprement
+                        printf("Aucune sauvegarde trouvee, lancement nouvelle partie...\n");
+                        ResetGame(); // Double sécurité
                         StartIntro(renderer); 
                         etat = ETAT_INTRO;
                     }
@@ -324,6 +403,71 @@ int main(int argc, char* argv[]) {
             }
             DrawPause(renderer, fontGrand, fontPetit);           // Par-dessus le jeu !
         }
+        // --- DESSIN CONFIRMATION QUITTER ---
+        else if (etat == ETAT_CONFIRM_QUIT) {
+            // 1. Redessiner le fond en fonction d'où on vient
+            if (etat_avant_quit == ETAT_PAUSE) {
+                if (etat_avant_pause == ETAT_JEU_REVEILLE) DrawGameReveille(renderer, fontPetit, fontMini);
+                else DrawGame(renderer, fontPetit, fontMini);
+                DrawPause(renderer, fontGrand, fontPetit);
+            } else if (etat_avant_quit == ETAT_JEU) {
+                DrawGame(renderer, fontPetit, fontMini);
+            } else if (etat_avant_quit == ETAT_JEU_REVEILLE) {
+                DrawGameReveille(renderer, fontPetit, fontMini);
+            }
+
+            // 2. Assombrir l'écran
+            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
+            SDL_RenderFillRect(renderer, NULL);
+            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+
+            // 3. Dessiner la boîte
+            SDL_Rect box = { LOGICAL_WIDTH/2 - 90, LOGICAL_HEIGHT/2 - 45, 180, 90 };
+            SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
+            SDL_RenderFillRect(renderer, &box);
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderDrawRect(renderer, &box);
+
+            // 4. Dessiner le titre
+            SDL_Color cBlanc = {255, 255, 255, 255};
+            SDL_Color cDore = {255, 215, 0, 255};
+            SDL_Color cGris = {150, 150, 150, 255};
+
+            SDL_Surface *sTitre = TTF_RenderText_Solid(fontPetit, "Voulez vous sauvegarder ?", cBlanc);
+            if (sTitre) {
+                SDL_Texture *tTitre = SDL_CreateTextureFromSurface(renderer, sTitre);
+                SDL_Rect rTitre = { LOGICAL_WIDTH/2 - sTitre->w/2, box.y + 10, sTitre->w, sTitre->h };
+                SDL_RenderCopy(renderer, tTitre, NULL, &rTitre);
+                SDL_FreeSurface(sTitre);
+                SDL_DestroyTexture(tTitre);
+            }
+
+            // 5. Dessiner les choix
+            const char* opts[3] = {"OUI", "NON", "ANNULER"};
+            for (int i = 0; i < 3; i++) {
+                SDL_Color color = (i == selectionQuit) ? cDore : cGris;
+                SDL_Surface *sOpt = TTF_RenderText_Solid(fontPetit, opts[i], color);
+                if (sOpt) {
+                    SDL_Texture *tOpt = SDL_CreateTextureFromSurface(renderer, sOpt);
+                    SDL_Rect rOpt = { LOGICAL_WIDTH/2 - sOpt->w/2, box.y + 35 + (i * 15), sOpt->w, sOpt->h };
+                    SDL_RenderCopy(renderer, tOpt, NULL, &rOpt);
+                    SDL_FreeSurface(sOpt);
+                    SDL_DestroyTexture(tOpt);
+                    
+                    if (i == selectionQuit) {
+                        SDL_Surface *sCurs = TTF_RenderText_Solid(fontPetit, ">", color);
+                        if (sCurs) {
+                            SDL_Texture *tCurs = SDL_CreateTextureFromSurface(renderer, sCurs);
+                            SDL_Rect rCurs = { rOpt.x - 15, rOpt.y, sCurs->w, sCurs->h };
+                            SDL_RenderCopy(renderer, tCurs, NULL, &rCurs);
+                            SDL_FreeSurface(sCurs);
+                            SDL_DestroyTexture(tCurs);
+                        }
+                    }
+                }
+            }
+        }
 
         // 4. Bordure
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -337,9 +481,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // Fin du jeu : on demande à game.c de nettoyer ses poubelles
-    // CleanGame(); // Décommente si la fonction est dans game.c
-
+     CleanGame(); 
     // Nettoyage sons
     Mix_CloseAudio();
 

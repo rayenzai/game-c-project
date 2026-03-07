@@ -212,16 +212,16 @@ void ActionFantome(int rayonDetection) {
 
     // --- GESTION ÉTAT CHASSE ---
     if (isChasing) {
-        FANTOME_SPEED = 0.5f;
+        FANTOME_SPEED = 0.55f;
         // Si trop loin, on arrête la chasse
         if (distance > (6 * TILE_SIZE) || currentLevel < 4) {
             isChasing = 0;
             fantome.timer = 0; 
-            FANTOME_SPEED = 0.25f;
+            FANTOME_SPEED = 0.30f;
         }
     } 
     else {
-        FANTOME_SPEED = 0.25f;
+        FANTOME_SPEED = 0.30f;
         if (distance < rayonDetection && currentLevel >= 4) {
             if (CheckLineOfSight(fantome.x + fantome.w/2, fantome.y + fantome.h/2, 
                                  player.x + player.w/2, player.y + player.h/2)) {
@@ -271,7 +271,7 @@ void ActionFantome(int rayonDetection) {
 
             // On met un timer pour ne pas recalculer à chaque frame (optimisation)
             // Mais assez court pour réagir si le joueur bouge vite
-            fantome.timer = (int)(TILE_SIZE / FANTOME_SPEED); 
+            fantome.timer = (int)(TILE_SIZE / (FANTOME_SPEED));
         }
         
         // >>> MODE PATROUILLE (ALEATOIRE) <<<

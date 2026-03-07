@@ -12,6 +12,8 @@
 #include <math.h>
 #include "save.h"
 
+extern int fin_jeu;
+
 // #define VOLUME_MUSIQUE 32
 // #define VOLUME_BRUITAGES 32
 
@@ -702,6 +704,7 @@ int teleOn = 0;
 Uint32 debutTeleOn = 0;
 int salonPattern[MAP_HEIGHT][MAP_WIDTH] = {0};
 Uint32 tempsTeleOn = 10000;
+int premiereFoisAllumeeTele = 0;
 int aFiniSalon = 0;
 
 int showInteractPendule = 0;
@@ -1188,10 +1191,10 @@ int isWall(float x, float y)
         if(type == 295 && localX>12)return 0;
         return 1;
     }
-    if(type == 296 || type == 297){
+    if(type == 296 || type == 297 || type == 298 || type == 299 || type == 300 || type == 301){
         if(localY<14)return 0;
-        if(type == 296 && localX<4)return 0;
-        if(type == 297 && localX >12)return 0;
+        if((type == 296 || type == 298 || type == 300) && localX<4)return 0;
+        if((type == 297 || type == 299 || type == 301) && localX >12)return 0;
         return 1;
     }
     if(type_pattern == 388 || type_pattern == 389 || type_pattern == 374){
@@ -1795,7 +1798,6 @@ void UpdateGame(void)
         else if (dirX < 0) playerDir = 1; // Vers la Gauche
         else if (dirX > 0) playerDir = 2; // Vers la Droite
     }
-    static int premiereFoisAllumeeTele = 0;
 
     Uint32 tempsMtn = SDL_GetTicks();
 
@@ -3155,18 +3157,22 @@ void UpdateGame(void)
     if (currentLevel >= 5 && currentLevel <= 8)
     {
 
-        // 1. On définit la hitbox d'attaque du fantôme
-        // On veut qu'il attrape plus haut (pour la perspective) et un peu plus large
-        float killZoneHaut = fantome.y - 12;
-        float killZoneBas = fantome.y + fantome.h;
-        float killZoneGauche = fantome.x;
-        float killZoneDroite = fantome.x + fantome.w;
+// --- GESTION COLLISION JOUEUR / FANTOME (GAME OVER / RESET) ---
+        // 1. On définit le centre du fantôme
+        float fantomeCenterX = fantome.x + (fantome.w / 2.0f);
+        float fantomeCenterY = fantome.y + (fantome.h / 2.0f);
 
-        // 2. On vérifie si le joueur est dans cette zone
-        if (player.x < killZoneDroite &&
-            player.x + player.w > killZoneGauche &&
-            player.y < killZoneBas &&
-            player.y + player.h > killZoneHaut) // C'est cette ligne qui change tout
+        // 2. On définit le centre du joueur (en remontant un peu pour viser le torse)
+        float playerCenterX = player.x + (player.w / 2.0f);
+        float playerCenterY = player.y + (player.h / 2.0f) - 4; // On remonte de 4 pixels
+
+        // 3. On calcule la distance exacte entre les deux centres
+        float diffX = playerCenterX - fantomeCenterX;
+        float diffY = playerCenterY - fantomeCenterY;
+        float distanceFantomeJoueur = sqrtf(diffX * diffX + diffY * diffY);
+
+        // 4. Si la distance est très petite (ex: 10 pixels), c'est capturé !
+        if (distanceFantomeJoueur < 10.0f) 
         {
             printf("GAME OVER - ATTRAPE !\n");
 
@@ -4050,7 +4056,7 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
         if (dialogue_statue_bas == 1)
             texteAffiche = "Son visage est tordu par la haine.";
         if (dialogue_statue_bas == 2)
-            texteAffiche = "Un sourir ne ferait pas de mal...";
+            texteAffiche = "Un sourire ne ferait pas de mal...";
 
         DrawTexte(texteAffiche, renderer, font, 20, 180, 280, 50);
     }
@@ -4232,11 +4238,11 @@ void DrawGame(SDL_Renderer *renderer, TTF_Font *font, TTF_Font *fontMini)
         char Prompt[100] = "";
         if (cpt_piece_tableau == 0)
         {
-            sprintf(Prompt, "[E] Ajouter la %d ere piece", cpt_piece_tableau + 1);
+            sprintf(Prompt, "[E] Ajouter la %dere piece", cpt_piece_tableau + 1);
         }
         else
         {
-            sprintf(Prompt, "[E] Ajouter la %d eme piece", cpt_piece_tableau + 1);
+            sprintf(Prompt, "[E] Ajouter la %deme piece", cpt_piece_tableau + 1);
         }
         SDL_Color cBlanc = {255, 255, 255, 255};
         SDL_Surface *sText = TTF_RenderText_Solid(fontMini, Prompt, cBlanc);
@@ -4797,6 +4803,16 @@ void ResetGame(void) {
     papaReveil = 0;
     affichePapaReveil = 0;
     penduleEnCours = 0; 
+    premiereFoisAllumeeTele = 0;
+    aFiniSalon = 0;
+    dialogue_chambre_parents = 0;
+    has_interact_livre = 0;
+
+    for (int y = 0; y < 15; y++) {
+        for (int x = 0; x < 20; x++) {
+            salonPattern[y][x] = 0;
+        }
+    }
 }
 // Fonction helper pour vérifier si une position est sur la table (le chemin)
 int isInOrganicPath(int gridX, int gridY) {
@@ -5068,6 +5084,7 @@ void DrawCircleLight(SDL_Renderer *renderer, int cx, int cy, int rayon) {
 
 void SauvegarderPartie(int isAuto) {
     SaveData data;
+    data.magic = 12345;
     data.currentLevel = currentLevel;
     data.playerX = player.x;
     data.playerY = player.y;
@@ -5104,6 +5121,23 @@ void SauvegarderPartie(int isAuto) {
     data.bouche_has_soupe = bouche_has_soupe;
     data.bouche_has_pain = bouche_has_pain;
     data.cpt_piece_tableau = cpt_piece_tableau;
+    data.fin_jeu = fin_jeu;
+    data.fin_du_jeu = fin_du_jeu;
+    data.estAdulte = estAdulte;
+    data.menu_fin = menu_fin;
+    data.ellipse = ellipse;
+    data.premiereFoisAllumeeTele = premiereFoisAllumeeTele;
+    data.aFiniSalon = aFiniSalon;
+    data.dialogue_chambre_parents = dialogue_chambre_parents;
+    data.has_interact_livre = has_interact_livre;
+    data.interact_statue_haut = interact_statue_haut;
+    data.interact_statue_bas = interact_statue_bas;
+
+    for (int y = 0; y < 15; y++) {
+        for (int x = 0; x < 20; x++) {
+            data.salonPattern[y][x] = salonPattern[y][x];
+        }
+    }
 
     // Copie de toutes les cases de la map modifiées
     for (int l = 0; l < NB_LEVELS; l++) {
@@ -5128,6 +5162,7 @@ int ChargerPartie(int isAuto) {
     else success = LoadGame("savegame_manuel.bin", &data);
     
     if (success) {
+        
         currentLevel = data.currentLevel;
         player.x = data.playerX;
         player.y = data.playerY;
@@ -5167,6 +5202,26 @@ int ChargerPartie(int isAuto) {
         dialogueStep = 0;         
         dialogueStep_sortie1 = 0;   
         dialogue_entree_labyrinthe = 0;
+        fin_jeu = data.fin_jeu;
+        fin_du_jeu = data.fin_du_jeu;
+        estAdulte = data.estAdulte;
+        menu_fin = data.menu_fin;
+        ellipse = data.ellipse;
+        premiereFoisAllumeeTele = data.premiereFoisAllumeeTele;
+        aFiniSalon = data.aFiniSalon;
+        dialogue_chambre_parents = data.dialogue_chambre_parents;
+        has_interact_livre = data.has_interact_livre;
+        interact_statue_haut = data.interact_statue_haut;
+        interact_statue_bas = data.interact_statue_bas;
+
+
+
+        // Restauration du chemin de la TV
+        for (int y = 0; y < 15; y++) {
+            for (int x = 0; x < 20; x++) {
+                salonPattern[y][x] = data.salonPattern[y][x];
+            }
+        }
 
         // Restaure la map
         for (int l = 0; l < NB_LEVELS; l++) {
@@ -5177,6 +5232,7 @@ int ChargerPartie(int isAuto) {
             }
         }
     }
+    
         return success;
     }
 void DrawProjectiles(SDL_Renderer *renderer) {

@@ -51,14 +51,22 @@ int LoadGame(const char* filepath, SaveData* data) {
         return 0; 
     }
 
-    size_t read = fread(data, sizeof(SaveData), 1, file);
+    // On lit les données dans la structure
+    size_t nb_lus = fread(data, sizeof(SaveData), 1, file);
     fclose(file);
 
-    if (read == 1) {
+    if (nb_lus == 1) {
+        // --- LA VÉRIFICATION MAGIQUE ---
+        // Si le nombre n'est pas 12345, c'est que le fichier est ancien ou corrompu
+        if (data->magic != 12345) {
+            printf("Erreur : Sauvegarde corrompue ou version incompatible !\n");
+            return 0; // On refuse de charger pour éviter les bugs
+        }
+        
         printf("Chargement réussi depuis : %s\n", cheminComplet);
         return 1; 
     } else {
-        printf("Erreur de lecture\n");
+        printf("Erreur de lecture : fichier vide ou illisible\n");
         return 0; 
     }
 }

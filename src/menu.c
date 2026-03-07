@@ -14,7 +14,7 @@ static SDL_Texture *bgMenuTexture = NULL;
 static int isLoadSubMenu = 0; 
 static int selection = 0;
 
-static const char *optionsMain[] = {"JOUER", "CHARGER", "OPTIONS", "QUITTER"};
+static const char *optionsMain[] = {"NOUVELLE PARTIE", "CHARGER UNE PATIE", "OPTIONS", "QUITTER"};
 static int nbOptionsMain = 4;
 
 static const char *optionsLoad[] = {"SAUVEGARDE MANUELLE", "SAUVEGARDE AUTO", "RETOUR"};

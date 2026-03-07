@@ -4,6 +4,7 @@
 #include "game.h" 
 
 typedef struct {
+    int magic;
     // --- 1. Le Joueur ---
     int currentLevel;
     float playerX;
@@ -50,6 +51,18 @@ typedef struct {
     int bouche_has_pain;
     int cpt_piece_tableau;
 
+    int fin_jeu;
+    int fin_du_jeu;
+    int estAdulte;
+    int menu_fin;
+    int ellipse;
+    int premiereFoisAllumeeTele;
+    int aFiniSalon;
+    int dialogue_chambre_parents;
+    int has_interact_livre;
+    int salonPattern[15][20];
+    int interact_statue_haut;
+    int interact_statue_bas;
     // --- 4. La Carte ---
     int maps[NB_LEVELS][MAP_HEIGHT][MAP_WIDTH];
 
