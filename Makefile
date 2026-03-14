@@ -1,5 +1,11 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99 -Iinclude $(shell sdl2-config --cflags)
+CFLAGS = -Wall -Wextra -std=c99 -Iinclude -I/opt/homebrew/include $(shell sdl2-config --cflags)
+# Détection automatique du système d'exploitation
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+    # Si c'est un Mac (Darwin), on rajoute le chemin Homebrew
+    CFLAGS += -I/opt/homebrew/include
+endif
 LDFLAGS = $(shell sdl2-config --libs) -lSDL2_ttf -lSDL2_mixer -lm
 
 SRC_DIR = src
